@@ -9,11 +9,11 @@ buildscript {
     ext.GuavaVersion = '30.1.1-jre'
     ext.exoLibraryVersion = '2.13.2'
 
-    ext.VKPCompileSDK = 30
+    ext.VKPCompileSDK = 29
     ext.VKPBuildTools = '30.0.3'
     ext.VKPNdk = '22.0.7026061'
-    ext.VKPMinSDK = 24
-    ext.VKPTargetSDK = 30
+    ext.VKPMinSDK = 29
+    ext.VKPTargetSDK = 29
     ext.VKPVersionCode = 4
     ext.VKPVersionName = "1b$VKPVersionCode"
 

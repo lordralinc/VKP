@@ -329,7 +329,7 @@ public class NotificationHelper {
             builder.setSound(findNotificationSound());
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >=  30) {
             createNotificationShortcut(context, builder, new Person.Builder()
                     .setName(getSenderName(message.getSender(), context)).setIcon(IconCompat.createWithBitmap(message.getSenderId() == accountId ? acc_avatar : avatar))
                     .setKey(String.valueOf(message.getSenderId())).build(), peer, accountId, message, text);

@@ -1275,14 +1275,11 @@ public class Utils {
         metrics = context.getResources().getDisplayMetrics();
         density = metrics.density;
         Display display = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            display = context.getDisplay();
-        } else {
-            WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            if (manager != null) {
-                display = manager.getDefaultDisplay();
-            }
+        WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (manager != null) {
+            display = manager.getDefaultDisplay();
         }
+
         if (display != null) {
             RLottieDrawable.updateScreenRefreshRate((int) display.getRefreshRate());
         }
