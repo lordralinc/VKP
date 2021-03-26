@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <dev.ragnarok.fenrir.view.AlternativeAspectRatioFrameLayout
+        <dev.idm.vkp.view.AlternativeAspectRatioFrameLayout
             android:id="@+id/offset_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

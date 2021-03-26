@@ -71,7 +71,7 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <dev.ragnarok.fenrir.view.KeyboardView
+            <dev.idm.vkp.view.KeyboardView
                 android:id="@+id/keyboard"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"

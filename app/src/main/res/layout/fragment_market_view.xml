@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <dev.ragnarok.fenrir.view.AspectRatioImageView
+            <dev.idm.vkp.view.AspectRatioImageView
                 android:id="@+id/item_market_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -131,7 +131,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <dev.ragnarok.fenrir.view.CircleCounterButton
+        <dev.idm.vkp.view.CircleCounterButton
             android:id="@+id/fave_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -141,7 +141,7 @@
             app:button_icon="@drawable/star"
             app:noactive_icon_color="?attr/colorOnSurface" />
 
-        <dev.ragnarok.fenrir.view.CircleCounterButton
+        <dev.idm.vkp.view.CircleCounterButton
             android:id="@+id/share_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

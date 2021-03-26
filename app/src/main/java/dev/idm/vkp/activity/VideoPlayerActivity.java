@@ -1,0 +1,462 @@
+package dev.idm.vkp.activity;
+
+import android.app.AppOpsManager;
+import android.app.PictureInPictureParams;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Rational;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ImageView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.r0adkll.slidr.Slidr;
+import com.r0adkll.slidr.model.SlidrConfig;
+
+import org.jetbrains.annotations.NotNull;
+
+import dev.idm.vkp.Extra;
+import dev.idm.vkp.Injection;
+import dev.idm.vkp.R;
+import dev.idm.vkp.media.video.ExoVideoPlayer;
+import dev.idm.vkp.media.video.IVideoPlayer;
+import dev.idm.vkp.model.Commented;
+import dev.idm.vkp.model.InternalVideoSize;
+import dev.idm.vkp.model.ProxyConfig;
+import dev.idm.vkp.model.Video;
+import dev.idm.vkp.model.VideoSize;
+import dev.idm.vkp.place.PlaceFactory;
+import dev.idm.vkp.push.OwnerInfo;
+import dev.idm.vkp.settings.CurrentTheme;
+import dev.idm.vkp.settings.IProxySettings;
+import dev.idm.vkp.settings.Settings;
+import dev.idm.vkp.util.Logger;
+import dev.idm.vkp.util.Objects;
+import dev.idm.vkp.util.RxUtils;
+import dev.idm.vkp.util.Utils;
+import dev.idm.vkp.view.AlternativeAspectRatioFrameLayout;
+import dev.idm.vkp.view.VideoControllerView;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+
+public class VideoPlayerActivity extends AppCompatActivity implements SurfaceHolder.Callback,
+        VideoControllerView.MediaPlayerControl, IVideoPlayer.IVideoSizeChangeListener {
+
+    public static final String EXTRA_VIDEO = "video";
+    public static final String EXTRA_SIZE = "size";
+    public static final String EXTRA_LOCAL = "local";
+    private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private View mDecorView;
+    private VideoControllerView mControllerView;
+    private AlternativeAspectRatioFrameLayout Frame;
+    private IVideoPlayer mPlayer;
+    private Video video;
+    private boolean onStopCalled;
+    private @InternalVideoSize
+    int size;
+    private boolean doNotPause;
+    private final ActivityResultLauncher<Intent> requestSwipeble = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> doNotPause = false);
+    private boolean isLocal;
+    private boolean isLandscape;
+
+    private void onOpen() {
+        Intent intent = new Intent(this, SwipebleActivity.class);
+        intent.setAction(MainActivity.ACTION_OPEN_WALL);
+        intent.putExtra(Extra.OWNER_ID, video.getOwnerId());
+        doNotPause = true;
+        SwipebleActivity.applyIntent(intent);
+        requestSwipeble.launch(intent);
+    }
+
+    @Override
+    protected void onStop() {
+        onStopCalled = true;
+        super.onStop();
+    }
+
+    @Override
+    public void finish() {
+        finishAndRemoveTask();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Logger.d(VideoPlayerActivity.class.getName(), "onNewIntent, intent: " + intent);
+        handleIntent(intent, true);
+    }
+
+    private void handleIntent(Intent intent, boolean update) {
+        if (intent == null) {
+            return;
+        }
+        video = intent.getParcelableExtra(EXTRA_VIDEO);
+        size = intent.getIntExtra(EXTRA_SIZE, InternalVideoSize.SIZE_240);
+        isLocal = intent.getBooleanExtra(EXTRA_LOCAL, false);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(video.getTitle());
+            actionBar.setSubtitle(video.getDescription());
+        }
+
+        if (toolbar != null) {
+            if (!isLocal) {
+                mCompositeDisposable.add(OwnerInfo.getRx(this, Settings.get().accounts().getCurrent(), video.getOwnerId())
+                        .compose(RxUtils.applySingleIOToMainSchedulers())
+                        .subscribe(userInfo -> {
+                            ImageView av = findViewById(R.id.toolbar_avatar);
+                            av.setImageBitmap(userInfo.getAvatar());
+                            av.setOnClickListener(v -> onOpen());
+                            if (Utils.isEmpty(video.getDescription()) && actionBar != null) {
+                                actionBar.setSubtitle(userInfo.getOwner().getFullName());
+                            }
+                        }, throwable -> {
+                        }));
+            } else {
+                findViewById(R.id.toolbar_avatar).setVisibility(View.GONE);
+            }
+        }
+        if (update) {
+            IProxySettings settings = Injection.provideProxySettings();
+            ProxyConfig config = settings.getActiveProxy();
+
+            String url = getFileUrl();
+
+            mPlayer.updateSource(this, url, config, size);
+            mPlayer.play();
+            mControllerView.updateComment(!isLocal && video.isCanComment());
+        }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(Utils.updateActivityContext(newBase));
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        if (Settings.get().other().isVideo_swipes()) {
+            Slidr.attach(this, new SlidrConfig.Builder().scrimColor(CurrentTheme.getColorBackground(this)).build());
+        }
+
+        setTheme(Settings.get().ui().getMainTheme());
+        Utils.prepareDensity(this);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_video);
+
+        if (Utils.hasLollipop()) {
+            getWindow().setStatusBarColor(Color.BLACK);
+        }
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        mDecorView = getWindow().getDecorView();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if (toolbar != null) {
+            toolbar.setNavigationIcon(R.drawable.arrow_left);
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+
+        if (Objects.isNull(savedInstanceState)) {
+            handleIntent(getIntent(), false);
+        }
+
+        mControllerView = new VideoControllerView(this);
+
+        ViewGroup surfaceContainer = findViewById(R.id.videoSurfaceContainer);
+        SurfaceView mSurfaceView = findViewById(R.id.videoSurface);
+        Frame = findViewById(R.id.aspect_ratio_layout);
+        surfaceContainer.setOnClickListener(v -> resolveControlsVisibility());
+
+        SurfaceHolder videoHolder = mSurfaceView.getHolder();
+        videoHolder.addCallback(this);
+
+        resolveControlsVisibility();
+
+        mPlayer = createPlayer();
+        mPlayer.addVideoSizeChangeListener(this);
+        mPlayer.play();
+
+        mControllerView.setMediaPlayer(this);
+        if (Settings.get().other().isVideo_controller_to_decor()) {
+            mControllerView.setAnchorView((ViewGroup) mDecorView, true);
+        } else {
+            mControllerView.setAnchorView(findViewById(R.id.panel), false);
+        }
+        mControllerView.updateComment(!isLocal && video.isCanComment());
+        mControllerView.updatePip(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE) && hasPipPermission());
+    }
+
+    private IVideoPlayer createPlayer() {
+        IProxySettings settings = Injection.provideProxySettings();
+        ProxyConfig config = settings.getActiveProxy();
+
+        String url = getFileUrl();
+        return new ExoVideoPlayer(this, url, config, size);
+    }
+
+    private void resolveControlsVisibility() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null)
+            return;
+
+        if (actionBar.isShowing()) {
+            actionBar.hide();
+            mControllerView.hide();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                mDecorView.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES));
+
+            mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        } else {
+            actionBar.show();
+            mControllerView.show();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                mDecorView.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT));
+            mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mPlayer.release();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        onStopCalled = false;
+
+        ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null && actionBar.isShowing()) {
+            actionBar.hide();
+            mControllerView.hide();
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+            mDecorView.setLayoutParams(new WindowManager.LayoutParams(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES));
+        mDecorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE);
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null)
+            return;
+        if (isInPictureInPictureMode) {
+            actionBar.hide();
+            mControllerView.hide();
+        } else {
+            if (onStopCalled) {
+                finish();
+            } else {
+                actionBar.show();
+                mControllerView.show();
+            }
+        }
+    }
+
+    private boolean canVideoPause() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return !isInPictureInPictureMode();
+        } else return true;
+    }
+
+    @Override
+    protected void onPause() {
+        if (canVideoPause()) {
+            if (!doNotPause) {
+                mPlayer.pause();
+            }
+            mControllerView.updatePausePlay();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mPlayer.setSurfaceHolder(holder);
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+
+    }
+
+    @Override
+    public boolean canPause() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekBackward() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekForward() {
+        return true;
+    }
+
+    @Override
+    public int getBufferPercentage() {
+        return mPlayer.getBufferPercentage();
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return mPlayer.getCurrentPosition();
+    }
+
+    @Override
+    public int getDuration() {
+        return mPlayer.getDuration();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return mPlayer.isPlaying();
+    }
+
+    @Override
+    public void pause() {
+        mPlayer.pause();
+    }
+
+    @Override
+    public void seekTo(int i) {
+        mPlayer.seekTo(i);
+    }
+
+    @Override
+    public void start() {
+        mPlayer.play();
+    }
+
+    @Override
+    public boolean isFullScreen() {
+        return false;
+    }
+
+    @Override
+    public void commentClick() {
+        Intent intent = new Intent(this, SwipebleActivity.class);
+        intent.setAction(MainActivity.ACTION_OPEN_PLACE);
+        Commented commented = Commented.from(video);
+        intent.putExtra(Extra.PLACE, PlaceFactory.getCommentsPlace(Settings.get().accounts().getCurrent(), commented, null));
+        doNotPause = true;
+        SwipebleActivity.applyIntent(intent);
+        requestSwipeble.launch(intent);
+    }
+
+    @Override
+    public void toggleFullScreen() {
+        setRequestedOrientation(isLandscape ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    @SuppressWarnings("deprecation")
+    private boolean hasPipPermission() {
+        AppOpsManager appsOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return appsOps.unsafeCheckOpNoThrow(
+                    AppOpsManager.OPSTR_PICTURE_IN_PICTURE,
+                    android.os.Process.myUid(),
+                    getPackageName()
+            ) == AppOpsManager.MODE_ALLOWED;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return appsOps.checkOpNoThrow(
+                    AppOpsManager.OPSTR_PICTURE_IN_PICTURE,
+                    android.os.Process.myUid(),
+                    getPackageName()
+            ) == AppOpsManager.MODE_ALLOWED;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void toPIPScreen() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
+                    && hasPipPermission())
+                if (!isInPictureInPictureMode()) {
+                    Rational aspectRatio = new Rational(Frame.getWidth(), Frame.getHeight());
+                    enterPictureInPictureMode(new PictureInPictureParams.Builder().setAspectRatio(aspectRatio).build());
+                }
+        }
+    }
+
+    private String getFileUrl() {
+        switch (size) {
+            case InternalVideoSize.SIZE_240:
+                return video.getMp4link240();
+            case InternalVideoSize.SIZE_360:
+                return video.getMp4link360();
+            case InternalVideoSize.SIZE_480:
+                return video.getMp4link480();
+            case InternalVideoSize.SIZE_720:
+                return video.getMp4link720();
+            case InternalVideoSize.SIZE_1080:
+                return video.getMp4link1080();
+            case InternalVideoSize.SIZE_HLS:
+                return video.getHls();
+            case InternalVideoSize.SIZE_LIVE:
+                return video.getLive();
+            default:
+                throw new IllegalArgumentException("Unknown video size");
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            isLandscape = true;
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            isLandscape = false;
+        }
+    }
+
+    @Override
+    public void onVideoSizeChanged(@NonNull IVideoPlayer player, VideoSize size) {
+        Frame.setAspectRatio(size.getWidth(), size.getHeight());
+    }
+}

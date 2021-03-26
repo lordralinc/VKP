@@ -1,0 +1,192 @@
+package dev.idm.vkp.fragment.wallattachments;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.List;
+
+import dev.idm.vkp.Constants;
+import dev.idm.vkp.Extra;
+import dev.idm.vkp.R;
+import dev.idm.vkp.activity.ActivityFeatures;
+import dev.idm.vkp.activity.ActivityUtils;
+import dev.idm.vkp.adapter.fave.FavePhotosAdapter;
+import dev.idm.vkp.fragment.base.PlaceSupportMvpFragment;
+import dev.idm.vkp.listener.EndlessRecyclerOnScrollListener;
+import dev.idm.vkp.listener.PicassoPauseOnScrollListener;
+import dev.idm.vkp.model.Photo;
+import dev.idm.vkp.model.TmpSource;
+import dev.idm.vkp.mvp.core.IPresenterFactory;
+import dev.idm.vkp.mvp.presenter.wallattachments.WallPhotosAttachmentsPresenter;
+import dev.idm.vkp.mvp.view.wallattachments.IWallPhotosAttachmentsView;
+import dev.idm.vkp.place.PlaceFactory;
+import dev.idm.vkp.util.ViewUtils;
+
+import static dev.idm.vkp.util.Objects.nonNull;
+
+public class WallPhotosAttachmentsFragment extends PlaceSupportMvpFragment<WallPhotosAttachmentsPresenter, IWallPhotosAttachmentsView>
+        implements IWallPhotosAttachmentsView, FavePhotosAdapter.PhotoSelectionListener {
+
+    private TextView mEmpty;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private FavePhotosAdapter mAdapter;
+    private FloatingActionButton mLoadMore;
+
+    public static WallPhotosAttachmentsFragment newInstance(int accountId, int ownerId) {
+        Bundle args = new Bundle();
+        args.putInt(Extra.ACCOUNT_ID, accountId);
+        args.putInt(Extra.OWNER_ID, ownerId);
+        WallPhotosAttachmentsFragment fragment = new WallPhotosAttachmentsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_wall_attachments, container, false);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(root.findViewById(R.id.toolbar));
+        mEmpty = root.findViewById(R.id.empty);
+        mLoadMore = root.findViewById(R.id.goto_button);
+
+        int columns = getContext().getResources().getInteger(R.integer.photos_column_count);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(requireActivity(), columns);
+
+        RecyclerView recyclerView = root.findViewById(android.R.id.list);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.addOnScrollListener(new PicassoPauseOnScrollListener(Constants.PICASSO_TAG));
+        recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener() {
+            @Override
+            public void onScrollToLastElement() {
+                getPresenter().fireScrollToEnd();
+            }
+        });
+        mLoadMore.setOnClickListener(v -> getPresenter().fireScrollToEnd());
+
+        mSwipeRefreshLayout = root.findViewById(R.id.refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(() -> getPresenter().fireRefresh());
+        ViewUtils.setupSwipeRefreshLayoutWithCurrentTheme(requireActivity(), mSwipeRefreshLayout);
+
+        mAdapter = new FavePhotosAdapter(requireActivity(), Collections.emptyList());
+        mAdapter.setPhotoSelectionListener(this);
+
+        recyclerView.setAdapter(mAdapter);
+
+        resolveEmptyText();
+        return root;
+    }
+
+    private void resolveEmptyText() {
+        if (nonNull(mEmpty) && nonNull(mAdapter)) {
+            mEmpty.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    @Override
+    public void displayData(List<Photo> photos) {
+        if (nonNull(mAdapter)) {
+            mAdapter.setData(photos);
+            resolveEmptyText();
+        }
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        if (nonNull(mAdapter)) {
+            mAdapter.notifyDataSetChanged();
+            resolveEmptyText();
+        }
+    }
+
+    @Override
+    public void notifyDataAdded(int position, int count) {
+        if (nonNull(mAdapter)) {
+            mAdapter.notifyItemRangeInserted(position, count);
+            resolveEmptyText();
+        }
+    }
+
+    @Override
+    public void showRefreshing(boolean refreshing) {
+        if (nonNull(mSwipeRefreshLayout)) {
+            mSwipeRefreshLayout.setRefreshing(refreshing);
+        }
+    }
+
+    @NotNull
+    @Override
+    public IPresenterFactory<WallPhotosAttachmentsPresenter> getPresenterFactory(@Nullable Bundle saveInstanceState) {
+        return () -> new WallPhotosAttachmentsPresenter(
+                getArguments().getInt(Extra.ACCOUNT_ID),
+                getArguments().getInt(Extra.OWNER_ID),
+                saveInstanceState
+        );
+    }
+
+    @Override
+    public void setToolbarTitle(String title) {
+        ActionBar actionBar = ActivityUtils.supportToolbarFor(this);
+        if (nonNull(actionBar)) {
+            actionBar.setTitle(title);
+        }
+    }
+
+    @Override
+    public void setToolbarSubtitle(String subtitle) {
+        ActionBar actionBar = ActivityUtils.supportToolbarFor(this);
+        if (nonNull(actionBar)) {
+            actionBar.setSubtitle(subtitle);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        new ActivityFeatures.Builder()
+                .begin()
+                .setHideNavigationMenu(false)
+                .setBarsColored(requireActivity(), true)
+                .build()
+                .apply(requireActivity());
+    }
+
+    @Override
+    public void onPhotoClicked(int position, Photo photo) {
+        getPresenter().firePhotoClick(position, photo);
+    }
+
+    @Override
+    public void goToTempPhotosGallery(int accountId, @NonNull TmpSource source, int index) {
+        PlaceFactory.getTmpSourceGalleryPlace(accountId, source, index).tryOpenWith(requireActivity());
+    }
+
+    @Override
+    public void onSetLoadingStatus(int isLoad) {
+        switch (isLoad) {
+            case 1:
+                mLoadMore.setImageResource(R.drawable.audio_died);
+                break;
+            case 2:
+                mLoadMore.setImageResource(R.drawable.view);
+                break;
+            default:
+                mLoadMore.setImageResource(R.drawable.ic_arrow_down);
+                break;
+        }
+    }
+}

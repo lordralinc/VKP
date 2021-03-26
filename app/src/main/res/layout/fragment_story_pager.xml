@@ -58,7 +58,7 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
-        <dev.ragnarok.fenrir.view.CircleCounterButton
+        <dev.idm.vkp.view.CircleCounterButton
             android:id="@+id/button_download"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
             custom:button_icon="@drawable/download"
             custom:noactive_icon_color="#fff" />
 
-        <dev.ragnarok.fenrir.view.CircleCounterButton
+        <dev.idm.vkp.view.CircleCounterButton
             android:id="@+id/button_link"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

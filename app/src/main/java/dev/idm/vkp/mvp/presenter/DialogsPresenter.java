@@ -1,0 +1,601 @@
+package dev.idm.vkp.mvp.presenter;
+
+import android.content.Context;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import dev.idm.vkp.Injection;
+import dev.idm.vkp.R;
+import dev.idm.vkp.crypt.KeyLocationPolicy;
+import dev.idm.vkp.domain.IAccountsInteractor;
+import dev.idm.vkp.domain.IMessagesRepository;
+import dev.idm.vkp.domain.InteractorFactory;
+import dev.idm.vkp.domain.Repository;
+import dev.idm.vkp.exception.UnauthorizedException;
+import dev.idm.vkp.longpoll.ILongpollManager;
+import dev.idm.vkp.longpoll.LongpollInstance;
+import dev.idm.vkp.model.AbsModel;
+import dev.idm.vkp.model.Dialog;
+import dev.idm.vkp.model.FwdMessages;
+import dev.idm.vkp.model.Message;
+import dev.idm.vkp.model.ModelsBundle;
+import dev.idm.vkp.model.Owner;
+import dev.idm.vkp.model.Peer;
+import dev.idm.vkp.model.PeerUpdate;
+import dev.idm.vkp.model.SaveMessageBuilder;
+import dev.idm.vkp.model.User;
+import dev.idm.vkp.mvp.presenter.base.AccountDependencyPresenter;
+import dev.idm.vkp.mvp.view.IDialogsView;
+import dev.idm.vkp.settings.ISettings;
+import dev.idm.vkp.settings.Settings;
+import dev.idm.vkp.util.Analytics;
+import dev.idm.vkp.util.AssertUtils;
+import dev.idm.vkp.util.Optional;
+import dev.idm.vkp.util.PersistentLogger;
+import dev.idm.vkp.util.RxUtils;
+import dev.idm.vkp.util.ShortcutUtils;
+import dev.idm.vkp.util.Utils;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+
+import static dev.idm.vkp.util.Objects.isNull;
+import static dev.idm.vkp.util.Objects.nonNull;
+import static dev.idm.vkp.util.RxUtils.dummy;
+import static dev.idm.vkp.util.RxUtils.ignore;
+import static dev.idm.vkp.util.Utils.getCauseIfRuntime;
+import static dev.idm.vkp.util.Utils.indexOf;
+import static dev.idm.vkp.util.Utils.isEmpty;
+import static dev.idm.vkp.util.Utils.safeIsEmpty;
+
+
+public class DialogsPresenter extends AccountDependencyPresenter<IDialogsView> {
+
+    private static final int COUNT = 30;
+
+    private static final String SAVE_DIALOGS_OWNER_ID = "save-dialogs-owner-id";
+    private static final Comparator<Dialog> COMPARATOR = (rhs, lhs) -> Integer.compare(lhs.getLastMessageId(), rhs.getLastMessageId());
+    private final ArrayList<Dialog> dialogs;
+    private final IMessagesRepository messagesInteractor;
+    private final IAccountsInteractor accountsInteractor;
+    private final ILongpollManager longpollManager;
+    private final CompositeDisposable netDisposable = new CompositeDisposable();
+    private final CompositeDisposable cacheLoadingDisposable = new CompositeDisposable();
+    private final ModelsBundle models;
+    private int dialogsOwnerId;
+    private boolean endOfContent;
+    private boolean netLoadingNow;
+    private boolean cacheNowLoading;
+
+    public DialogsPresenter(int accountId, int initialDialogsOwnerId, @Nullable ModelsBundle models, @Nullable Bundle savedInstanceState) {
+        super(accountId, savedInstanceState);
+        setSupportAccountHotSwap(true);
+        this.models = models;
+
+        dialogs = new ArrayList<>();
+
+        if (nonNull(savedInstanceState)) {
+            dialogsOwnerId = savedInstanceState.getInt(SAVE_DIALOGS_OWNER_ID);
+        } else {
+            dialogsOwnerId = initialDialogsOwnerId;
+        }
+
+        messagesInteractor = Repository.INSTANCE.getMessages();
+        accountsInteractor = InteractorFactory.createAccountInteractor();
+        longpollManager = LongpollInstance.get();
+
+        appendDisposable(messagesInteractor
+                .observePeerUpdates()
+                .observeOn(Injection.provideMainThreadScheduler())
+                .subscribe(this::onPeerUpdate, ignore()));
+
+        appendDisposable(messagesInteractor.observePeerDeleting()
+                .observeOn(Injection.provideMainThreadScheduler())
+                .subscribe(dialog -> onDialogDeleted(dialog.getAccountId(), dialog.getPeerId()), ignore()));
+
+        appendDisposable(longpollManager.observeKeepAlive()
+                .observeOn(Injection.provideMainThreadScheduler())
+                .subscribe(ignore -> checkLongpoll(), ignore()));
+
+        loadCachedThenActualData();
+    }
+
+    private static String getTitleIfEmpty(@NonNull Collection<User> users) {
+        return Utils.join(users, ", ", User::getFirstName);
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle outState) {
+        super.saveState(outState);
+        outState.putInt(SAVE_DIALOGS_OWNER_ID, dialogsOwnerId);
+    }
+
+    @Override
+    public void onGuiCreated(@NonNull IDialogsView viewHost) {
+        super.onGuiCreated(viewHost);
+        viewHost.displayData(dialogs);
+
+        // only for user dialogs
+        viewHost.setCreateGroupChatButtonVisible(dialogsOwnerId > 0);
+    }
+
+    private void onDialogsFirstResponse(List<Dialog> data) {
+        if (!Settings.get().other().isBe_online() || Utils.isHiddenAccount(getAccountId())) {
+            netDisposable.add(accountsInteractor.setOffline(getAccountId())
+                    .compose(RxUtils.applySingleIOToMainSchedulers())
+                    .subscribe(t -> {
+                    }, t -> {
+                    }));
+        }
+        setNetLoadingNow(false);
+
+        endOfContent = false;
+        dialogs.clear();
+        dialogs.addAll(data);
+
+        safeNotifyDataSetChanged();
+
+        if (Utils.needReloadStickers(getAccountId())) {
+            receiveStickers();
+        }
+    }
+
+    private void onDialogsGetError(Throwable t) {
+        Throwable cause = getCauseIfRuntime(t);
+
+        cause.printStackTrace();
+
+        setNetLoadingNow(false);
+
+        if (cause instanceof UnauthorizedException) {
+            return;
+        }
+        PersistentLogger.logThrowable("Dialogs issues", cause);
+        showError(getView(), cause);
+    }
+
+    private void setNetLoadingNow(boolean netLoadingNow) {
+        this.netLoadingNow = netLoadingNow;
+        resolveRefreshingView();
+    }
+
+    private void requestAtLast() {
+        if (netLoadingNow) {
+            return;
+        }
+
+        setNetLoadingNow(true);
+
+        netDisposable.add(messagesInteractor.getDialogs(dialogsOwnerId, COUNT, null)
+                .compose(RxUtils.applySingleIOToMainSchedulers())
+                .subscribe(this::onDialogsFirstResponse, this::onDialogsGetError));
+
+        resolveRefreshingView();
+    }
+
+    private void requestNext() {
+        if (netLoadingNow) {
+            return;
+        }
+
+        Integer lastMid = getLastDialogMessageId();
+        if (isNull(lastMid)) {
+            return;
+        }
+
+        setNetLoadingNow(true);
+        netDisposable.add(messagesInteractor.getDialogs(dialogsOwnerId, COUNT, lastMid)
+                .compose(RxUtils.applySingleIOToMainSchedulers())
+                .subscribe(this::onNextDialogsResponse,
+                        throwable -> onDialogsGetError(getCauseIfRuntime(throwable))));
+    }
+
+    private void onNextDialogsResponse(List<Dialog> data) {
+        if (!Settings.get().other().isBe_online() || Utils.isHiddenAccount(getAccountId())) {
+            netDisposable.add(accountsInteractor.setOffline(getAccountId())
+                    .compose(RxUtils.applySingleIOToMainSchedulers())
+                    .subscribe(t -> {
+                    }, t -> {
+                    }));
+        }
+
+        setNetLoadingNow(false);
+        endOfContent = isEmpty(dialogs);
+
+        int startSize = dialogs.size();
+        dialogs.addAll(data);
+
+        if (isGuiReady()) {
+            getView().notifyDataAdded(startSize, data.size());
+        }
+    }
+
+    private void onDialogRemovedSuccessfully(int accountId, int peeId) {
+        callView(v -> v.showSnackbar(R.string.deleted, true));
+        onDialogDeleted(accountId, peeId);
+    }
+
+    private void removeDialog(int peeId) {
+        int accountId = dialogsOwnerId;
+
+        appendDisposable(messagesInteractor.deleteDialog(accountId, peeId)
+                .compose(RxUtils.applyCompletableIOToMainSchedulers())
+                .subscribe(() -> onDialogRemovedSuccessfully(accountId, peeId), t -> showError(getView(), t)));
+    }
+
+    private void resolveRefreshingView() {
+        // on resume only !!!
+        if (isGuiResumed()) {
+            getView().showRefreshing(cacheNowLoading || netLoadingNow);
+        }
+    }
+
+    private void loadCachedThenActualData() {
+        cacheNowLoading = true;
+        resolveRefreshingView();
+
+        cacheLoadingDisposable.add(messagesInteractor.getCachedDialogs(dialogsOwnerId)
+                .compose(RxUtils.applySingleIOToMainSchedulers())
+                .subscribe(this::onCachedDataReceived, ignored -> {
+                    ignored.printStackTrace();
+                    onCachedDataReceived(Collections.emptyList());
+                }));
+    }
+
+    public void fireRepost(@NonNull Dialog dialog) {
+        if (models == null) {
+            return;
+        }
+        ArrayList<Message> fwds = new ArrayList<Message>();
+        SaveMessageBuilder builder = new SaveMessageBuilder(getAccountId(), dialog.getPeerId());
+        for (AbsModel model : models) {
+            if (model instanceof FwdMessages) {
+                fwds.addAll(((FwdMessages) model).fwds);
+            } else {
+                builder.attach(model);
+            }
+        }
+        builder.setForwardMessages(fwds);
+        boolean encryptionEnabled = Settings.get().security().isMessageEncryptionEnabled(getAccountId(), dialog.getPeerId());
+
+        @KeyLocationPolicy
+        int keyLocationPolicy = KeyLocationPolicy.PERSIST;
+        if (encryptionEnabled) {
+            keyLocationPolicy = Settings.get().security().getEncryptionLocationPolicy(getAccountId(), dialog.getPeerId());
+        }
+        builder.setRequireEncryption(encryptionEnabled).setKeyLocationPolicy(keyLocationPolicy);
+        appendDisposable(messagesInteractor.put(builder)
+                .compose(RxUtils.applySingleIOToMainSchedulers())
+                .doOnSuccess(v -> {
+                    messagesInteractor.runSendingQueue();
+                })
+                .subscribe(t -> callView(v -> v.showSnackbar(R.string.success, false)), this::onDialogsGetError));
+    }
+
+    private void receiveStickers() {
+        try {
+            //noinspection ResultOfMethodCallIgnored
+            InteractorFactory.createStickersInteractor()
+                    .getAndStore(getAccountId())
+                    .compose(RxUtils.applyCompletableIOToMainSchedulers())
+                    .subscribe(dummy(), ignore());
+        } catch (Exception ignored) {
+            /*ignore*/
+        }
+    }
+
+    private void onCachedDataReceived(List<Dialog> data) {
+        cacheNowLoading = false;
+
+        dialogs.clear();
+        dialogs.addAll(data);
+
+        safeNotifyDataSetChanged();
+        resolveRefreshingView();
+        callView(v -> v.notifyHasAttachments(models != null));
+
+        if (Settings.get().other().isNot_update_dialogs() || Utils.isHiddenCurrent()) {
+            if (Utils.needReloadStickers(getAccountId())) {
+                receiveStickers();
+            }
+            if (isGuiReady() && Utils.needReloadDialogs(getAccountId())) {
+                getView().askToReload();
+            }
+        } else {
+            requestAtLast();
+        }
+    }
+
+    private void onPeerUpdate(List<PeerUpdate> updates) {
+        for (PeerUpdate update : updates) {
+            if (update.getAccountId() == dialogsOwnerId) {
+                onDialogUpdate(update);
+            }
+        }
+    }
+
+    private void onDialogUpdate(PeerUpdate update) {
+        if (dialogsOwnerId != update.getAccountId()) {
+            return;
+        }
+
+        int accountId = update.getAccountId();
+        int peerId = update.getPeerId();
+
+        if (update.getLastMessage() != null) {
+            List<Integer> id = Collections.singletonList(update.getLastMessage().getMessageId());
+            appendDisposable(messagesInteractor.findCachedMessages(accountId, id)
+                    .compose(RxUtils.applySingleIOToMainSchedulers())
+                    .subscribe(messages -> {
+                        if (messages.isEmpty()) {
+                            onDialogDeleted(accountId, peerId);
+                        } else {
+                            onActualMessagePeerMessageReceived(accountId, peerId, update, Optional.wrap(messages.get(0)));
+                        }
+                    }, ignore()));
+        } else {
+            onActualMessagePeerMessageReceived(accountId, peerId, update, Optional.empty());
+        }
+    }
+
+    private void onActualMessagePeerMessageReceived(int accountId, int peerId, PeerUpdate update, Optional<Message> messageOptional) {
+        if (accountId != dialogsOwnerId) {
+            return;
+        }
+
+        int index = indexOf(dialogs, peerId);
+        if (index != -1) {
+            Dialog dialog = dialogs.get(index);
+
+            if (update.getReadIn() != null) {
+                dialog.setInRead(update.getReadIn().getMessageId());
+            }
+
+            if (update.getReadOut() != null) {
+                dialog.setOutRead(update.getReadOut().getMessageId());
+            }
+
+            if (update.getUnread() != null) {
+                dialog.setUnreadCount(update.getUnread().getCount());
+            }
+
+            if (messageOptional.nonEmpty()) {
+                Message message = messageOptional.get();
+                dialog.setLastMessageId(message.getId());
+                dialog.setMessage(message);
+
+                if (dialog.isChat()) {
+                    dialog.setInterlocutor(message.getSender());
+                }
+            }
+
+            if (update.getTitle() != null) {
+                dialog.setTitle(update.getTitle().getTitle());
+            }
+
+            Collections.sort(dialogs, COMPARATOR);
+        }
+
+        safeNotifyDataSetChanged();
+    }
+
+    private void onDialogDeleted(int accountId, int peerId) {
+        if (dialogsOwnerId != accountId) {
+            return;
+        }
+
+        int index = indexOf(dialogs, peerId);
+        if (index != -1) {
+            dialogs.remove(index);
+            safeNotifyDataSetChanged();
+        }
+    }
+
+    private void safeNotifyDataSetChanged() {
+        if (isGuiReady()) {
+            getView().notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onDestroyed() {
+        cacheLoadingDisposable.dispose();
+        netDisposable.dispose();
+        super.onDestroyed();
+    }
+
+    @Override
+    public void onGuiResumed() {
+        super.onGuiResumed();
+        resolveRefreshingView();
+        checkLongpoll();
+    }
+
+    private void checkLongpoll() {
+        if (isGuiResumed() && getAccountId() != ISettings.IAccountsSettings.INVALID_ID) {
+            longpollManager.keepAlive(dialogsOwnerId);
+        }
+    }
+
+    public void fireRefresh() {
+        cacheLoadingDisposable.dispose();
+        cacheNowLoading = false;
+
+        netDisposable.clear();
+        netLoadingNow = false;
+
+        requestAtLast();
+    }
+
+    public void fireSearchClick() {
+        AssertUtils.assertPositive(dialogsOwnerId);
+        getView().goToSearch(getAccountId());
+    }
+
+    public void fireImportantClick() {
+        AssertUtils.assertPositive(dialogsOwnerId);
+        getView().goToImportant(getAccountId());
+    }
+
+    public void fireDialogClick(Dialog dialog) {
+        openChat(dialog);
+    }
+
+    private void openChat(Dialog dialog) {
+        getView().goToChat(getAccountId(),
+                dialogsOwnerId,
+                dialog.getPeerId(),
+                dialog.getDisplayTitle(getApplicationContext()),
+                dialog.getImageUrl());
+    }
+
+    public void fireDialogAvatarClick(Dialog dialog) {
+        if (Peer.isUser(dialog.getPeerId()) || Peer.isGroup(dialog.getPeerId())) {
+            getView().goToOwnerWall(getAccountId(), Peer.toOwnerId(dialog.getPeerId()), dialog.getInterlocutor());
+        } else {
+            openChat(dialog);
+        }
+    }
+
+    private boolean canLoadMore() {
+        return !cacheNowLoading && !endOfContent && !netLoadingNow && !dialogs.isEmpty();
+    }
+
+    public void fireScrollToEnd() {
+        if (canLoadMore()) {
+            requestNext();
+        }
+    }
+
+    private Integer getLastDialogMessageId() {
+        try {
+            return dialogs.get(dialogs.size() - 1).getLastMessageId();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void fireNewGroupChatTitleEntered(List<User> users, String title) {
+        String targetTitle = safeIsEmpty(title) ? getTitleIfEmpty(users) : title;
+        int accountId = getAccountId();
+
+        appendDisposable(messagesInteractor.createGroupChat(accountId, Utils.idsListOf(users), targetTitle)
+                .compose(RxUtils.applySingleIOToMainSchedulers())
+                .subscribe(chatid -> onGroupChatCreated(chatid, targetTitle), t -> showError(getView(), getCauseIfRuntime(t))));
+    }
+
+    private void onGroupChatCreated(int chatId, String title) {
+        callView(view -> view.goToChat(getAccountId(), dialogsOwnerId, Peer.fromChatId(chatId), title, null));
+    }
+
+    public void fireUsersForChatSelected(@NonNull ArrayList<Owner> owners) {
+        ArrayList<User> users = new ArrayList<>();
+        for (Owner i : owners) {
+            if (i instanceof User) {
+                users.add((User) i);
+            }
+        }
+        if (users.size() == 1) {
+            User user = users.get(0);
+            // Post?
+            getView().goToChat(getAccountId(), dialogsOwnerId, Peer.fromUserId(user.getId()), user.getFullName(), user.getMaxSquareAvatar());
+        } else if (users.size() > 1) {
+            getView().showEnterNewGroupChatTitle(users);
+        }
+    }
+
+    public void fireRemoveDialogClick(Dialog dialog) {
+        removeDialog(dialog.getPeerId());
+    }
+
+    public void fireCreateShortcutClick(Dialog dialog) {
+        AssertUtils.assertPositive(dialogsOwnerId);
+
+        Context app = getApplicationContext();
+
+        appendDisposable(ShortcutUtils
+                .createChatShortcutRx(app, dialog.getImageUrl(), getAccountId(),
+                        dialog.getPeerId(), dialog.getDisplayTitle(app))
+                .compose(RxUtils.applyCompletableIOToMainSchedulers())
+                .subscribe(this::onShortcutCreated, throwable -> safeShowError(getView(), throwable.getMessage())));
+    }
+
+    private void onShortcutCreated() {
+        if (isGuiReady()) {
+            getView().showSnackbar(R.string.success, true);
+        }
+    }
+
+    public void fireNotificationsSettingsClick(Dialog dialog) {
+        AssertUtils.assertPositive(dialogsOwnerId);
+        getView().showNotificationSettings(getAccountId(), dialog.getPeerId());
+    }
+
+    @Override
+    protected void afterAccountChange(int oldAid, int newAid) {
+        super.afterAccountChange(oldAid, newAid);
+
+        // если на экране диалоги группы, то ничего не трогаем
+        if (dialogsOwnerId < 0 && dialogsOwnerId != ISettings.IAccountsSettings.INVALID_ID) {
+            return;
+        }
+
+        dialogsOwnerId = newAid;
+
+        cacheLoadingDisposable.clear();
+        cacheNowLoading = false;
+
+        netDisposable.clear();
+        netLoadingNow = false;
+
+        loadCachedThenActualData();
+
+        longpollManager.forceDestroy(oldAid);
+        checkLongpoll();
+    }
+
+    public void fireAddToLauncherShortcuts(Dialog dialog) {
+        AssertUtils.assertPositive(dialogsOwnerId);
+
+        Peer peer = new Peer(dialog.getId())
+                .setAvaUrl(dialog.getImageUrl())
+                .setTitle(dialog.getDisplayTitle(getApplicationContext()));
+
+        Completable completable = ShortcutUtils.addDynamicShortcut(getApplicationContext(), dialogsOwnerId, peer);
+
+        appendDisposable(completable
+                .compose(RxUtils.applyCompletableIOToMainSchedulers())
+                .subscribe(() -> safeShowToast(getView(), R.string.success, false), Analytics::logUnexpectedError));
+    }
+
+    public void fireRead(Dialog dialog) {
+        appendDisposable(messagesInteractor.markAsRead(getAccountId(), dialog.getPeerId(), dialog.getLastMessageId())
+                .compose(RxUtils.applyCompletableIOToMainSchedulers())
+                .subscribe(() -> {
+                    safeShowToast(getView(), R.string.success, false);
+                    dialog.setInRead(dialog.getLastMessageId());
+                    getView().notifyDataSetChanged();
+                }, Analytics::logUnexpectedError));
+    }
+
+    public void fireContextViewCreated(IDialogsView.IContextView contextView, Dialog dialog) {
+        boolean isHide = Settings.get().security().ContainsValueInSet(dialog.getId(), "hidden_dialogs");
+        contextView.setCanDelete(true);
+        contextView.setCanRead(!Utils.isHiddenCurrent() && !dialog.isLastMessageOut() && dialog.getLastMessageId() != dialog.getInRead());
+        contextView.setCanAddToHomescreen(dialogsOwnerId > 0 && !isHide);
+        contextView.setCanAddToShortcuts(dialogsOwnerId > 0 && !isHide);
+        contextView.setCanConfigNotifications(dialogsOwnerId > 0);
+        contextView.setIsHidden(isHide);
+    }
+
+    public void fireOptionViewCreated(IDialogsView.IOptionView view) {
+        view.setCanSearch(dialogsOwnerId > 0);
+    }
+}

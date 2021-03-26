@@ -1,0 +1,73 @@
+package dev.idm.vkp.mvp.presenter.search;
+
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+
+import java.util.List;
+
+import dev.idm.vkp.R;
+import dev.idm.vkp.api.model.VkApiArtist;
+import dev.idm.vkp.domain.IAudioInteractor;
+import dev.idm.vkp.domain.InteractorFactory;
+import dev.idm.vkp.fragment.search.criteria.ArtistSearchCriteria;
+import dev.idm.vkp.fragment.search.nextfrom.IntNextFrom;
+import dev.idm.vkp.model.AudioPlaylist;
+import dev.idm.vkp.mvp.view.search.IArtistSearchView;
+import dev.idm.vkp.util.Pair;
+import dev.idm.vkp.util.RxUtils;
+import dev.idm.vkp.util.Utils;
+import io.reactivex.rxjava3.core.Single;
+
+public class ArtistSearchPresenter extends AbsSearchPresenter<IArtistSearchView, ArtistSearchCriteria, VkApiArtist, IntNextFrom> {
+
+    private final IAudioInteractor audioInteractor;
+
+    public ArtistSearchPresenter(int accountId, @Nullable ArtistSearchCriteria criteria, @Nullable Bundle savedInstanceState) {
+        super(accountId, criteria, savedInstanceState);
+        audioInteractor = InteractorFactory.createAudioInteractor();
+    }
+
+    @Override
+    IntNextFrom getInitialNextFrom() {
+        return new IntNextFrom(0);
+    }
+
+    @Override
+    boolean isAtLast(IntNextFrom startFrom) {
+        return startFrom.getOffset() == 0;
+    }
+
+    @Override
+    void onSeacrhError(Throwable throwable) {
+        super.onSeacrhError(throwable);
+        if (isGuiResumed()) {
+            showError(getView(), Utils.getCauseIfRuntime(throwable));
+        }
+    }
+
+    @Override
+    Single<Pair<List<VkApiArtist>, IntNextFrom>> doSearch(int accountId, ArtistSearchCriteria criteria, IntNextFrom startFrom) {
+        IntNextFrom nextFrom = new IntNextFrom(startFrom.getOffset() + 50);
+        return audioInteractor.searchArtists(accountId, criteria, startFrom.getOffset(), 50)
+                .map(audio -> Pair.Companion.create(audio, nextFrom));
+    }
+
+    public void onAdd(AudioPlaylist album) {
+        int accountId = getAccountId();
+        appendDisposable(audioInteractor.followPlaylist(accountId, album.getId(), album.getOwnerId(), album.getAccess_key())
+                .compose(RxUtils.applySingleIOToMainSchedulers())
+                .subscribe(data -> getView().getCustomToast().showToast(R.string.success), throwable ->
+                        showError(getView(), throwable)));
+    }
+
+    @Override
+    boolean canSearch(ArtistSearchCriteria criteria) {
+        return true;
+    }
+
+    @Override
+    ArtistSearchCriteria instantiateEmptyCriteria() {
+        return new ArtistSearchCriteria("");
+    }
+}

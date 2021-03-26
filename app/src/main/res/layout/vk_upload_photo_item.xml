@@ -8,7 +8,7 @@
     card_view:cardCornerRadius="0dp"
     card_view:cardUseCompatPadding="true">
 
-    <dev.ragnarok.fenrir.view.square.SquareFrameLayout
+    <dev.idm.vkp.view.square.SquareFrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -47,7 +47,7 @@
                     android:src="@drawable/close"
                     custom:tint="?white_color" />
 
-                <dev.ragnarok.fenrir.view.CircleRoadProgress
+                <dev.idm.vkp.view.CircleRoadProgress
                     android:id="@+id/progress"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
@@ -75,7 +75,7 @@
 
         </RelativeLayout>
 
-    </dev.ragnarok.fenrir.view.square.SquareFrameLayout>
+    </dev.idm.vkp.view.square.SquareFrameLayout>
 
 </com.google.android.material.card.MaterialCardView>
 

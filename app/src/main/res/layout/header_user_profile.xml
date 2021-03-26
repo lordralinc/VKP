@@ -82,7 +82,7 @@
                         android:visibility="gone"
                         app:tint="@color/white" />
 
-                    <dev.ragnarok.fenrir.view.OnlineView
+                    <dev.idm.vkp.view.OnlineView
                         android:id="@+id/header_navi_menu_online"
                         android:layout_width="@dimen/online_dot_size_big"
                         android:layout_height="@dimen/online_dot_size_big"
@@ -139,7 +139,7 @@
                             android:visibility="gone"
                             app:tint="?colorOnSurface" />
 
-                        <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+                        <dev.idm.vkp.view.emoji.EmojiconTextView
                             android:id="@+id/fragment_user_profile_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

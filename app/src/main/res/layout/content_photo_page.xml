@@ -9,13 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <dev.ragnarok.fenrir.view.TouchImageView
+        <dev.idm.vkp.view.TouchImageView
             android:id="@+id/image_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            app:layout_behavior="dev.ragnarok.fenrir.view.swipehelper.VerticalSwipeBehavior" />
+            app:layout_behavior="dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <dev.ragnarok.fenrir.module.rlottie.RLottieImageView
@@ -39,7 +39,7 @@
         android:src="@drawable/refresh"
         android:visibility="gone"
         app:fabSize="normal"
-        app:layout_behavior="dev.ragnarok.fenrir.view.FABBehavior"
+        app:layout_behavior="dev.idm.vkp.view.FABBehavior"
         app:maxImageSize="30dp" />
 
 </RelativeLayout>

@@ -373,7 +373,7 @@
             app:allowDividerAbove="true"
             app:iconSpaceReserved="false" />
 
-        <dev.ragnarok.fenrir.colorpicker.ColorPickerPreference
+        <dev.idm.vkp.colorpicker.ColorPickerPreference
             android:dependency="custom_chat_color_usage"
             android:key="custom_chat_color"
             android:title="@string/custom_chat_color"
@@ -386,7 +386,7 @@
             app:pickerButtonOk="@string/button_yes"
             app:pickerTitle="@string/custom_chat_color" />
 
-        <dev.ragnarok.fenrir.colorpicker.ColorPickerPreference
+        <dev.idm.vkp.colorpicker.ColorPickerPreference
             android:dependency="custom_chat_color_usage"
             android:key="custom_chat_color_second"
             android:title="@string/custom_chat_color_second"
@@ -413,7 +413,7 @@
             android:title="@string/usage_custom_message_color"
             app:iconSpaceReserved="false" />
 
-        <dev.ragnarok.fenrir.colorpicker.ColorPickerPreference
+        <dev.idm.vkp.colorpicker.ColorPickerPreference
             android:dependency="custom_message_color_usage"
             android:key="custom_message_color"
             android:title="@string/custom_message_color"
@@ -426,7 +426,7 @@
             app:pickerButtonOk="@string/button_yes"
             app:pickerTitle="@string/custom_message_color" />
 
-        <dev.ragnarok.fenrir.colorpicker.ColorPickerPreference
+        <dev.idm.vkp.colorpicker.ColorPickerPreference
             android:dependency="custom_message_color_usage"
             android:key="custom_second_message_color"
             android:title="@string/custom_second_message_color"
@@ -829,6 +829,23 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/idm"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            android:key="settings_idm_show_commands_on_dialog"
+            android:title="@string/settings_idm_show_commands_on_dialog"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="update_idm_token"
+            android:title="@string/update_idm_token"
+            app:iconSpaceReserved="false" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/about_settings"
         app:iconSpaceReserved="false">
 
@@ -846,11 +863,6 @@
         <Preference
             android:key="select_custom_icon"
             android:title="@string/select_custom_icon"
-            app:iconSpaceReserved="false" />
-
-        <Preference
-            android:key="dedicated"
-            android:title="@string/project_dedicated"
             app:iconSpaceReserved="false" />
 
         <Preference

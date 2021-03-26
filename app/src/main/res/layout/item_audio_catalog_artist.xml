@@ -34,7 +34,7 @@
             app:cardCornerRadius="10dp"
             app:cardElevation="1dp">
 
-            <dev.ragnarok.fenrir.view.AspectRatioImageView
+            <dev.idm.vkp.view.AspectRatioImageView
                 android:id="@+id/item_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

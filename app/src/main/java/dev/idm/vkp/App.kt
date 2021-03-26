@@ -1,0 +1,110 @@
+package dev.idm.vkp
+
+import android.annotation.SuppressLint
+import android.app.Application
+import android.os.Handler
+import androidx.appcompat.app.AppCompatDelegate
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import dev.ragnarok.fenrir.module.FenrirNative
+import dev.idm.vkp.domain.Repository.messages
+import dev.idm.vkp.longpoll.NotificationHelper
+import dev.idm.vkp.model.PeerUpdate
+import dev.idm.vkp.model.SentMsg
+import dev.idm.vkp.picasso.PicassoInstance
+import dev.idm.vkp.player.util.MusicUtils
+import dev.idm.vkp.service.ErrorLocalizer
+import dev.idm.vkp.service.KeepLongpollService
+import dev.idm.vkp.settings.Settings
+import dev.idm.vkp.util.CustomToast.Companion.CreateCustomToast
+import dev.idm.vkp.util.PersistentLogger
+import dev.idm.vkp.util.RxUtils
+import ealvatag.tag.TagOptionSingleton
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.plugins.RxJavaPlugins
+
+class App : Application(), ImageLoaderFactory {
+    private val compositeDisposable = CompositeDisposable()
+
+    override fun newImageLoader(): ImageLoader {
+        return PicassoInstance.createCoilImageLoader(this, Injection.provideProxySettings())
+    }
+
+    @SuppressLint("UnsafeExperimentalUsageWarning")
+    override fun onCreate() {
+        sInstanse = this
+        AppCompatDelegate.setDefaultNightMode(Settings.get().ui().nightMode)
+
+        //CrashConfig.Builder.create().apply()
+        if (Settings.get().other().isEnable_native) {
+            FenrirNative.loadNativeLibrary { PersistentLogger.logThrowable("NativeError", it) }
+        }
+        FenrirNative.updateAppContext(this)
+        TagOptionSingleton.getInstance().isAndroid = true
+        MusicUtils.registerBroadcast(this)
+        super.onCreate()
+        PicassoInstance.init(this, Injection.provideProxySettings())
+        if (Settings.get().other().isKeepLongpoll) {
+            KeepLongpollService.start(this)
+        }
+        compositeDisposable.add(messages
+            .observePeerUpdates()
+            .flatMap { source: List<PeerUpdate> -> Flowable.fromIterable(source) }
+            .subscribe({ update: PeerUpdate ->
+                if (update.readIn != null) {
+                    NotificationHelper.tryCancelNotificationForPeer(
+                        this,
+                        update.accountId,
+                        update.peerId
+                    )
+                }
+            }, RxUtils.ignore())
+        )
+        compositeDisposable.add(
+            messages
+                .observeSentMessages()
+                .subscribe({ sentMsg: SentMsg ->
+                    NotificationHelper.tryCancelNotificationForPeer(
+                        this,
+                        sentMsg.accountId,
+                        sentMsg.peerId
+                    )
+                }, RxUtils.ignore())
+        )
+        compositeDisposable.add(
+            messages
+                .observeMessagesSendErrors()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ throwable: Throwable ->
+                    run {
+                        CreateCustomToast(this).showToastError(
+                            ErrorLocalizer.localizeThrowable(this, throwable)
+                        ); throwable.printStackTrace()
+                    }
+                }, RxUtils.ignore())
+        )
+        RxJavaPlugins.setErrorHandler {
+            Handler(mainLooper).post {
+                CreateCustomToast(this).showToastError(
+                    ErrorLocalizer.localizeThrowable(
+                        this,
+                        it
+                    )
+                )
+            }
+        }
+    }
+
+    companion object {
+        private var sInstanse: App? = null
+
+        @JvmStatic
+        val instance: App
+            get() {
+                checkNotNull(sInstanse) { "App instance is null!!! WTF???" }
+                return sInstanse!!
+            }
+    }
+}

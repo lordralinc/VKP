@@ -22,7 +22,7 @@
             app:subtitleTextAppearance="@style/TextAppearance.MaterialComponents.Caption"
             app:titleTextAppearance="@style/TextAppearance.Toolbar.Title" />
 
-        <dev.ragnarok.fenrir.view.MySearchView
+        <dev.idm.vkp.view.MySearchView
             android:id="@+id/searchview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

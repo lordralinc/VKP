@@ -12,7 +12,7 @@
         android:background="?message_bubble_color"
         android:orientation="vertical">
 
-        <dev.ragnarok.fenrir.view.square.SquareFrameLayout
+        <dev.idm.vkp.view.square.SquareFrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -35,7 +35,7 @@
                 android:src="@drawable/close"
                 app:tint="?white_color" />
 
-        </dev.ragnarok.fenrir.view.square.SquareFrameLayout>
+        </dev.idm.vkp.view.square.SquareFrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

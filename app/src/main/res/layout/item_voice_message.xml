@@ -53,7 +53,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <dev.ragnarok.fenrir.view.WaveFormView
+    <dev.idm.vkp.view.WaveFormView
         android:id="@+id/item_voice_wave_form_view"
         android:layout_width="match_parent"
         android:layout_height="48dp"

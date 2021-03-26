@@ -22,7 +22,7 @@
             android:layout_width="@dimen/avatar_size_usual"
             android:layout_height="@dimen/avatar_size_usual" />
 
-        <dev.ragnarok.fenrir.view.OnlineView
+        <dev.idm.vkp.view.OnlineView
             android:id="@+id/online"
             android:layout_width="16dp"
             android:layout_height="16dp"

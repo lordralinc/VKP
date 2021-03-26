@@ -1,0 +1,254 @@
+package dev.idm.vkp.mvp.presenter;
+
+import android.content.Context;
+import android.os.Bundle;
+import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+
+import java.util.ArrayList;
+
+import dev.idm.vkp.Injection;
+import dev.idm.vkp.R;
+import dev.idm.vkp.media.gif.IGifPlayer;
+import dev.idm.vkp.media.gif.PlayerPrepareException;
+import dev.idm.vkp.model.Document;
+import dev.idm.vkp.model.VideoSize;
+import dev.idm.vkp.mvp.reflect.OnGuiCreated;
+import dev.idm.vkp.mvp.view.IGifPagerView;
+import dev.idm.vkp.util.AppPerms;
+import dev.idm.vkp.util.AssertUtils;
+import dev.idm.vkp.util.DownloadWorkUtils;
+import dev.idm.vkp.util.Objects;
+import dev.idm.vkp.util.Utils;
+
+public class GifPagerPresenter extends BaseDocumentPresenter<IGifPagerView> implements IGifPlayer.IStatusChangeListener, IGifPlayer.IVideoSizeChangeListener {
+
+    private static final String SAVE_PAGER_INDEX = "save_pager_index";
+    private static final VideoSize DEF_SIZE = new VideoSize(1, 1);
+    private final ArrayList<Document> mDocuments;
+    private IGifPlayer mGifPlayer;
+    private int mCurrentIndex;
+
+    public GifPagerPresenter(int accountId, @NonNull ArrayList<Document> documents, int index, @Nullable Bundle savedInstanceState) {
+        super(accountId, savedInstanceState);
+        mDocuments = documents;
+
+        if (savedInstanceState == null) {
+            mCurrentIndex = index;
+        } else {
+            mCurrentIndex = savedInstanceState.getInt(SAVE_PAGER_INDEX);
+        }
+
+        initGifPlayer();
+    }
+
+    @Override
+    public void saveState(@NonNull Bundle outState) {
+        super.saveState(outState);
+        outState.putInt(SAVE_PAGER_INDEX, mCurrentIndex);
+    }
+
+    @OnGuiCreated
+    private void resolveData() {
+        if (isGuiReady()) {
+            getView().displayData(mDocuments.size(), mCurrentIndex);
+        }
+    }
+
+    public void fireSurfaceCreated(int adapterPosition) {
+        if (mCurrentIndex == adapterPosition) {
+            resolvePlayerDisplay();
+        }
+    }
+
+    @OnGuiCreated
+    private void resolveToolbarTitle() {
+        if (isGuiReady()) {
+            getView().setToolbarTitle(R.string.gif_player);
+        }
+    }
+
+    @OnGuiCreated
+    private void resolveToolbarSubtitle() {
+        if (isGuiReady()) {
+            getView().setToolbarSubtitle(R.string.image_number, mCurrentIndex + 1, mDocuments.size());
+        }
+    }
+
+    @OnGuiCreated
+    private void resolvePlayerDisplay() {
+        if (isGuiReady()) {
+            getView().attachDisplayToPlayer(mCurrentIndex, mGifPlayer);
+        } else {
+            mGifPlayer.setDisplay(null);
+        }
+    }
+
+    private void initGifPlayer() {
+        if (Objects.nonNull(mGifPlayer)) {
+            IGifPlayer old = mGifPlayer;
+            mGifPlayer = null;
+            old.release();
+        }
+
+        Document document = mDocuments.get(mCurrentIndex);
+        AssertUtils.requireNonNull(document);
+
+        String url = document.getVideoPreview().getSrc();
+
+        mGifPlayer = Injection.provideGifPlayerFactory().createGifPlayer(url, true);
+        mGifPlayer.addStatusChangeListener(this);
+        mGifPlayer.addVideoSizeChangeListener(this);
+
+        try {
+            mGifPlayer.play();
+        } catch (PlayerPrepareException e) {
+            safeShowLongToast(getView(), R.string.unable_to_play_file);
+        }
+    }
+
+    private void selectPage(int position) {
+        if (mCurrentIndex == position) {
+            return;
+        }
+
+        mCurrentIndex = position;
+        initGifPlayer();
+    }
+
+    @OnGuiCreated
+    private void resolveAddDeleteButton() {
+        if (isGuiReady()) {
+            getView().setupAddRemoveButton(!isMy());
+        }
+    }
+
+    private boolean isMy() {
+        return mDocuments.get(mCurrentIndex).getOwnerId() == getAccountId();
+    }
+
+    @OnGuiCreated
+    private void resolveAspectRatio() {
+        if (isGuiReady()) {
+            VideoSize size = mGifPlayer.getVideoSize();
+            if (size != null) {
+                getView().setAspectRatioAt(mCurrentIndex, size.getWidth(), size.getHeight());
+            }
+        }
+    }
+
+    @OnGuiCreated
+    private void resolvePreparingProgress() {
+        boolean preparing = !Objects.isNull(mGifPlayer) && mGifPlayer.getPlayerStatus() == IGifPlayer.IStatus.PREPARING;
+        if (isGuiReady()) {
+            getView().setPreparingProgressVisible(mCurrentIndex, preparing);
+        }
+    }
+
+    public void firePageSelected(int position) {
+        if (mCurrentIndex == position) {
+            return;
+        }
+
+        selectPage(position);
+        resolveToolbarSubtitle();
+        resolvePreparingProgress();
+    }
+
+    public void fireAddDeleteButtonClick() {
+        Document document = mDocuments.get(mCurrentIndex);
+        if (isMy()) {
+            delete(document.getId(), document.getOwnerId());
+        } else {
+            addYourself(document);
+        }
+    }
+
+    public void fireHolderCreate(int adapterPosition) {
+        boolean isProgress = adapterPosition == mCurrentIndex && mGifPlayer.getPlayerStatus() == IGifPlayer.IStatus.PREPARING;
+
+        VideoSize size = mGifPlayer.getVideoSize();
+        if (Objects.isNull(size)) {
+            size = DEF_SIZE;
+        }
+
+        getView().configHolder(adapterPosition, isProgress, size.getWidth(), size.getWidth());
+    }
+
+    public void fireShareButtonClick() {
+        getView().shareDocument(getAccountId(), mDocuments.get(mCurrentIndex));
+    }
+
+    public void fireDownloadButtonClick(Context context, View view) {
+        if (!AppPerms.hasWriteStoragePermission(context)) {
+            getView().requestWriteExternalStoragePermission();
+            return;
+        }
+
+        downloadImpl(context, view);
+    }
+
+    @Override
+    public void onWritePermissionResolved(Context context, View view) {
+        if (AppPerms.hasWriteStoragePermission(context)) {
+            downloadImpl(context, view);
+        }
+    }
+
+    @Override
+    public void onGuiPaused() {
+        super.onGuiPaused();
+        if (Objects.nonNull(mGifPlayer)) {
+            mGifPlayer.pause();
+        }
+    }
+
+    @Override
+    public void onGuiResumed() {
+        super.onGuiResumed();
+
+        if (Objects.nonNull(mGifPlayer)) {
+            try {
+                mGifPlayer.play();
+            } catch (PlayerPrepareException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onDestroyed() {
+        if (Objects.nonNull(mGifPlayer)) {
+            mGifPlayer.release();
+        }
+        super.onDestroyed();
+    }
+
+    private void downloadImpl(Context context, View view) {
+        Document document = mDocuments.get(mCurrentIndex);
+
+        if (DownloadWorkUtils.doDownloadDoc(context, document, false) == 1) {
+            Utils.ThemedSnack(view, R.string.audio_force_download, BaseTransientBottomBar.LENGTH_LONG).setAction(R.string.button_yes,
+                    v1 -> DownloadWorkUtils.doDownloadDoc(context, document, true)).show();
+        }
+    }
+
+    @Override
+    public void onPlayerStatusChange(@NonNull IGifPlayer player, int previousStatus, int currentStatus) {
+        if (mGifPlayer == player) {
+            resolvePreparingProgress();
+            resolvePlayerDisplay();
+        }
+    }
+
+    @Override
+    public void onVideoSizeChanged(@NonNull IGifPlayer player, VideoSize size) {
+        if (mGifPlayer == player) {
+            resolveAspectRatio();
+        }
+    }
+}

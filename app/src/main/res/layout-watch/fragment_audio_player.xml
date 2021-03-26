@@ -115,7 +115,7 @@
                 android:contentDescription="@string/album_cover"
                 android:scaleType="fitStart"
                 android:stateListAnimator="@animator/clicked"
-                app:layout_behavior="dev.ragnarok.fenrir.view.swipehelper.HorizontalSwipeBehavior"
+                app:layout_behavior="dev.idm.vkp.view.swipehelper.HorizontalSwipeBehavior"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.RoundedPlayerCover" />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -178,7 +178,7 @@
             app:layout_constraintTop_toTopOf="@id/audio_save"
             app:tint="?colorOnSurface" />
 
-        <dev.ragnarok.fenrir.player.ui.RepeatingImageButton
+        <dev.idm.vkp.player.ui.RepeatingImageButton
             android:id="@+id/audio_save"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="48dp"
@@ -261,7 +261,7 @@
             app:tint="?colorOnSurface" />
 
 
-        <dev.ragnarok.fenrir.player.ui.ShuffleButton
+        <dev.idm.vkp.player.ui.ShuffleButton
             android:id="@+id/action_button_shuffle"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="@dimen/audio_player_controls_end_button_width"
@@ -276,7 +276,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/action_button_play" />
 
-        <dev.ragnarok.fenrir.player.ui.RepeatingImageButton
+        <dev.idm.vkp.player.ui.RepeatingImageButton
             android:id="@+id/action_button_previous"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="@dimen/audio_player_controls_main_button_width"
@@ -291,7 +291,7 @@
             app:layout_constraintEnd_toStartOf="@+id/action_button_play"
             app:layout_constraintStart_toEndOf="@id/action_button_shuffle" />
 
-        <dev.ragnarok.fenrir.player.ui.PlayPauseButton
+        <dev.idm.vkp.player.ui.PlayPauseButton
             android:id="@+id/action_button_play"
             style="?attr/fab_player"
             android:layout_width="@dimen/audio_player_controls_main_button_width"
@@ -307,7 +307,7 @@
             app:layout_constraintStart_toEndOf="@id/action_button_previous"
             app:layout_constraintTop_toBottomOf="@id/audio_player_title" />
 
-        <dev.ragnarok.fenrir.player.ui.RepeatingImageButton
+        <dev.idm.vkp.player.ui.RepeatingImageButton
             android:id="@+id/action_button_next"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="@dimen/audio_player_controls_main_button_width"
@@ -322,7 +322,7 @@
             app:layout_constraintEnd_toStartOf="@+id/action_button_repeat"
             app:layout_constraintStart_toEndOf="@id/action_button_play" />
 
-        <dev.ragnarok.fenrir.player.ui.RepeatButton
+        <dev.idm.vkp.player.ui.RepeatButton
             android:id="@+id/action_button_repeat"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="@dimen/audio_player_controls_end_button_width"

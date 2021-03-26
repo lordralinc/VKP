@@ -22,7 +22,7 @@
             app:subtitleTextAppearance="@style/TextAppearance.MaterialComponents.Caption"
             app:titleTextAppearance="@style/TextAppearance.Toolbar.Title" />
 
-        <dev.ragnarok.fenrir.view.MySearchView
+        <dev.idm.vkp.view.MySearchView
             android:id="@+id/searchview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/plus"
         app:fabSize="mini"
-        app:layout_behavior="dev.ragnarok.fenrir.view.FABBehavior"
+        app:layout_behavior="dev.idm.vkp.view.FABBehavior"
         app:maxImageSize="30dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

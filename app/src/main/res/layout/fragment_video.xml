@@ -60,7 +60,7 @@
                             tools:text="Name" />
                     </LinearLayout>
 
-                    <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+                    <dev.idm.vkp.view.emoji.EmojiconTextView
                         android:id="@+id/fragment_video_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                         app:cardCornerRadius="4dp"
                         app:cardElevation="0dp">
 
-                        <dev.ragnarok.fenrir.view.AspectRatioImageView
+                        <dev.idm.vkp.view.AspectRatioImageView
                             android:id="@+id/fragment_video_preview_image"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
                             android:contentDescription="@string/play"
                             android:stateListAnimator="@animator/clicked" />
 
-                        <dev.ragnarok.fenrir.view.ColorFilterImageView
+                        <dev.idm.vkp.view.ColorFilterImageView
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:layout_gravity="center"
@@ -108,7 +108,7 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+                    <dev.idm.vkp.view.emoji.EmojiconTextView
                         android:id="@+id/fragment_video_subtitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -153,7 +153,7 @@
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp">
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/like_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -164,7 +164,7 @@
                     app:button_icon="@drawable/heart"
                     app:noactive_icon_color="?attr/colorOnSurface" />
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/comments_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -176,7 +176,7 @@
                     app:button_icon="@drawable/comment"
                     app:noactive_icon_color="?attr/colorOnSurface" />
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/share_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

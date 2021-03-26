@@ -1,0 +1,29 @@
+package dev.idm.vkp.domain;
+
+import java.util.List;
+
+import dev.idm.vkp.model.Audio;
+import dev.idm.vkp.model.Video;
+import io.reactivex.rxjava3.core.Single;
+
+public interface ILocalServerInteractor {
+    Single<List<Video>> getVideos(int offset, int count);
+
+    Single<List<Audio>> getAudios(int offset, int count);
+
+    Single<List<Audio>> getDiscography(int offset, int count);
+
+    Single<List<Video>> searchVideos(String q, int offset, int count);
+
+    Single<List<Audio>> searchAudios(String q, int offset, int count);
+
+    Single<List<Audio>> searchDiscography(String q, int offset, int count);
+
+    Single<Integer> update_time(String hash);
+
+    Single<Integer> delete_media(String hash);
+
+    Single<String> get_file_name(String hash);
+
+    Single<Integer> update_file_name(String hash, String name);
+}

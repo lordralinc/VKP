@@ -70,7 +70,7 @@
             tools:text="AB"
             tools:textColor="?android:textColorPrimary" />
 
-        <dev.ragnarok.fenrir.view.OnlineView
+        <dev.idm.vkp.view.OnlineView
             android:id="@+id/item_chat_online"
             android:layout_width="16dp"
             android:layout_height="16dp"
@@ -148,7 +148,7 @@
             app:layout_constraintTop_toTopOf="@id/item_chat_avatar"
             tools:text="time" />
 
-        <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+        <dev.idm.vkp.view.emoji.EmojiconTextView
             android:id="@+id/dialog_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

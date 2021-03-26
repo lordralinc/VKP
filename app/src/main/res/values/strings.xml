@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name" translatable="false">Fenrir VK</string>
+    <string name="app_name" translatable="false">VKP</string>
 
     <string-array name="array_language_names">
         <item>Default</item>
@@ -779,11 +779,10 @@
     <string name="developer">Developers:</string>
     <string name="first_developer">Umerov Artyom</string>
     <string name="second_developer">Danilyuk Dmitry</string>
+    <string name="third_developer">Yury Yushmanov</string>
     <string name="first_pagan">First pagan</string>
-    <string name="repo">Repository: https://github.com/umerov1999/Fenrir-for-VK</string>
+    <string name="repo">Repository: https://github.com/lordralinc/VKP</string>
     <string name="repo_local_server">Repository: https://github.com/umerov1999/FenrirMediaServer/releases</string>
-    <string name="project_dedicated_summary">Project Dedicated for Arnoldova Ekaterina, https://vk.com/id255645173</string>
-    <string name="project_dedicated">Project Dedicated</string>
     <string name="comment">Comment</string>
     <string name="search">Search</string>
     <string name="input">Input</string>
@@ -1125,6 +1124,7 @@
     <string name="wait_until_file_upload_is_complete">Wait for the file download to complete</string>
     <string name="link">Link</string>
     <string name="id">Id</string>
+    <string name="domain">Domain</string>
     <string name="article">Article</string>
     <string name="copied">Copied</string>
 
@@ -1717,4 +1717,10 @@
     <string name="enable_native">Enable native libraries</string>
     <string name="lifecycle_music_service">Audio service lifetime (sec)</string>
     <string name="ffmpeg_audio_codecs">FFmpeg audio codecs</string>
+    <string name="commands_for_idm">Commands for IDM</string>
+    <string name="idm">IDM</string>
+    <string name="settings_idm_show_commands_on_dialog">Show IDM commands on dialogs</string>
+    <string name="idm_registered_state">Registered?</string>
+    <string name="idm_is_agent">Agent</string>
+    <string name="update_idm_token">Update IDM token</string>
 </resources>

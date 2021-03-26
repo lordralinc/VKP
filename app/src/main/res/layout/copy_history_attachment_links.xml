@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <dev.ragnarok.fenrir.view.mozaik.MozaikLayout
+    <dev.idm.vkp.view.mozaik.MozaikLayout
         android:id="@+id/copy_history_photo_attachments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <dev.ragnarok.fenrir.adapter.AudioContainer
+    <dev.idm.vkp.adapter.AudioContainer
         android:id="@+id/copy_history_audio_attachments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

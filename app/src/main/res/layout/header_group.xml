@@ -92,7 +92,7 @@
                             android:visibility="gone"
                             app:tint="?colorOnSurface" />
 
-                        <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+                        <dev.idm.vkp.view.emoji.EmojiconTextView
                             android:id="@+id/header_group_status"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

@@ -5,12 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <dev.ragnarok.fenrir.view.FlingRelativeLayout
+    <dev.idm.vkp.view.FlingRelativeLayout
         android:id="@+id/fling_root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <dev.ragnarok.fenrir.view.AlternativeAspectRatioFrameLayout
+        <dev.idm.vkp.view.AlternativeAspectRatioFrameLayout
             android:id="@+id/aspect_ratio_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -21,10 +21,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-        </dev.ragnarok.fenrir.view.AlternativeAspectRatioFrameLayout>
+        </dev.idm.vkp.view.AlternativeAspectRatioFrameLayout>
 
 
-    </dev.ragnarok.fenrir.view.FlingRelativeLayout>
+    </dev.idm.vkp.view.FlingRelativeLayout>
 
 
     <dev.ragnarok.fenrir.module.rlottie.RLottieImageView

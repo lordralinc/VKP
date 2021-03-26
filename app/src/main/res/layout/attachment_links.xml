@@ -2,7 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <dev.ragnarok.fenrir.view.mozaik.MozaikLayout
+    <dev.idm.vkp.view.mozaik.MozaikLayout
         android:id="@+id/photo_attachments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" />
 
-    <dev.ragnarok.fenrir.adapter.AudioContainer
+    <dev.idm.vkp.adapter.AudioContainer
         android:id="@+id/audio_attachments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

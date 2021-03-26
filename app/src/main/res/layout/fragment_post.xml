@@ -32,7 +32,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+                    <dev.idm.vkp.view.emoji.EmojiconTextView
                         android:id="@+id/fragment_post_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
 
                 <include layout="@layout/line_divider" />
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/like_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
                     custom:button_icon="@drawable/heart"
                     custom:noactive_icon_color="?attr/colorOnSurface" />
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/comments_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -126,7 +126,7 @@
                     custom:button_icon="@drawable/comment"
                     custom:noactive_icon_color="?attr/colorOnSurface" />
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/share_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -651,11 +651,10 @@
     <string name="developer">Разработчики:</string>
     <string name="first_developer">Умеров Артём</string>
     <string name="second_developer">Данилюк Дмитрий</string>
+    <string name="third_developer">Юрий Юшманов</string>
     <string name="first_pagan">Первый языческий</string>
-    <string name="repo">Репозиторий: https://github.com/umerov1999/Fenrir-for-VK</string>
+    <string name="repo">Репозиторий: https://github.com/lordralinc/VKP</string>
     <string name="repo_local_server">Репозиторий: https://github.com/umerov1999/FenrirMediaServer/releases</string>
-    <string name="project_dedicated_summary">Проект посвящён Арнольдове Екатерине, https://vk.com/id255645173</string>
-    <string name="project_dedicated">Проект посвящён</string>
     <string name="comment">Комментарий</string>
     <string name="search">Поиск</string>
     <string name="input">Ввод</string>
@@ -1544,4 +1543,11 @@
     <string name="enable_native">Использовать нативные библиотеки</string>
     <string name="lifecycle_music_service">Время жизни плеера (сек.)</string>
     <string name="ffmpeg_audio_codecs">FFmpeg аудио кодеки</string>
+    <string name="domain">Домен</string>
+    <string name="commands_for_idm">Команды для IDM</string>
+    <string name="idm">IDM</string>
+    <string name="settings_idm_show_commands_on_dialog">Показывать команды IDM в диалоге</string>
+    <string name="idm_registered_state">Зарегистрирован?</string>
+    <string name="idm_is_agent">Агент</string>
+    <string name="update_idm_token">Обновмить токен IDM</string>
 </resources>

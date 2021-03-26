@@ -1,0 +1,9 @@
+package dev.idm.vkp.push;
+
+import io.reactivex.rxjava3.core.Completable;
+
+public interface IPushRegistrationResolver {
+    boolean canReceivePushNotification();
+
+    Completable resolvePushRegistration();
+}

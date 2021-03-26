@@ -35,7 +35,7 @@
             android:layout_height="@dimen/avatar_size_small"
             android:layout_marginStart="4dp" />
 
-        <dev.ragnarok.fenrir.view.OnlineView
+        <dev.idm.vkp.view.OnlineView
             android:id="@+id/item_message_important"
             android:layout_width="@dimen/online_dot_size"
             android:layout_height="@dimen/online_dot_size"
@@ -47,7 +47,7 @@
             app:circle_color="?icon_color_active"
             app:stroke_color="?android:colorBackground" />
 
-        <dev.ragnarok.fenrir.view.MessageView
+        <dev.idm.vkp.view.MessageView
             android:id="@+id/item_message_bubble"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
             app:first_color="#00ffffff"
             app:second_color="#00ffffff">
 
-            <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+            <dev.idm.vkp.view.emoji.EmojiconTextView
                 android:id="@+id/item_message_user"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                 app:hashTagColor="?attr/colorAccent"
                 tools:text="User" />
 
-            <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+            <dev.idm.vkp.view.emoji.EmojiconTextView
                 android:id="@+id/item_message_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -127,7 +127,7 @@
 
             </LinearLayout>
 
-        </dev.ragnarok.fenrir.view.MessageView>
+        </dev.idm.vkp.view.MessageView>
 
     </RelativeLayout>
 </LinearLayout>

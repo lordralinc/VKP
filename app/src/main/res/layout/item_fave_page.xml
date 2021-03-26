@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <dev.ragnarok.fenrir.view.AspectRatioImageView
+            <dev.idm.vkp.view.AspectRatioImageView
                 android:id="@+id/avatar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
                 app:aspectRatioW="1"
                 app:dominantMeasurement="width" />
 
-            <dev.ragnarok.fenrir.view.OnlineView
+            <dev.idm.vkp.view.OnlineView
                 android:id="@+id/header_navi_menu_online"
                 android:layout_width="@dimen/online_dot_size_big"
                 android:layout_height="@dimen/online_dot_size_big"

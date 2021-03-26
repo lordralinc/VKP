@@ -21,7 +21,7 @@
         app:cardCornerRadius="10dp"
         app:cardElevation="1dp">
 
-        <dev.ragnarok.fenrir.view.AspectRatioImageView
+        <dev.idm.vkp.view.AspectRatioImageView
             android:id="@+id/item_poll_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         android:layout_below="@id/item_poll_frame"
         android:scrollbars="vertical" />
 
-    <dev.ragnarok.fenrir.view.ProgressButton
+    <dev.idm.vkp.view.ProgressButton
         android:id="@+id/vote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

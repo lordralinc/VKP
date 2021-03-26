@@ -189,7 +189,7 @@
             android:layout_marginBottom="10dp"
             android:src="@drawable/ic_outline_keyboard_arrow_up"
             app:fabSize="mini"
-            app:layout_behavior="dev.ragnarok.fenrir.view.FABBehavior" />
+            app:layout_behavior="dev.idm.vkp.view.FABBehavior" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <RelativeLayout
@@ -249,7 +249,7 @@
             android:paddingEnd="4dp"
             android:paddingBottom="8dp">
 
-            <dev.ragnarok.fenrir.view.ColorFilterImageView
+            <dev.idm.vkp.view.ColorFilterImageView
                 android:id="@+id/iconEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

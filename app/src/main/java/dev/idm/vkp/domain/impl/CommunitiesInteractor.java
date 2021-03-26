@@ -1,0 +1,79 @@
+package dev.idm.vkp.domain.impl;
+
+import java.util.List;
+
+import dev.idm.vkp.api.interfaces.INetworker;
+import dev.idm.vkp.api.model.VKApiCommunity;
+import dev.idm.vkp.db.column.GroupColumns;
+import dev.idm.vkp.db.interfaces.IStorages;
+import dev.idm.vkp.db.model.entity.CommunityEntity;
+import dev.idm.vkp.domain.ICommunitiesInteractor;
+import dev.idm.vkp.domain.mappers.Dto2Entity;
+import dev.idm.vkp.domain.mappers.Dto2Model;
+import dev.idm.vkp.domain.mappers.Entity2Model;
+import dev.idm.vkp.model.Community;
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Single;
+
+import static dev.idm.vkp.util.Utils.listEmptyIfNull;
+
+
+public class CommunitiesInteractor implements ICommunitiesInteractor {
+
+    private final INetworker networker;
+    private final IStorages stores;
+
+    public CommunitiesInteractor(INetworker networker, IStorages repositories) {
+        this.networker = networker;
+        stores = repositories;
+    }
+
+    @Override
+    public Single<List<Community>> getCachedData(int accountId, int userId) {
+        return stores.relativeship()
+                .getCommunities(accountId, userId)
+                .map(Entity2Model::buildCommunitiesFromDbos);
+    }
+
+    @Override
+    public Single<List<Community>> getActual(int accountId, int userId, int count, int offset) {
+        return networker.vkDefault(accountId)
+                .groups()
+                .get(userId, true, null, GroupColumns.API_FIELDS, offset, count)
+                .flatMap(items -> {
+                    List<VKApiCommunity> dtos = listEmptyIfNull(items.getItems());
+                    List<CommunityEntity> dbos = Dto2Entity.mapCommunities(dtos);
+
+                    return stores.relativeship()
+                            .storeComminities(accountId, dbos, userId, offset == 0)
+                            .andThen(Single.just(Entity2Model.buildCommunitiesFromDbos(dbos)));
+                });
+    }
+
+    @Override
+    public Single<List<Community>> search(int accountId, String q, String type, Integer countryId, Integer cityId, Boolean futureOnly, Integer sort, int count, int offset) {
+        return networker.vkDefault(accountId)
+                .groups()
+                .search(q, type, countryId, cityId, futureOnly, null, sort, offset, count)
+                .map(items -> {
+                    List<VKApiCommunity> dtos = listEmptyIfNull(items.getItems());
+                    return Dto2Model.transformCommunities(dtos);
+                });
+    }
+
+    @Override
+    public Completable join(int accountId, int groupId) {
+        return networker.vkDefault(accountId)
+                .groups()
+                .join(groupId, null)
+                .ignoreElement();
+    }
+
+    @Override
+    public Completable leave(int accountId, int groupId) {
+        return networker.vkDefault(accountId)
+                .groups()
+                .leave(groupId)
+                .ignoreElement();
+    }
+}

@@ -68,7 +68,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/chevron_up"
         app:fabSize="mini"
-        app:layout_behavior="dev.ragnarok.fenrir.view.FABBehavior"
+        app:layout_behavior="dev.idm.vkp.view.FABBehavior"
         app:maxImageSize="30dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

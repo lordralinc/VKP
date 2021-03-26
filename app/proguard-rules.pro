@@ -45,7 +45,7 @@
 
 # OnGuiCreated annotation based on Java Reflection Api
 -keepclassmembers class ** {
-  @dev.ragnarok.fenrir.mvp.reflect.OnGuiCreated *;
+  @dev.idm.vkp.mvp.reflect.OnGuiCreated *;
 }
 
 -keepclassmembers class * {
@@ -131,9 +131,9 @@ public void onClickButton(android.view.View);
 #-keep class com.google.gson.stream.** { *; }
 
 # Application classes that will be serialized/deserialized over Gson
--keep class dev.ragnarok.fenrir.model.** { *; }
--keep class dev.ragnarok.fenrir.api.model.** { *; }
--keep class dev.ragnarok.fenrir.db.model.entity.** { *; }
+-keep class dev.idm.vkp.model.** { *; }
+-keep class dev.idm.vkp.api.model.** { *; }
+-keep class dev.idm.vkp.db.model.entity.** { *; }
 
 # Prevent proguard from stripping interface information from TypeAdapterFactory,
 # JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)

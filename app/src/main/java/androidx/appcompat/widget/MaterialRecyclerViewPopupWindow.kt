@@ -12,8 +12,8 @@ import android.widget.PopupWindow
 import androidx.core.widget.PopupWindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import dev.ragnarok.fenrir.R
-import dev.ragnarok.fenrir.materialpopupmenu.internal.PopupMenuAdapter
+import dev.idm.vkp.R
+import dev.idm.vkp.materialpopupmenu.internal.PopupMenuAdapter
 import kotlin.math.ceil
 
 

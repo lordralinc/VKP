@@ -37,7 +37,7 @@
                     android:src="@drawable/file"
                     custom:tint="?white_color" />
 
-                <dev.ragnarok.fenrir.view.TouchImageView
+                <dev.idm.vkp.view.TouchImageView
                     android:id="@+id/fragment_document_preview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -50,14 +50,14 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp">
 
-                    <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+                    <dev.idm.vkp.view.emoji.EmojiconTextView
                         android:id="@+id/fragment_document_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:textSize="16sp" />
 
-                    <dev.ragnarok.fenrir.view.emoji.EmojiconTextView
+                    <dev.idm.vkp.view.emoji.EmojiconTextView
                         android:id="@+id/fragment_document_subtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                 android:paddingTop="4dp"
                 android:paddingBottom="4dp">
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/add_or_delete_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
                     custom:always_counter="false"
                     custom:noactive_icon_color="?attr/colorOnSurface" />
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/download_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
                     custom:button_icon="@drawable/download"
                     custom:noactive_icon_color="?attr/colorOnSurface" />
 
-                <dev.ragnarok.fenrir.view.CircleCounterButton
+                <dev.idm.vkp.view.CircleCounterButton
                     android:id="@+id/share_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

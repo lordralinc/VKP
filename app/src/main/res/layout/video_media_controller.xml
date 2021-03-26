@@ -77,7 +77,7 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/page_first" />
 
-            <dev.ragnarok.fenrir.view.media.MaterialPlayPauseFab
+            <dev.idm.vkp.view.media.MaterialPlayPauseFab
                 android:id="@+id/pause"
                 style="@style/Theme.FloatingActionButtonSecondary"
                 android:layout_width="wrap_content"

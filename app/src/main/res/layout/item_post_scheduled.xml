@@ -28,7 +28,7 @@
 
         <include layout="@layout/content_post" />
 
-        <dev.ragnarok.fenrir.view.CircleCounterButton
+        <dev.idm.vkp.view.CircleCounterButton
             android:id="@+id/button_delete"
             android:layout_width="48dp"
             android:layout_height="48dp"

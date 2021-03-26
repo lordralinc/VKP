@@ -65,7 +65,7 @@
 
         </LinearLayout>
 
-        <dev.ragnarok.fenrir.view.emoji.EmojiconEditText
+        <dev.idm.vkp.view.emoji.EmojiconEditText
             android:id="@+id/fragment_create_post_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
 
     </LinearLayout>
 
-    <dev.ragnarok.fenrir.view.SawView
+    <dev.idm.vkp.view.SawView
         android:layout_width="match_parent"
         android:layout_height="8dp"
         app:sawBackground="?android:windowBackground"

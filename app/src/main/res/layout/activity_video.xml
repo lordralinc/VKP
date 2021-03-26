@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
-    <dev.ragnarok.fenrir.view.AlternativeAspectRatioFrameLayout
+    <dev.idm.vkp.view.AlternativeAspectRatioFrameLayout
         android:id="@+id/aspect_ratio_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +16,7 @@
             android:id="@+id/videoSurface"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-    </dev.ragnarok.fenrir.view.AlternativeAspectRatioFrameLayout>
+    </dev.idm.vkp.view.AlternativeAspectRatioFrameLayout>
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
