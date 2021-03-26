@@ -1549,5 +1549,9 @@
     <string name="settings_idm_show_commands_on_dialog">Показывать команды IDM в диалоге</string>
     <string name="idm_registered_state">Зарегистрирован?</string>
     <string name="idm_is_agent">Агент</string>
-    <string name="update_idm_token">Обновмить токен IDM</string>
+    <string name="update_idm_token">Обновить токен IDM</string>
+    <string name="error_on_checking_update">Ошибка при проверке обновлений</string>
+    <string name="update_started">Запущен процесс обновения</string>
+    <string name="update_title">Обновление</string>
+    <string name="update_text">Доступно обновлние %s\nP.S. Можете загрузить его в настройках</string>
 </resources>

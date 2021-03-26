@@ -517,6 +517,7 @@ public class DialogsFragment extends BaseMvpFragment<DialogsPresenter, IDialogsV
 
         IAccountApis api = Apis.get().vkManual(account_id, access_token);
         Map<String, String> params = new HashMap<>();
+
         if (nonNull(mSwipeRefreshLayout)) {
             api
                 .other()

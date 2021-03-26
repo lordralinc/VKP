@@ -23,7 +23,10 @@ import com.squareup.picasso.Transformation;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashSet;
@@ -255,7 +258,6 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         if (dialog.getInterlocutor() instanceof User) {
             User interlocutor = (User) dialog.getInterlocutor();
-            holder.mDialogTitle.setTextColor(Utils.getVerifiedColor(mContext, interlocutor.isVerified()));
             online = interlocutor.isOnline();
             onlineMobile = interlocutor.isOnlineMobile();
             platform = interlocutor.getPlatform();
@@ -270,7 +272,15 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         } else {
             holder.ivVerified.setVisibility(View.GONE);
             holder.blacklisted.setVisibility(View.GONE);
-            holder.mDialogTitle.setTextColor(Utils.getVerifiedColor(mContext, false));
+        }
+        int mask = Settings.get().notifications().getNotifPref(
+                Settings.get().accounts().getCurrent(),
+                dialog.getPeerId()
+        );
+        if (mask == 0 ){
+            holder.mDialogTitle.setTextColor(CurrentTheme.getSecondaryTextColorCode(mContext));
+        } else {
+            holder.mDialogTitle.setTextColor(CurrentTheme.getPrimaryTextColorCode(mContext));
         }
 
         Integer iconRes = ViewUtils.getOnlineIcon(online, onlineMobile, platform, app);
@@ -287,17 +297,6 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         holder.tvUnreadCount.setText(AppTextUtils.getCounterWithK(dialog.getUnreadCount()));
         holder.tvUnreadCount.setVisibility(counterVisible ? View.VISIBLE : View.INVISIBLE);
 
-        int mask = Settings.get().notifications().getNotifPref(
-                Settings.get().accounts().getCurrent(),
-                dialog.getPeerId()
-        );
-//        if (mask == 0 ){
-//            holder.tvUnreadCount.setBackgroundColor(R.attr.colorSecondary);
-//            holder.tvUnreadCount.setTextColor(ColorStateList.valueOf(R.attr.colorOnSecondary));
-//        } else {
-//            holder.tvUnreadCount.setBackgroundColor(R.attr.colorPrimary);
-//            holder.tvUnreadCount.setTextColor(ColorStateList.valueOf(R.attr.colorOnPrimary));
-//        }
 
         long lastMessageJavaTime = dialog.getLastMessageDate() * 1000;
         int headerStatus = getDivided(lastMessageJavaTime, previous == null ? null : previous.getLastMessageDate() * 1000);

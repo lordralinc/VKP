@@ -6,16 +6,16 @@ buildscript {
     ext.okhttpLibraryVersion = '5.0.0-alpha.2'
     ext.okioVersion = '2.10.0'
     ext.RxJavaVersion = '3.0.11'
-    ext.GuavaVersion = '27.1-android'
+    ext.GuavaVersion = '30.1.1-jre'
     ext.exoLibraryVersion = '2.13.2'
 
-    ext.fenrirCompileSDK = 30
-    ext.fenrirBuildTools = '30.0.3'
-    ext.fenrirNdk = '22.0.7026061'
-    ext.fenrirMinSDK = 24
-    ext.fenrirTargetSDK = 24
-    ext.FenrirVersionCode = 3
-    ext.FenrirVersionName = "1b$FenrirVersionCode"
+    ext.VKPCompileSDK = 30
+    ext.VKPBuildTools = '30.0.3'
+    ext.VKPNdk = '22.0.7026061'
+    ext.VKPMinSDK = 24
+    ext.VKPTargetSDK = 30
+    ext.VKPVersionCode = 4
+    ext.VKPVersionName = "1b$VKPVersionCode"
 
     repositories {
         mavenCentral()

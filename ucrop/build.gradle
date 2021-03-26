@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion fenrirCompileSDK
-    buildToolsVersion fenrirBuildTools
+    compileSdkVersion VKPCompileSDK
+    buildToolsVersion VKPBuildTools
 
     defaultConfig {
-        minSdkVersion fenrirMinSDK
+        minSdkVersion VKPMinSDK
         //noinspection ExpiredTargetSdkVersion,OldTargetApi
-        targetSdkVersion fenrirTargetSDK
+        targetSdkVersion VKPTargetSDK
         versionCode 26
         versionName "2.2.6-non-native"
     }
@@ -27,6 +27,7 @@ android {
     }
 
     resourcePrefix 'ucrop_'
+    ndkVersion VKPNdk
 
 }
 

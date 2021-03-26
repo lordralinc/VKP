@@ -201,9 +201,7 @@ public class DialogsPresenter extends AccountDependencyPresenter<IDialogsView> {
         if (!Settings.get().other().isBe_online() || Utils.isHiddenAccount(getAccountId())) {
             netDisposable.add(accountsInteractor.setOffline(getAccountId())
                     .compose(RxUtils.applySingleIOToMainSchedulers())
-                    .subscribe(t -> {
-                    }, t -> {
-                    }));
+                    .subscribe(t -> {}, t -> {}));
         }
 
         setNetLoadingNow(false);

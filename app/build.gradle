@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/home/lordralinc/StudioProjects/VKP/ExampleKey.keystore')
+            storePassword 'salo11Petuh'
+            keyAlias 'fenrir'
+            keyPassword 'salo11Petuh'
+        }
+    }
     packagingOptions {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/license.txt'
@@ -9,16 +17,16 @@ android {
         exclude 'META-INF/NOTICE'
     }
 
-    compileSdkVersion fenrirCompileSDK
-    buildToolsVersion fenrirBuildTools
-    ndkVersion fenrirNdk
+    compileSdkVersion VKPCompileSDK
+    buildToolsVersion VKPBuildTools
+    ndkVersion VKPNdk
 
     defaultConfig {
-        minSdkVersion fenrirMinSDK
+        minSdkVersion VKPMinSDK
         //noinspection ExpiredTargetSdkVersion,OldTargetApi
-        targetSdkVersion fenrirTargetSDK
-        versionCode FenrirVersionCode
-        versionName FenrirVersionName
+        targetSdkVersion VKPTargetSDK
+        versionCode VKPVersionCode
+        versionName VKPVersionName
 
         buildConfigField 'String', 'SERVICE_TOKEN',             getProps("vk_service_token")
         buildConfigField 'String', 'YOUTUBE_DEV_KEY',           getProps("youtube_dev_key")
@@ -31,6 +39,7 @@ android {
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
+        signingConfig signingConfigs.release
 
     }
 

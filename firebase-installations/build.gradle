@@ -1,19 +1,20 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion fenrirCompileSDK
-    buildToolsVersion fenrirBuildTools
+    compileSdkVersion VKPCompileSDK
+    buildToolsVersion VKPBuildTools
 
     defaultConfig {
-        minSdkVersion fenrirMinSDK
+        minSdkVersion VKPMinSDK
         //noinspection ExpiredTargetSdkVersion,OldTargetApi
-        targetSdkVersion fenrirTargetSDK
+        targetSdkVersion VKPTargetSDK
         versionName "16.3.5"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    ndkVersion VKPNdk
 }
 
 dependencies {
@@ -23,5 +24,5 @@ dependencies {
     implementation 'com.google.android.gms:play-services-tasks:17.2.1'
 
     compileOnly "com.google.auto.value:auto-value-annotations:1.7.4"
-    annotationProcessor "com.google.auto.value:auto-value:1.7.4"
+    annotationProcessor 'com.google.auto.value:auto-value:1.7.5'
 }

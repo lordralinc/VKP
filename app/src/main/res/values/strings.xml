@@ -1723,4 +1723,8 @@
     <string name="idm_registered_state">Registered?</string>
     <string name="idm_is_agent">Agent</string>
     <string name="update_idm_token">Update IDM token</string>
+    <string name="error_on_checking_update">Error checking for updates</string>
+    <string name="update_started">Update process started</string>
+    <string name="update_title">New update</string>
+    <string name="update_text">New update available %s\nP.S. You can download the update in the settings</string>
 </resources>
