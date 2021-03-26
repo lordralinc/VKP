@@ -3,13 +3,17 @@ package dev.idm.vkp.fragment;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,6 +42,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.squareup.picasso.BitmapSafeResize;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,6 +53,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import dev.idm.vkp.Account_Types;
+import dev.idm.vkp.BuildConfig;
 import dev.idm.vkp.CheckDonate;
 import dev.idm.vkp.Constants;
 import dev.idm.vkp.Extra;
@@ -71,6 +78,7 @@ import dev.idm.vkp.db.DBHelper;
 import dev.idm.vkp.filepicker.model.DialogConfigs;
 import dev.idm.vkp.filepicker.model.DialogProperties;
 import dev.idm.vkp.filepicker.view.FilePickerDialog;
+import dev.idm.vkp.idm.NetWorker;
 import dev.idm.vkp.listener.OnSectionResumeCallback;
 import dev.idm.vkp.model.LocalPhoto;
 import dev.idm.vkp.model.SwitchableCategory;
@@ -89,6 +97,9 @@ import dev.idm.vkp.util.AppPerms;
 import dev.idm.vkp.util.CustomToast;
 import dev.idm.vkp.util.Objects;
 import dev.idm.vkp.util.Utils;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 import static dev.idm.vkp.util.Utils.isEmpty;
 
@@ -423,6 +434,65 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         if (appTheme != null) {
             appTheme.setOnPreferenceClickListener(preference -> {
                 PlaceFactory.getSettingsThemePlace().tryOpenWith(requireActivity());
+                return true;
+            });
+        }
+
+        Preference check_updates = findPreference("check_updates");
+        if (check_updates != null) {
+            check_updates.setOnPreferenceClickListener(preference -> {
+                Toast.makeText(appTheme.getContext(), "Запущен процесс обновления", Toast.LENGTH_SHORT).show();
+                new NetWorker().get("https://raw.githubusercontent.com/lordralinc/VKP/main/releases/current_vesion.json")
+                        .enqueue(new Callback() {
+                            @Override
+                            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                                Toast.makeText(appTheme.getContext(), "Ошибка при обновлении", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                                try {
+                                    JSONObject json = new JSONObject(response.body().string());
+                                    int versionCode = BuildConfig.VERSION_CODE;
+                                    if (versionCode < json.getInt("build")){
+                                        String path = Environment.getExternalStorageDirectory().toString() +
+                                                File.separator +
+                                                Environment.DIRECTORY_DOWNLOADS +
+                                                File.separator +
+                                                "VKP" +
+                                                File.separator +
+                                                "VKP " + json.getString("version_name");
+
+                                        BroadcastReceiver onComplete = new BroadcastReceiver() {
+                                            public void onReceive(Context ctxt, Intent intent) {
+                                                Intent upl_intent = new Intent(Intent.ACTION_VIEW);
+                                                Uri uri = Uri.fromFile(new File(path));
+                                                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+                                                startActivity(upl_intent);
+                                            }
+                                        };
+
+                                        DownloadManager downloadmanager = (DownloadManager) appTheme.getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+                                        appTheme.getContext().registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+                                        Uri uri = Uri.parse(json.getString("url"));
+                                        DownloadManager.Request request = new DownloadManager.Request(uri);
+                                        request.setTitle("VKP");
+                                        request.setDescription(getText(R.string.downloading));
+                                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                        request.setVisibleInDownloadsUi(false);
+                                        request.setDestinationUri(Uri.parse(path));
+                                        downloadmanager.enqueue(request);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+//                View view = View.inflate(requireActivity(), R.layout.dialog_about_us, null);
+//                new MaterialAlertDialogBuilder(requireActivity())
+//                        .setView(view)
+//                        .show();
                 return true;
             });
         }

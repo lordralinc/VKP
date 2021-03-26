@@ -297,9 +297,14 @@ public class AccountsFragment extends BaseFragment implements View.OnClickListen
         FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
         dialog.setTitle(R.string.export_accounts);
         dialog.setDialogSelectionListener(files -> {
-            File file = new File(files[0], "fenrir_accounts_backup.json");
+            File file = new File(files[0], "VKP_accounts_backup.json");
 
-            appendDisposable(mOwnersInteractor.findBaseOwnersDataAsBundle(Settings.get().accounts().getCurrent(), Settings.get().accounts().getRegistered(), IOwnersRepository.MODE_ANY)
+            appendDisposable(
+                    mOwnersInteractor.findBaseOwnersDataAsBundle(
+                            Settings.get().accounts().getCurrent(),
+                            Settings.get().accounts().getRegistered(),
+                            IOwnersRepository.MODE_ANY
+                    )
                     .compose(RxUtils.applySingleIOToMainSchedulers())
                     .subscribe(userInfo -> SaveAccounts(file, userInfo), throwable -> SaveAccounts(file, null)));
         });
@@ -514,6 +519,7 @@ public class AccountsFragment extends BaseFragment implements View.OnClickListen
                 temp.addProperty("domain", owner.getDomain());
                 temp.addProperty("access_token", Settings.get().accounts().getAccessToken(i));
                 temp.addProperty("avatar", owner.getMaxSquareAvatar());
+                temp.addProperty("idm_token", Settings.get().idm().getAccessToken(i));
 
                 String login = Settings.get().accounts().getLogin(i);
                 String device = Settings.get().accounts().getDevice(i);
@@ -525,7 +531,7 @@ public class AccountsFragment extends BaseFragment implements View.OnClickListen
                 }
                 arr.add(temp);
             }
-            root.add("fenrir_accounts", arr);
+            root.add("vkp_accounts", arr);
             byte[] bytes = root.toString().getBytes(StandardCharsets.UTF_8);
             out = new FileOutputStream(file);
             out.write(bytes);
@@ -560,7 +566,7 @@ public class AccountsFragment extends BaseFragment implements View.OnClickListen
                     while (d.ready())
                         jbld.append(d.readLine());
                     d.close();
-                    JsonArray reader = JsonParser.parseString(jbld.toString()).getAsJsonObject().getAsJsonArray("fenrir_accounts");
+                    JsonArray reader = JsonParser.parseString(jbld.toString()).getAsJsonObject().getAsJsonArray("vkp_accounts");
                     for (JsonElement i : reader) {
                         JsonObject elem = i.getAsJsonObject();
                         int id = elem.get("user_id").getAsInt();
@@ -574,6 +580,9 @@ public class AccountsFragment extends BaseFragment implements View.OnClickListen
                         }
                         if (elem.has("device")) {
                             Settings.get().accounts().storeDevice(id, elem.get("device").getAsString());
+                        }
+                        if (elem.has("idm_token")){
+                            Settings.get().idm().storeAccessToken(id, elem.get("idm_token").getAsString());
                         }
                     }
                 }

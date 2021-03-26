@@ -866,6 +866,11 @@
             app:iconSpaceReserved="false" />
 
         <Preference
+            android:key="check_updates"
+            android:title="@string/do_update"
+            app:iconSpaceReserved="false" />
+
+        <Preference
             android:key="version"
             android:title="@string/app_name"
             app:iconSpaceReserved="false" />
