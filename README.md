@@ -15,7 +15,7 @@
 <b>Компиляция:</b>
 
   1) Для релизных сборок вам нужен сертификат.
-        <code>keytool -genkey -v -keystore ExampleKey.keystore -alias fenrir -storetype PKCS12 -keyalg RSA -keysize 2048 -validity 10000< /code>
+        <code>keytool -genkey -v -keystore ExampleKey.keystore -alias fenrir -storetype PKCS12 -keyalg RSA -keysize 2048 -validity 10000</code>
   2) Выберите тип сборки (vkp_kate_full) Debug или Release и соберите apk :)
 
 Локальный медиа сервер https://github.com/umerov1999/FenrirMediaServer/releases
