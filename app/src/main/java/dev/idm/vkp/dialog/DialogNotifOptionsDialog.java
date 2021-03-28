@@ -20,6 +20,7 @@ import dev.idm.vkp.api.interfaces.IAccountApis;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.Optional;
 
+import static dev.idm.vkp.settings.ISettings.INotificationSettings.FLAG_PUSH;
 import static dev.idm.vkp.settings.NotificationsPrefs.FLAG_HIGH_PRIORITY;
 import static dev.idm.vkp.settings.NotificationsPrefs.FLAG_LED;
 import static dev.idm.vkp.settings.NotificationsPrefs.FLAG_SHOW_NOTIF;
@@ -36,6 +37,7 @@ public class DialogNotifOptionsDialog extends DialogFragment {
     private SwitchCompat scEnable;
     private SwitchCompat scHighPriority;
     private SwitchCompat scSound;
+    private SwitchCompat scPush;
     private SwitchCompat scVibro;
     private SwitchCompat scLed;
 
@@ -69,6 +71,7 @@ public class DialogNotifOptionsDialog extends DialogFragment {
         scSound = root.findViewById(R.id.sound);
         scVibro = root.findViewById(R.id.vibro);
         scLed = root.findViewById(R.id.led);
+        scPush = root.findViewById(R.id.push);
 
         scEnable.setChecked(hasFlag(mask, FLAG_SHOW_NOTIF));
         scEnable.setOnCheckedChangeListener((buttonView, isChecked) -> resolveOtherSwitches());
@@ -77,6 +80,7 @@ public class DialogNotifOptionsDialog extends DialogFragment {
         scHighPriority.setChecked(hasFlag(mask, FLAG_HIGH_PRIORITY));
         scVibro.setChecked(hasFlag(mask, FLAG_VIBRO));
         scLed.setChecked(hasFlag(mask, FLAG_LED));
+        scPush.setChecked(hasFlag(mask, FLAG_PUSH));
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireActivity())
                 .setTitle(R.string.peer_notification_settings)
@@ -97,6 +101,10 @@ public class DialogNotifOptionsDialog extends DialogFragment {
         int newMask = 0;
         if (scEnable.isChecked()) {
             newMask += FLAG_SHOW_NOTIF;
+        }
+
+        if (scPush.isChecked()) {
+            newMask += FLAG_PUSH;
         }
 
         if (scHighPriority.isEnabled() && scHighPriority.isChecked()) {
@@ -147,5 +155,6 @@ public class DialogNotifOptionsDialog extends DialogFragment {
         scSound.setEnabled(enable);
         scVibro.setEnabled(enable);
         scLed.setEnabled(enable);
+        scPush.setEnabled(enable);
     }
 }

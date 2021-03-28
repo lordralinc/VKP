@@ -2,6 +2,7 @@ package dev.idm.vkp.push;
 
 public final class PushType {
     public static final String MSG = "msg";
+    public static final String MSG_PUSH = "msg_push";
     public static final String POST = "post";
     public static final String REPLY = "reply";
     public static final String COMMENT = "comment";

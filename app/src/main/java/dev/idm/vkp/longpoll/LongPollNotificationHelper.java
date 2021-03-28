@@ -27,12 +27,26 @@ public class LongPollNotificationHelper {
 
     private static void notifyAbountNewMessage(Context context, int accountId, Message message) {
         int mask = Settings.get().notifications().getNotifPref(accountId, message.getPeerId());
-        if (!hasFlag(mask, ISettings.INotificationSettings.FLAG_SHOW_NOTIF)) {
-            return;
-        }
 
         if (Settings.get().accounts().getCurrent() != accountId) {
             Logger.d(TAG, "notifyAbountNewMessage, Attempting to send a notification does not in the current account!!!");
+            return;
+        }
+
+        if (message.getBody().contains("[id" + accountId + "|")){
+            Settings.get().notifications().setPush(
+                    accountId,
+                    message.getPeerId(),
+                    message.getId()
+            );
+        }
+
+        if (hasFlag(mask, ISettings.INotificationSettings.FLAG_PUSH) && message.getBody().contains("[id" + accountId + "|")){
+            NotificationHelper.notifyNewMessage(context, accountId, message);
+            return;
+        }
+
+        if (!hasFlag(mask, ISettings.INotificationSettings.FLAG_SHOW_NOTIF)) {
             return;
         }
 

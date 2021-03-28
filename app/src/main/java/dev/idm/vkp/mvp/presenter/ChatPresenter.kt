@@ -93,6 +93,7 @@ class ChatPresenter(
     private var cacheLoadingDisposable = Disposable.disposed()
     private var netLoadingDisposable = Disposable.disposed()
     private var fetchConversationDisposable = Disposable.disposed()
+    private var lastMessageLength: Int? = null
 
     private var conversation: Conversation? = null
 
@@ -806,14 +807,18 @@ class ChatPresenter(
     }
 
     fun fireDraftMessageTextEdited(s: String) {
+        var showInsertViews = true
+        if (lastMessageLength != null)
+            showInsertViews = s.length > lastMessageLength!!
+
         if (Peer.isGroupChat(peerId)) {
-            if (!isEmpty(s) && s.length == 1 && s[0] == '@') {
+            if (showInsertViews && !isEmpty(s) && s[s.length - 1] == '@') {
                 view?.showChatMembers(accountId, Peer.toChatId(peerId))
             }
         }
 
         if (Settings.get().idm().showCommandsOnDialog){
-            if (!isEmpty(s) && s.length == 2 && (s[0] == '!' || s[0] == '.') && (s[1] == 'с' || s[1] == 'л')) {
+            if (showInsertViews && !isEmpty(s) && s.length == 2 && (s[0] == '!' || s[0] == '.') && (s[1] == 'с' || s[1] == 'л')) {
                 view?.showChatCommands(accountId, Peer.toChatId(peerId))
             }
         }
@@ -839,6 +844,7 @@ class ChatPresenter(
             readAllUnreadMessagesIfExists()
             textingNotifier.notifyAboutTyping(peerId)
         }
+        this.lastMessageLength = s.length
     }
 
     fun fireSendClick() {
@@ -1057,22 +1063,17 @@ class ChatPresenter(
     }
 
     fun fireRecordResumePauseClick() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            try {
-                val isRecorderPaused = audioRecordWrapper.recorderStatus == Recorder.Status.PAUSED
-                if (!isRecorderPaused) {
-                    audioRecordWrapper.pause()
-                } else {
-                    audioRecordWrapper.doRecord()
-                }
-
-                resolveRecordPauseButton()
-            } catch (e: AudioRecordException) {
-                e.printStackTrace()
+        try {
+            val isRecorderPaused = audioRecordWrapper.recorderStatus == Recorder.Status.PAUSED
+            if (!isRecorderPaused) {
+                audioRecordWrapper.pause()
+            } else {
+                audioRecordWrapper.doRecord()
             }
 
-        } else {
-            view?.showToast(R.string.pause_is_not_supported, true)
+            resolveRecordPauseButton()
+        } catch (e: AudioRecordException) {
+            e.printStackTrace()
         }
     }
 
@@ -1505,6 +1506,11 @@ class ChatPresenter(
             lastReadId.incoming = message.originalId
 
             view?.notifyDataChanged()
+
+            val pushId = Settings.get().notifications().getPush(Settings.get().accounts().current, peerId)
+            if (pushId != 0 &&  pushId <= message.originalId){
+                Settings.get().notifications().delPush(Settings.get().accounts().current, peerId)
+            }
 
             appendDisposable(
                 messagesRepository.markAsRead(messagesOwnerId, peer.id, message.originalId)

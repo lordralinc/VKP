@@ -16,6 +16,16 @@
         android:textSize="@dimen/font_size_title" />
 
     <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/push"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:padding="8dp"
+        android:text="@string/enable_groupchat_push_title"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="@dimen/font_size_title" />
+
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/priority"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

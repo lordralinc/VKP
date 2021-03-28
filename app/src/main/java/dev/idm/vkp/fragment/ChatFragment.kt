@@ -1236,9 +1236,9 @@ class ChatFragment : PlaceSupportMvpFragment<ChatPresenter, IChatView>(), IChatV
 
     private fun insertDomain(owner: Owner) {
         if (nonEmpty(owner.domain)) {
-            AppendMessageText("@" + owner.domain + ",")
+            AppendMessageText(owner.domain + ",")
         } else {
-            AppendMessageText("@id" + owner.ownerId + ",")
+            AppendMessageText("${owner.ownerId},")
         }
     }
 

@@ -116,6 +116,27 @@ public class NotificationsPrefs implements ISettings.INotificationSettings {
     }
 
     @Override
+    public int getPush(int accountId, int peerId) {
+        return PreferenceManager.getDefaultSharedPreferences(app)
+                .getInt("messages_push_" + accountId + "_" + peerId, 0);
+    }
+
+    @Override
+    public void setPush(int accountId, int peerId, int messageId) {
+        PreferenceManager.getDefaultSharedPreferences(app)
+                .edit()
+                .putInt("messages_push_" + accountId + "_" + peerId, messageId)
+                .apply();
+    }
+
+    @Override
+    public void delPush(int accountId, int peerId) {
+        PreferenceManager.getDefaultSharedPreferences(app)
+                .edit().remove("messages_push_" + accountId + "_" + peerId)
+                .apply();
+    }
+
+    @Override
     public boolean isLikeNotificationEnable() {
         return isOtherNotificationsEnable() && PreferenceManager.getDefaultSharedPreferences(app)
                 .getBoolean("likes_notification", true);
@@ -217,6 +238,9 @@ public class NotificationsPrefs implements ISettings.INotificationSettings {
 
             if (sharedPreferences.getBoolean("new_groupchat_message_notif_led", true)) {
                 value += FLAG_LED;
+            }
+            if (sharedPreferences.getBoolean("new_groupchat_message_notif_push", true)) {
+                value += FLAG_PUSH;
             }
         }
         return value;

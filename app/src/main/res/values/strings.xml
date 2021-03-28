@@ -257,6 +257,7 @@
     <string name="messages_in_groupchat_tite">Messages in group chat</string>
     <string name="enable_groupchat_notif_title">Enable notifications</string>
     <string name="enable_groupchat_sound_title">Sound</string>
+    <string name="enable_groupchat_push_title">Push</string>
     <string name="enable_groupchat_vibro_title">Vibration</string>
     <string name="enable_groupchat_led_title">LED</string>
 

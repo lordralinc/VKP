@@ -287,20 +287,15 @@ public class InputViewController {
     @SuppressLint("SetTextI18n")
     public void AppendTextQuietly(String text) {
         if (text != null) {
-            mInputField.removeTextChangedListener(mTextWatcher);
-
-            String txt = Utils.firstNonEmptyString(mInputField.getText().toString(), " ");
-
-            if (txt.lastIndexOf('@') != -1) {
-                txt = txt.substring(0, txt.length() - 1);
-            }
-
-            mInputField.setText(txt + " " + text);mInputField.requestFocus();
-            mInputField.setText(mInputField.getText());mInputField.requestFocus();
-
+            String txt = java.util.Objects.requireNonNull(mInputField.getText()).toString();
+            String newText = txt.toCharArray()[txt.length() - 1] == '@' ?
+                    txt + text :
+                    txt + " " + text;
+            mInputField.setText(newText);
+            callback.onInputTextChanged(newText);
             if (!Utils.isEmpty(text))
-                mInputField.setSelection(mInputField.getText().length());
-            mInputField.addTextChangedListener(mTextWatcher);
+                mInputField.setSelection(text.length());
+            mInputField.requestFocus();
         }
     }
 

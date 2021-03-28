@@ -297,6 +297,12 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         holder.tvUnreadCount.setText(AppTextUtils.getCounterWithK(dialog.getUnreadCount()));
         holder.tvUnreadCount.setVisibility(counterVisible ? View.VISIBLE : View.INVISIBLE);
 
+        boolean pushVisible = Settings.get().notifications().getPush(Settings.get().accounts().getCurrent(), dialog.getPeerId()) != 0;
+        if (!counterVisible && pushVisible){
+            Settings.get().notifications().delPush(Settings.get().accounts().getCurrent(), dialog.getPeerId());
+        }
+        holder.tvPush.setVisibility(pushVisible && counterVisible ? View.VISIBLE : View.INVISIBLE);
+        holder.tvPush.setText("@");
 
         long lastMessageJavaTime = dialog.getLastMessageDate() * 1000;
         int headerStatus = getDivided(lastMessageJavaTime, previous == null ? null : previous.getLastMessageDate() * 1000);
@@ -434,6 +440,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         final ImageView ivVerified;
         final ImageView blacklisted;
         final TextView tvUnreadCount;
+        final TextView tvPush;
         final ImageView ivUnreadTicks;
         final OnlineView ivOnline;
         final TextView tvDate;
@@ -450,6 +457,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ivUnreadTicks = view.findViewById(R.id.unread_ticks);
             ivAvatar = view.findViewById(R.id.item_chat_avatar);
             tvUnreadCount = view.findViewById(R.id.item_chat_unread_count);
+            tvPush = view.findViewById(R.id.item_chat_push);
             ivOnline = view.findViewById(R.id.item_chat_online);
             tvDate = view.findViewById(R.id.item_chat_date);
             mHeaderTitle = view.findViewById(R.id.header_title);

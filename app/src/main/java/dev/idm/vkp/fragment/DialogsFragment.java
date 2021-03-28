@@ -2,6 +2,7 @@ package dev.idm.vkp.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
@@ -21,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,6 +42,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import dev.idm.vkp.CheckDonate;
 import dev.idm.vkp.Extra;
@@ -70,6 +73,7 @@ import dev.idm.vkp.mvp.presenter.DialogsPresenter;
 import dev.idm.vkp.mvp.view.IDialogsView;
 import dev.idm.vkp.place.Place;
 import dev.idm.vkp.place.PlaceFactory;
+import dev.idm.vkp.settings.ISettings;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.AssertUtils;
 import dev.idm.vkp.util.CustomToast;
@@ -493,14 +497,38 @@ public class DialogsFragment extends BaseMvpFragment<DialogsPresenter, IDialogsV
                             vk_mask
                         );
                 }
+
                 if (current_mask == 0 && vk_mask != 0){
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+                    int value = sharedPreferences.getBoolean("high_notif_priority", false) ? ISettings.INotificationSettings.FLAG_HIGH_PRIORITY : 0;
+                    if (sharedPreferences.getBoolean("new_dialog_message_notif_enable", true)) {
+                        value += ISettings.INotificationSettings.FLAG_SHOW_NOTIF;
+                    }
+
+                    if (sharedPreferences.getBoolean("new_dialog_message_notif_sound", true)) {
+                        value += ISettings.INotificationSettings.FLAG_SOUND;
+                    }
+
+                    if (sharedPreferences.getBoolean("new_dialog_message_notif_vibration", true)) {
+                        value += ISettings.INotificationSettings.FLAG_VIBRO;
+                    }
+
+                    if (sharedPreferences.getBoolean("new_dialog_message_notif_led", true)) {
+                        value += ISettings.INotificationSettings.FLAG_LED;
+                    }
+
+                    if (sharedPreferences.getBoolean("new_dialog_message_notif_push", true)) {
+                        value += ISettings.INotificationSettings.FLAG_PUSH;
+                    }
+
+
                     Settings
                         .get()
                         .notifications()
                         .setNotifPref(
                             Settings.get().accounts().getCurrent(),
                             item.getInt("peer_id"),
-                            15
+                            value
                         );
                 }
             }

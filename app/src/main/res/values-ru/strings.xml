@@ -159,6 +159,7 @@
     <string name="messages_in_groupchat_tite">Сообщения в групповых беседах</string>
     <string name="enable_groupchat_notif_title">Включить оповещения</string>
     <string name="enable_groupchat_sound_title">Звук</string>
+    <string name="enable_groupchat_push_title">Пуши</string>
     <string name="enable_groupchat_vibro_title">Вибро</string>
     <string name="enable_groupchat_led_title">Светодиод</string>
 

@@ -326,6 +326,7 @@ public interface ISettings {
         int FLAG_LED = 4;
         int FLAG_SHOW_NOTIF = 8;
         int FLAG_HIGH_PRIORITY = 16;
+        int FLAG_PUSH = 32;
 
         int getNotifPref(int aid, int peerid);
 
@@ -366,6 +367,10 @@ public interface ISettings {
         boolean isQuickReplyImmediately();
 
         boolean isBirtdayNotifEnabled();
+
+        int getPush(int accountId, int peerId);
+        void delPush(int accountId, int peerId);
+        void setPush(int accountId, int peerId, int messageId);
     }
 
     interface IRecentChats {

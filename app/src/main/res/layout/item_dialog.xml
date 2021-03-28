@@ -112,22 +112,6 @@
             app:tint="?colorOnSurface"
             tools:src="@drawable/channel" />
 
-        <TextView
-            android:id="@+id/dialog_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="7dp"
-            android:layout_toStartOf="@id/unread_ticks"
-            android:layout_toEndOf="@id/dialog_type"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            app:layout_constraintEnd_toStartOf="@+id/unread_ticks"
-            app:layout_constraintStart_toEndOf="@+id/dialog_type"
-            app:layout_constraintTop_toTopOf="@+id/item_chat_avatar"
-            app:layout_goneMarginStart="12dp"
-            tools:text="Name" />
 
         <ImageView
             android:id="@+id/unread_ticks"
@@ -150,6 +134,23 @@
             app:layout_constraintTop_toTopOf="@id/item_chat_avatar"
             tools:text="time" />
 
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="7dp"
+            android:layout_toStartOf="@id/unread_ticks"
+            android:layout_toEndOf="@id/dialog_type"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+            app:layout_constraintEnd_toStartOf="@+id/unread_ticks"
+            app:layout_constraintStart_toEndOf="@+id/dialog_type"
+            app:layout_constraintTop_toTopOf="@+id/item_chat_avatar"
+            app:layout_goneMarginStart="12dp"
+            tools:text="Name" />
+
         <dev.idm.vkp.view.emoji.EmojiconTextView
             android:id="@+id/dialog_message"
             android:layout_width="0dp"
@@ -164,10 +165,33 @@
             android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
             android:textSize="14sp"
             app:emojiconSize="17sp"
-            app:layout_constraintEnd_toStartOf="@+id/item_chat_unread_count"
+            app:layout_constraintEnd_toStartOf="@+id/item_chat_push"
             app:layout_constraintStart_toEndOf="@+id/item_chat_avatar"
             app:layout_constraintTop_toBottomOf="@id/dialog_title"
             tools:text="Message" />
+
+        <TextView
+            android:id="@+id/item_chat_push"
+            android:layout_width="wrap_content"
+            android:layout_height="26dp"
+            android:layout_alignTop="@id/dialog_message"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/counter"
+            android:backgroundTint="?colorPrimary"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:minWidth="26dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+            android:textColor="?colorOnPrimary"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/item_chat_unread_count"
+            app:layout_constraintStart_toEndOf="@+id/dialog_title"
+            app:layout_constraintTop_toBottomOf="@id/dialog_title" />
 
         <TextView
             android:id="@+id/item_chat_unread_count"
@@ -187,8 +211,16 @@
             android:textColor="?colorOnPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/item_chat_date"
+            app:layout_constraintStart_toEndOf="@+id/item_chat_push"
             app:layout_constraintTop_toBottomOf="@+id/dialog_title"
             tools:text="2000" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="20dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
