@@ -141,7 +141,7 @@ class App : Application(), ImageLoaderFactory {
 
 
 
-        NetWorker().get("https://raw.githubusercontent.com/lordralinc/VKP/main/releases/current_version.json")
+        NetWorker().get("https://raw.githubusercontent.com/IDM-Team/VKP/main/releases/current_version.json")
             .enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     Toast.makeText(

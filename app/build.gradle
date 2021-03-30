@@ -2,14 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    signingConfigs {
-        release {
-            storeFile file('/home/lordralinc/StudioProjects/VKP/ExampleKey.keystore')
-            storePassword 'salo11Petuh'
-            keyAlias 'fenrir'
-            keyPassword 'salo11Petuh'
-        }
-    }
     packagingOptions {
         exclude 'META-INF/notice.txt'
         exclude 'META-INF/license.txt'
@@ -39,7 +31,6 @@ android {
         ndk {
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
-        signingConfig signingConfigs.release
 
     }
 
