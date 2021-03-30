@@ -11,33 +11,22 @@ import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.google.gson.Gson;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrConfig;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dev.idm.vkp.Account_Types;
-import dev.idm.vkp.CheckDonate;
 import dev.idm.vkp.Constants;
 import dev.idm.vkp.R;
 import dev.idm.vkp.api.Auth;
 import dev.idm.vkp.api.util.VKStringUtils;
-import dev.idm.vkp.idm.IdmApi;
-import dev.idm.vkp.idm.responses.Donuts;
 import dev.idm.vkp.model.Token;
 import dev.idm.vkp.settings.CurrentTheme;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.Logger;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 import static dev.idm.vkp.util.Utils.nonEmpty;
 

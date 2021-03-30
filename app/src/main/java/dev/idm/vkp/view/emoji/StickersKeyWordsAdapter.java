@@ -32,7 +32,7 @@ public class StickersKeyWordsAdapter extends RecyclerView.Adapter<RecyclerView.V
     public StickersKeyWordsAdapter(Context context, List<Sticker> stickers) {
         this.context = context;
         this.stickers = stickers;
-        isNightStiker = Settings.get().ui().isStickers_by_theme() && Settings.get().ui().isDarkModeEnabled(context);
+        isNightStiker = Settings.get().ui().isStickersByTheme() && Settings.get().ui().isDarkModeEnabled(context);
     }
 
     public void setStickerClickedListener(EmojiconsPopup.OnStickerClickedListener listener) {

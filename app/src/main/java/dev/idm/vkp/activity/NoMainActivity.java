@@ -32,7 +32,7 @@ public abstract class NoMainActivity extends AppCompatActivity {
         setTheme(Settings.get().ui().getMainTheme());
         Utils.prepareDensity(this);
         super.onCreate(savedInstanceState);
-        isZoomPhoto = Settings.get().other().isDo_zoom_photo();
+        isZoomPhoto = Settings.get().other().isDoZoomPhoto();
         setContentView(R.layout.activity_no_main);
 
         Window w = getWindow();

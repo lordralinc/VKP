@@ -128,7 +128,7 @@ public class AudiosByArtistFragment extends BaseMvpFragment<AudiosByArtistPresen
 
         FloatingActionButton save_mode = root.findViewById(R.id.save_mode_button);
         FloatingActionButton Goto = root.findViewById(R.id.goto_button);
-        save_mode.setVisibility(Settings.get().other().isAudio_save_mode_button() ? View.VISIBLE : View.GONE);
+        save_mode.setVisibility(Settings.get().other().isAudioSaveModeButton() ? View.VISIBLE : View.GONE);
         save_mode.setOnClickListener(v -> {
             if (!CheckDonate.isFullVersion(requireActivity())) {
                 return;

@@ -203,7 +203,7 @@ public class AudiosLocalServerPresenter extends AccountDependencyPresenter<IAudi
 
     public void playAudio(Context context, int position) {
         MusicPlaybackService.startForPlayList(context, new ArrayList<>(audios), position, false);
-        if (!Settings.get().other().isShow_mini_player())
+        if (!Settings.get().other().isShowMiniPlayer())
             PlaceFactory.getPlayerPlace(getAccountId()).tryOpenWith(context);
     }
 

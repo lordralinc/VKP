@@ -9,6 +9,7 @@ public class AbsMenuItem implements Parcelable {
     public static final int TYPE_WITHOUT_ICON = 1;
     public static final int TYPE_DIVIDER = 2;
     public static final int TYPE_RECENT_CHAT = 3;
+
     public static Creator<AbsMenuItem> CREATOR = new Creator<AbsMenuItem>() {
         public AbsMenuItem createFromParcel(Parcel source) {
             return new AbsMenuItem(source);
@@ -65,4 +66,5 @@ public class AbsMenuItem implements Parcelable {
     public int hashCode() {
         return type;
     }
+
 }

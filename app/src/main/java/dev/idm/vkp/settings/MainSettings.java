@@ -37,37 +37,37 @@ class MainSettings implements ISettings.IMainSettings {
     }
 
     @Override
-    public boolean isAudio_round_icon() {
+    public boolean isAudioRoundIcon() {
         return getDefaultPreferences().getBoolean("audio_round_icon", true);
     }
 
     @Override
-    public boolean isUse_long_click_download() {
+    public boolean isUseLongClickDownload() {
         return getDefaultPreferences().getBoolean("use_long_click_download", false);
     }
 
     @Override
-    public boolean isPlayer_support_volume() {
+    public boolean isPlayerSupportVolume() {
         return getDefaultPreferences().getBoolean("is_player_support_volume", false);
     }
 
     @Override
-    public boolean isShow_bot_keyboard() {
+    public boolean isShowBotKeyboard() {
         return getDefaultPreferences().getBoolean("show_bot_keyboard", true);
     }
 
     @Override
-    public boolean isMy_message_no_color() {
+    public boolean isMyMessageNoColor() {
         return getDefaultPreferences().getBoolean("my_message_no_color", false);
     }
 
     @Override
-    public boolean is_smooth_chat() {
+    public boolean isSmoothChat() {
         return getDefaultPreferences().getBoolean("smooth_chat", false);
     }
 
     @Override
-    public boolean isMessages_menu_down() {
+    public boolean isMessagesMenuDown() {
         return getDefaultPreferences().getBoolean("messages_menu_down", false);
     }
 
@@ -100,7 +100,7 @@ class MainSettings implements ISettings.IMainSettings {
     }
 
     @Override
-    public int getStart_newsMode() {
+    public int getStartNewsMode() {
         try {
             return Integer.parseInt(Objects.requireNonNull(getDefaultPreferences().getString("start_news", "2")));
         } catch (Exception e) {
@@ -174,12 +174,12 @@ class MainSettings implements ISettings.IMainSettings {
     }
 
     @Override
-    public boolean isWebview_night_mode() {
+    public boolean isWebViewNightMode() {
         return getDefaultPreferences().getBoolean("webview_night_mode", true);
     }
 
     @Override
-    public boolean isLoad_history_notif() {
+    public boolean isLoadHistoryNotif() {
         return getDefaultPreferences().getBoolean("load_history_notif", false);
     }
 
@@ -189,12 +189,12 @@ class MainSettings implements ISettings.IMainSettings {
     }
 
     @Override
-    public boolean isDont_write() {
+    public boolean isDoNotWrite() {
         return getDefaultPreferences().getBoolean("dont_write", false);
     }
 
     @Override
-    public boolean isOver_ten_attach() {
+    public boolean isOverTenAttach() {
         return getDefaultPreferences().getBoolean("over_ten_attach", false);
     }
 }

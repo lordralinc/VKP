@@ -91,7 +91,7 @@ public class NotificationHelper {
                 .subscribe(account -> ChatEntryFetcher.getRx(context, accountId, message.getPeerId())
                         .subscribeOn(NotificationScheduler.INSTANCE)
                         .subscribe(info -> {
-                            if (Settings.get().main().isLoad_history_notif()) {
+                            if (Settings.get().main().isLoadHistoryNotif()) {
                                 Repository.INSTANCE.getMessages().getPeerMessages(accountId, message.getPeerId(), 10, 1, null, false, false)
                                         .subscribeOn(NotificationScheduler.INSTANCE)
                                         .subscribe(history -> doShowNotification(accountId, context, account, info, message, history), t -> doShowNotification(accountId, context, account, info, message, null));
@@ -329,7 +329,7 @@ public class NotificationHelper {
             builder.setSound(findNotificationSound());
         }
 
-        if (Build.VERSION.SDK_INT >=  30) {
+        if (Build.VERSION.SDK_INT >= 30) {
             createNotificationShortcut(context, builder, new Person.Builder()
                     .setName(getSenderName(message.getSender(), context)).setIcon(IconCompat.createWithBitmap(message.getSenderId() == accountId ? acc_avatar : avatar))
                     .setKey(String.valueOf(message.getSenderId())).build(), peer, accountId, message, text);

@@ -41,7 +41,6 @@ import dev.idm.vkp.modalbottomsheetdialogfragment.OptionRequest;
 import dev.idm.vkp.model.Audio;
 import dev.idm.vkp.model.IdPair;
 import dev.idm.vkp.model.menu.AudioItem;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.picasso.PicassoInstance;
 import dev.idm.vkp.picasso.transforms.PolyTransformation;
 import dev.idm.vkp.picasso.transforms.RoundTransformation;
@@ -57,6 +56,7 @@ import dev.idm.vkp.util.Mp3InfoHelper;
 import dev.idm.vkp.util.RxUtils;
 import dev.idm.vkp.util.Utils;
 import dev.idm.vkp.view.WeakViewAnimatorAdapter;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 import static dev.idm.vkp.player.util.MusicUtils.observeServiceBinding;
@@ -94,11 +94,11 @@ public class AudioContainer extends LinearLayout {
 
     @DrawableRes
     private int getAudioCoverSimple() {
-        return Settings.get().main().isAudio_round_icon() ? R.drawable.audio_button : R.drawable.audio_button_material;
+        return Settings.get().main().isAudioRoundIcon() ? R.drawable.audio_button : R.drawable.audio_button_material;
     }
 
     private Transformation TransformCover() {
-        return Settings.get().main().isAudio_round_icon() ? new RoundTransformation() : new PolyTransformation();
+        return Settings.get().main().isAudioRoundIcon() ? new RoundTransformation() : new PolyTransformation();
     }
 
     private void updateAudioStatus(AudioHolder holder, Audio audio) {
@@ -238,7 +238,7 @@ public class AudioContainer extends LinearLayout {
 
                 holder.ibPlay.setOnClickListener(v -> {
                     if (MusicUtils.isNowPlayingOrPreparingOrPaused(audio)) {
-                        if (!Settings.get().other().isUse_stop_audio()) {
+                        if (!Settings.get().other().isUseStopAudio()) {
                             updateAudioStatus(holder, audio);
                             MusicUtils.playOrPause();
                         } else {

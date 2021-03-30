@@ -82,6 +82,7 @@ public class FriendsRecycleAdapter extends RecyclerView.Adapter<FriendsRecycleAd
         SelectionUtils.addSelectionProfileSupport(context, holder.avatarRoot, user);
 
         holder.ivVerified.setVisibility(user.isVerified() ? View.VISIBLE : View.GONE);
+        holder.ivVerified.setBackgroundTintList(user.getDonatedColour());
     }
 
     @Override

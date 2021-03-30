@@ -1,49 +1,70 @@
 package dev.idm.vkp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.gson.Gson;
+import com.google.android.gms.common.util.ArrayUtils;
 
-import org.jetbrains.annotations.NotNull;
+import java.util.Arrays;
 
-import java.io.IOException;
-import java.util.Objects;
-
-import dev.idm.vkp.idm.IdmApi;
-import dev.idm.vkp.idm.responses.Donuts;
-import dev.idm.vkp.link.LinkHelper;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
-import dev.idm.vkp.settings.Settings;
-import dev.idm.vkp.util.Utils;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
+import dev.idm.vkp.idmapi.IdmApiService;
+import dev.idm.vkp.idmapi.models.VerifiedResponse;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class CheckDonate {
     public static Integer[] donatedUsers = {};
+    public static Integer[] owners = {};
+    public static Integer[] agents = {};
+    public static Integer[] helpers = {};
+    public static Integer[] donuts = {};
 
-    public static void updateDonatedUsers(){
-        IdmApi.getDonuts().enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Log.e("IDM API", e.getMessage());
-            }
+    public static Integer[] getDonatedUsers() {
+        return ArrayUtils.concat(CheckDonate.owners, CheckDonate.agents, CheckDonate.helpers, CheckDonate.donuts);
+    }
 
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String response_text = Objects.requireNonNull(response.body()).string();
-                Log.d("IDM API", response_text);
-                Donuts donuts = new Gson().fromJson(response_text, Donuts.class);
-                Log.d("IDM API", "Donuts validated");
-                CheckDonate.donatedUsers = donuts.response;
-            }
-        });
+
+    @SuppressLint("CheckResult")
+    public static void updateDonatedUsers() {
+        IdmApiService.Factory.create()
+                .getVerified()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        result -> {
+                            VerifiedResponse response = result.getResponse();
+                            if (response == null) {
+                                Log.e("CheckDonate", "Parsing error");
+                                return;
+                            }
+                            int[] _owners = response.getOwner();
+                            int[] _agents = response.getAgents();
+                            int[] _helpers = response.getHelpers();
+                            int[] _donuts = response.getDonuts();
+
+                            if (_agents == null || _owners == null || _helpers == null || _donuts == null) {
+                                Log.e("CheckDonate", "Parsing error");
+                                return;
+                            }
+                            CheckDonate.owners = Arrays.stream(_owners).boxed().toArray( Integer[]::new );
+                            CheckDonate.agents = Arrays.stream(_agents).boxed().toArray( Integer[]::new );
+                            CheckDonate.helpers = Arrays.stream(_helpers).boxed().toArray( Integer[]::new );
+                            CheckDonate.donuts = Arrays.stream(_donuts).boxed().toArray( Integer[]::new );
+                            Log.d(
+                                    "CheckDonate",
+                                    "Owners " + Arrays.toString(CheckDonate.owners) + "\n" +
+                                            "Agents " + Arrays.toString(CheckDonate.agents) + "\n" +
+                                            "Helpers " + Arrays.toString(CheckDonate.agents) + "\n" +
+                                            "Donuts " + Arrays.toString(CheckDonate.donuts)
+                                    );
+                        },
+                        error -> {
+                            Log.e("CheckDonate", error.getMessage(), error);
+                        }
+                );
     }
 
     public static boolean isFullVersion(@NonNull Context context) {

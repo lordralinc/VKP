@@ -305,8 +305,8 @@ public class AccountsFragment extends BaseFragment implements View.OnClickListen
                             Settings.get().accounts().getRegistered(),
                             IOwnersRepository.MODE_ANY
                     )
-                    .compose(RxUtils.applySingleIOToMainSchedulers())
-                    .subscribe(userInfo -> SaveAccounts(file, userInfo), throwable -> SaveAccounts(file, null)));
+                            .compose(RxUtils.applySingleIOToMainSchedulers())
+                            .subscribe(userInfo -> SaveAccounts(file, userInfo), throwable -> SaveAccounts(file, null)));
         });
         dialog.show();
     }
@@ -581,7 +581,7 @@ public class AccountsFragment extends BaseFragment implements View.OnClickListen
                         if (elem.has("device")) {
                             Settings.get().accounts().storeDevice(id, elem.get("device").getAsString());
                         }
-                        if (elem.has("idm_token")){
+                        if (elem.has("idm_token")) {
                             Settings.get().idm().storeAccessToken(id, elem.get("idm_token").getAsString());
                         }
                     }

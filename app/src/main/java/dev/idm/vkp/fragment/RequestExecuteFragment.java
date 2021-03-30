@@ -28,7 +28,7 @@ import dev.idm.vkp.mvp.presenter.RequestExecutePresenter;
 import dev.idm.vkp.mvp.view.IRequestExecuteView;
 import dev.idm.vkp.util.AppPerms;
 
-public class       RequestExecuteFragment extends BaseMvpFragment<RequestExecutePresenter, IRequestExecuteView> implements IRequestExecuteView {
+public class RequestExecuteFragment extends BaseMvpFragment<RequestExecutePresenter, IRequestExecuteView> implements IRequestExecuteView {
 
     private final AppPerms.doRequestPermissions requestWritePermission = AppPerms.requestPermissions(this,
             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},

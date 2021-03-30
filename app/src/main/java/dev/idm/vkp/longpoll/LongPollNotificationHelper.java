@@ -33,7 +33,7 @@ public class LongPollNotificationHelper {
             return;
         }
 
-        if (message.getBody().contains("[id" + accountId + "|")){
+        if (message.getBody().contains("[id" + accountId + "|")) {
             Settings.get().notifications().setPush(
                     accountId,
                     message.getPeerId(),
@@ -41,7 +41,7 @@ public class LongPollNotificationHelper {
             );
         }
 
-        if (hasFlag(mask, ISettings.INotificationSettings.FLAG_PUSH) && message.getBody().contains("[id" + accountId + "|")){
+        if (hasFlag(mask, ISettings.INotificationSettings.FLAG_PUSH) && message.getBody().contains("[id" + accountId + "|")) {
             NotificationHelper.notifyNewMessage(context, accountId, message);
             return;
         }

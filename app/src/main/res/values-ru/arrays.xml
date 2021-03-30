@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_music_services">
+        <item>Internal</item>
+        <item>VKX</item>
+    </string-array>
+</resources>

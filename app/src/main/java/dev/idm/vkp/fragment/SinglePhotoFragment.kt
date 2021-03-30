@@ -19,7 +19,6 @@ import dev.idm.vkp.R
 import dev.idm.vkp.activity.ActivityFeatures
 import dev.idm.vkp.fragment.base.BaseFragment
 import dev.idm.vkp.listener.BackPressCallback
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView
 import dev.idm.vkp.picasso.PicassoInstance
 import dev.idm.vkp.settings.CurrentTheme
 import dev.idm.vkp.settings.Settings
@@ -37,6 +36,7 @@ import dev.idm.vkp.view.pager.WeakPicassoLoadCallback
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior.Companion.from
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior.SettleOnTopAction
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -135,7 +135,7 @@ class SinglePhotoFragment : BaseFragment(), GoBackCallback, BackPressCallback {
                 return
             }
         } else dir.setLastModified(Calendar.getInstance().time.time)
-        if (prefix != null && Settings.get().other().isPhoto_to_user_dir) {
+        if (prefix != null && Settings.get().other().isPhotoToUserDir) {
             val dir_final = File(dir.absolutePath + "/" + prefix)
             if (!dir_final.isDirectory) {
                 val created = dir_final.mkdirs()

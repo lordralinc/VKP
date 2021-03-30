@@ -24,7 +24,7 @@ class PushSettings implements ISettings.IPushSettings {
     }
 
     @Override
-    public void savePushRegistations(Collection<VkPushRegistration> data) {
+    public void savePushRegistrations(Collection<VkPushRegistration> data) {
         Set<String> target = new HashSet<>(data.size());
 
         for (VkPushRegistration registration : data) {

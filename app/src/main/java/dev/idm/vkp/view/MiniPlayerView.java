@@ -27,7 +27,6 @@ import java.util.Objects;
 import dev.idm.vkp.Injection;
 import dev.idm.vkp.R;
 import dev.idm.vkp.model.Audio;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.picasso.PicassoInstance;
 import dev.idm.vkp.picasso.transforms.PolyTransformation;
 import dev.idm.vkp.picasso.transforms.RoundTransformation;
@@ -36,6 +35,7 @@ import dev.idm.vkp.player.util.MusicUtils;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.RxUtils;
 import dev.idm.vkp.util.Utils;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 import static dev.idm.vkp.player.util.MusicUtils.mService;
@@ -118,12 +118,12 @@ public class MiniPlayerView extends FrameLayout implements SeekBar.OnSeekBarChan
     }
 
     private Transformation TransformCover() {
-        return Settings.get().main().isAudio_round_icon() ? new RoundTransformation() : new PolyTransformation();
+        return Settings.get().main().isAudioRoundIcon() ? new RoundTransformation() : new PolyTransformation();
     }
 
     @DrawableRes
     private int getAudioCoverSimple() {
-        return Settings.get().main().isAudio_round_icon() ? R.drawable.audio_button : R.drawable.audio_button_material;
+        return Settings.get().main().isAudioRoundIcon() ? R.drawable.audio_button : R.drawable.audio_button_material;
     }
 
     private void updatePlaybackControls() {

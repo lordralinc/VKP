@@ -17,11 +17,11 @@ import dev.idm.vkp.Constants;
 import dev.idm.vkp.R;
 import dev.idm.vkp.model.Sticker;
 import dev.idm.vkp.model.StickerSet;
-import dev.ragnarok.fenrir.module.rlottie.RLottieDrawable;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.picasso.PicassoInstance;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.Utils;
+import dev.ragnarok.fenrir.module.rlottie.RLottieDrawable;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int TYPE_IMAGE = 0;
@@ -35,7 +35,7 @@ public class StickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public StickersAdapter(Context context, StickerSet stickers) {
         this.context = context;
         this.stickers = stickers;
-        isNightStiker = Settings.get().ui().isStickers_by_theme() && Settings.get().ui().isDarkModeEnabled(context);
+        isNightStiker = Settings.get().ui().isStickersByTheme() && Settings.get().ui().isDarkModeEnabled(context);
     }
 
 //    @Override

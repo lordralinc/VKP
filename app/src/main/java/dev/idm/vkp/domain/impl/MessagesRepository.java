@@ -396,7 +396,7 @@ public class MessagesRepository implements IMessagesRepository {
         if (nonEmpty(outgoing)) {
             for (OutputMessagesSetReadUpdate update : outgoing) {
 
-                if (Settings.get().other().isInfo_reading() && update.peer_id < VKApiMessage.CHAT_PEER) {
+                if (Settings.get().other().isInfoReading() && update.peer_id < VKApiMessage.CHAT_PEER) {
                     compositeDisposable.add(OwnerInfo.getRx(Injection.provideApplicationContext(), Settings.get().accounts().getCurrent(), update.peer_id)
                             .compose(RxUtils.applySingleIOToMainSchedulers())
                             .subscribe(userInfo -> CustomToast.CreateCustomToast(Injection.provideApplicationContext()).setBitmap(userInfo.getAvatar()).showToastInfo(userInfo.getOwner().getFullName() + " " + Injection.provideApplicationContext().getString(GetTypeUser(userInfo))), throwable -> {

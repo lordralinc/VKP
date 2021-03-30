@@ -55,7 +55,6 @@ import dev.idm.vkp.model.ParcelableOwnerWrapper;
 import dev.idm.vkp.model.Photo;
 import dev.idm.vkp.model.Post;
 import dev.idm.vkp.model.Story;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.mvp.presenter.AbsWallPresenter;
 import dev.idm.vkp.mvp.view.IVideosListView;
 import dev.idm.vkp.mvp.view.IVkPhotosView;
@@ -69,6 +68,7 @@ import dev.idm.vkp.util.FindAttachmentType;
 import dev.idm.vkp.util.Utils;
 import dev.idm.vkp.util.ViewUtils;
 import dev.idm.vkp.view.LoadMoreFooterHelper;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 import static dev.idm.vkp.util.Objects.nonNull;
 import static dev.idm.vkp.util.Utils.isEmpty;
@@ -139,9 +139,9 @@ public abstract class AbsWallFragment<V extends IWallView, P extends AbsWallPres
     }
 
     protected void setupPaganContent(@NonNull View Runes, @NonNull RLottieImageView paganSymbol) {
-        Runes.setVisibility(Settings.get().other().isRunes_show() ? View.VISIBLE : View.GONE);
-        paganSymbol.setVisibility(Settings.get().other().isShow_pagan_symbol() ? View.VISIBLE : View.GONE);
-        if (!Settings.get().other().isShow_pagan_symbol()) {
+        Runes.setVisibility(Settings.get().other().isRunesShow() ? View.VISIBLE : View.GONE);
+        paganSymbol.setVisibility(Settings.get().other().isShowPaganSymbol() ? View.VISIBLE : View.GONE);
+        if (!Settings.get().other().isShowPaganSymbol()) {
             return;
         }
         switch (Settings.get().other().getPaganSymbol()) {
@@ -372,7 +372,7 @@ public abstract class AbsWallFragment<V extends IWallView, P extends AbsWallPres
         OptionView view = new OptionView();
         getPresenter().fireOptionViewCreated(view);
 
-        boolean isDebug = Settings.get().other().isDeveloper_mode();
+        boolean isDebug = Settings.get().other().isDeveloperMode();
 
         menu.findItem(R.id.action_open_url).setVisible(isDebug);
         //menu.findItem(R.id.action_copy_id).setVisible(isDebug);

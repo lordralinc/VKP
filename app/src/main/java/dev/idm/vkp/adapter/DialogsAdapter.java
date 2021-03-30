@@ -2,8 +2,6 @@ package dev.idm.vkp.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -23,10 +21,7 @@ import com.squareup.picasso.Transformation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Array;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashSet;
@@ -264,6 +259,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             app = interlocutor.getOnlineApp();
             if (!dialog.isChat()) {
                 holder.ivVerified.setVisibility(interlocutor.isVerified() ? View.VISIBLE : View.GONE);
+                holder.ivVerified.setBackgroundTintList(interlocutor.getDonatedColour());
                 holder.blacklisted.setVisibility(interlocutor.getBlacklisted() ? View.VISIBLE : View.GONE);
             } else {
                 holder.blacklisted.setVisibility(View.GONE);
@@ -277,7 +273,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 Settings.get().accounts().getCurrent(),
                 dialog.getPeerId()
         );
-        if (mask == 0 ){
+        if (mask == 0) {
             holder.mDialogTitle.setTextColor(CurrentTheme.getSecondaryTextColorCode(mContext));
         } else {
             holder.mDialogTitle.setTextColor(CurrentTheme.getPrimaryTextColorCode(mContext));
@@ -298,7 +294,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         holder.tvUnreadCount.setVisibility(counterVisible ? View.VISIBLE : View.INVISIBLE);
 
         boolean pushVisible = Settings.get().notifications().getPush(Settings.get().accounts().getCurrent(), dialog.getPeerId()) != 0;
-        if (!counterVisible && pushVisible){
+        if (!counterVisible && pushVisible) {
             Settings.get().notifications().delPush(Settings.get().accounts().getCurrent(), dialog.getPeerId());
         }
         holder.tvPush.setVisibility(pushVisible && counterVisible ? View.VISIBLE : View.INVISIBLE);

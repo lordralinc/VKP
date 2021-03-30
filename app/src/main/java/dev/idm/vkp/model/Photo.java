@@ -2,8 +2,8 @@ package dev.idm.vkp.model;
 
 import android.os.Parcel;
 
-import dev.ragnarok.fenrir.module.parcel.ParcelNative;
 import dev.idm.vkp.util.Objects;
+import dev.ragnarok.fenrir.module.parcel.ParcelNative;
 
 
 public class Photo extends AbsModel implements ISomeones, ParcelNative.ParcelableNative {

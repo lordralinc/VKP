@@ -61,6 +61,7 @@ public class FavePagesAdapter extends RecyclerView.Adapter<FavePagesAdapter.Hold
             holder.name.setTextColor(Utils.getVerifiedColor(context, user.isVerified()));
             holder.blacklisted.setVisibility(user.getBlacklisted() ? View.VISIBLE : View.GONE);
             holder.ivVerified.setVisibility(user.isVerified() ? View.VISIBLE : View.GONE);
+            holder.ivVerified.setBackgroundTintList(user.getDonatedColour());
             Integer onlineIcon = ViewUtils.getOnlineIcon(true, user.isOnlineMobile(), user.getPlatform(), user.getOnlineApp());
             if (!user.isOnline())
                 holder.ivOnline.setCircleColor(CurrentTheme.getColorFromAttrs(R.attr.icon_color_inactive, context, "#000000"));

@@ -57,7 +57,7 @@ public class AudiosSearchPresenter extends AbsSearchPresenter<IAudioSearchView, 
 
     public void playAudio(Context context, int position) {
         MusicPlaybackService.startForPlayList(context, (ArrayList<Audio>) data, position, false);
-        if (!Settings.get().other().isShow_mini_player())
+        if (!Settings.get().other().isShowMiniPlayer())
             PlaceFactory.getPlayerPlace(Settings.get().accounts().getCurrent()).tryOpenWith(context);
     }
 

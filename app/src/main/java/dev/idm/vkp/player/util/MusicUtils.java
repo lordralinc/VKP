@@ -218,7 +218,7 @@ public final class MusicUtils {
     }
 
     public static boolean getMiniPlayerVisibility() {
-        if (!Settings.get().other().isShow_mini_player())
+        if (!Settings.get().other().isShowMiniPlayer())
             return false;
         try {
             if (mService != null) {

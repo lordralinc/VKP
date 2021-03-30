@@ -224,7 +224,7 @@ public class VkRetrofitProvider implements IVkRetrofitProvider {
 
     private RetrofitWrapper createDefaultVkApiRetrofit(OkHttpClient okHttpClient) {
         return RetrofitWrapper.wrap(new Retrofit.Builder()
-                .baseUrl("https://" + Settings.get().other().get_Api_Domain() + "/method/")
+                .baseUrl("https://" + Settings.get().other().getApiDomain() + "/method/")
                 .addConverterFactory(GSON_CONVERTER_FACTORY)
                 .addCallAdapterFactory(RX_ADAPTER_FACTORY)
                 .client(okHttpClient)

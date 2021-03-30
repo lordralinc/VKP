@@ -29,9 +29,9 @@ public class NotificationsPrefs implements ISettings.INotificationSettings {
     }
 
     @Override
-    public void setNotifPref(int aid, int peerid, int mask) {
+    public void setNotifPref(int aid, int peerId, int mask) {
         preferences.edit()
-                .putInt(keyFor(aid, peerid), mask)
+                .putInt(keyFor(aid, peerId), mask)
                 .apply();
     }
 
@@ -110,7 +110,7 @@ public class NotificationsPrefs implements ISettings.INotificationSettings {
     }
 
     @Override
-    public boolean isBirtdayNotifEnabled() {
+    public boolean isBirthdayNotifEnabled() {
         return isOtherNotificationsEnable() && PreferenceManager.getDefaultSharedPreferences(app)
                 .getBoolean("birtday_notification", true);
     }
@@ -199,8 +199,8 @@ public class NotificationsPrefs implements ISettings.INotificationSettings {
     }
 
     @Override
-    public int getNotifPref(int aid, int peerid) {
-        return preferences.getInt(keyFor(aid, peerid), getGlobalNotifPref(Peer.isGroupChat(peerid)));
+    public int getNotifPref(int aid, int peerId) {
+        return preferences.getInt(keyFor(aid, peerId), getGlobalNotifPref(Peer.isGroupChat(peerId)));
     }
 
     private int getGlobalNotifPref(boolean isGroup) {

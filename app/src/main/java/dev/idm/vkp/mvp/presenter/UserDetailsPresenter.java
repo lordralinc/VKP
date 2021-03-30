@@ -1,5 +1,6 @@
 package dev.idm.vkp.mvp.presenter;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -8,24 +9,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
-import com.google.gson.Gson;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
-import dev.idm.vkp.CheckDonate;
 import dev.idm.vkp.R;
 import dev.idm.vkp.api.model.VKApiUser;
 import dev.idm.vkp.domain.InteractorFactory;
-import dev.idm.vkp.idm.IdmApi;
-import dev.idm.vkp.idm.responses.Donuts;
-import dev.idm.vkp.idm.responses.IdmUser;
+import dev.idm.vkp.idmapi.IdmApiService;
+import dev.idm.vkp.idmapi.models.ErrorResponse;
+import dev.idm.vkp.idmapi.models.UserResponse;
+import dev.idm.vkp.idmapi.requests.GetUserById;
 import dev.idm.vkp.model.Career;
 import dev.idm.vkp.model.Icon;
 import dev.idm.vkp.model.Military;
@@ -42,12 +35,12 @@ import dev.idm.vkp.model.menu.AdvancedItem;
 import dev.idm.vkp.model.menu.Section;
 import dev.idm.vkp.mvp.presenter.base.AccountDependencyPresenter;
 import dev.idm.vkp.mvp.view.IUserDetailsView;
+import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.AppTextUtils;
 import dev.idm.vkp.util.RxUtils;
 import dev.idm.vkp.util.Utils;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static dev.idm.vkp.util.Objects.isNull;
 import static dev.idm.vkp.util.Objects.nonNull;
@@ -59,36 +52,53 @@ public class UserDetailsPresenter extends AccountDependencyPresenter<IUserDetail
 
     private final User user;
     private final UserDetails details;
-    private IdmUser idmUser;
+    private UserResponse idmUser;
+    private Boolean isUserRegistered = false;
     private List<Photo> photos_profile;
     private int current_select;
 
+    @SuppressLint("CheckResult")
     public UserDetailsPresenter(int accountId, @NonNull User user, @NonNull UserDetails details, @Nullable Bundle savedInstanceState) {
         super(accountId, savedInstanceState);
         this.user = user;
         this.details = details;
 
-        IdmApi.getUser(user.getId()).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) { idmUser = null; }
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                try{
-                    String response_text = Objects.requireNonNull(response.body()).string();
-                    Log.d("IDM API", response_text);
-                    idmUser = new Gson().fromJson(response_text, IdmUser.class);
-                    Log.d("IDM API", "idmUser validated");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    idmUser = new IdmUser();
-                    idmUser.response = null;
-                }
-            }
-        });
+        IdmApiService.Factory.create()
+                .getUserById(
+                        new GetUserById(user.getId()),
+                        "Token " + Settings.get().idm().getAccessToken(Settings.get().accounts().getCurrent())
+                )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            UserResponse IdmUser = response.getResponse();
+                            ErrorResponse error = response.getError();
+
+                            if (error != null){
+                                getView().getCustomToast()
+                                    .showToastError("Не удалось получить пользователя от сервера IDM: " + error.getDetail());
+                                if (error.getCode().equals("user_is_not_registered")){
+                                    isUserRegistered = false;
+                                }
+                                return;
+                            }
+
+                            idmUser = IdmUser;
+                            isUserRegistered = true;
+                            getView().displayData(createData());
+                        },
+                        error -> {
+                            getView().getCustomToast()
+                                .showToastError("Не удалось получить пользователя: " + error.getMessage());
+                            Log.e("UserDetailsPresenter", error.getMessage(), error);
+                        }
+                );
+
 
         appendDisposable(InteractorFactory.createPhotosInteractor().get(accountId, user.getOwnerId(), -6, 50, 0, true)
                 .compose(RxUtils.applySingleIOToMainSchedulers())
-                .subscribe(this::DisplayUserProfileAlbum, RxUtils.ignore()));
+                .subscribe(this::displayUserProfileAlbum, RxUtils.ignore()));
     }
 
     private static void addPersonalInfo(List<AdvancedItem> items, @DrawableRes int icon, int key, Section section, @StringRes int title, String v) {
@@ -100,7 +110,7 @@ public class UserDetailsPresenter extends AccountDependencyPresenter<IUserDetail
         }
     }
 
-    private static Integer getPolitivalViewRes(int political) {
+    private static Integer getPoliticalViewRes(int political) {
         switch (political) {
             case 1:
                 return R.string.political_views_communist;
@@ -201,7 +211,7 @@ public class UserDetailsPresenter extends AccountDependencyPresenter<IUserDetail
         callView(view -> view.openPhotoAlbum(getAccountId(), user.getOwnerId(), -6, new ArrayList<>(photos_profile), current_select));
     }
 
-    private void DisplayUserProfileAlbum(List<Photo> photos) {
+    private void displayUserProfileAlbum(List<Photo> photos) {
         if (photos.isEmpty()) {
             return;
         }
@@ -334,28 +344,21 @@ public class UserDetailsPresenter extends AccountDependencyPresenter<IUserDetail
         }
 
         Section idm = new Section(new Text("IDM"));
-        if (idmUser != null) {
-            if (idmUser.response != null){
-                items.add(new AdvancedItem(1, new Text(R.string.idm_registered_state))
-                        .setIcon(R.drawable.ic_about_me)
-                        .setSection(idm)
-                        .setSubtitle(new Text(R.string.button_yes)));
-                if (idmUser.response.is_agent){
-                    items.add(new AdvancedItem(1, new Text(R.string.idm_is_agent))
-                            .setIcon(R.drawable.ic_outline_forward)
-                            .setSection(idm));
-                }
-            } else {
-                items.add(new AdvancedItem(1, new Text(R.string.idm_registered_state))
-                        .setIcon(R.drawable.ic_about_me)
-                        .setSection(idm)
-                        .setSubtitle(new Text(R.string.button_no)));
+        if (isUserRegistered){
+            items.add(new AdvancedItem(1, new Text(R.string.idm_registered_state))
+                    .setIcon(R.drawable.ic_about_me)
+                    .setSection(idm)
+                    .setSubtitle(new Text(R.string.button_yes)));
+            if (idmUser.is_agent()) {
+                items.add(new AdvancedItem(1, new Text(R.string.idm_is_agent))
+                        .setIcon(R.drawable.ic_outline_forward)
+                        .setSection(idm));
             }
-
         } else {
-            items.add(new AdvancedItem(1, new Text(R.string.do_update))
-                    .setIcon(R.drawable.refresh)
-                    .setSection(idm));
+            items.add(new AdvancedItem(1, new Text(R.string.idm_registered_state))
+                    .setIcon(R.drawable.ic_about_me)
+                    .setSection(idm)
+                    .setSubtitle(new Text(R.string.button_no)));
         }
 
         Section pesonal = new Section(new Text(R.string.personal_information));
@@ -371,11 +374,11 @@ public class UserDetailsPresenter extends AccountDependencyPresenter<IUserDetail
 
         Section beliefs = new Section(new Text(R.string.beliefs));
 
-        if (nonNull(getPolitivalViewRes(details.getPolitical()))) {
+        if (nonNull(getPoliticalViewRes(details.getPolitical()))) {
             items.add(new AdvancedItem(16, new Text(R.string.political_views))
                     .setSection(beliefs)
                     .setIcon(R.drawable.ic_profile_personal)
-                    .setSubtitle(new Text(getPolitivalViewRes(details.getPolitical()))));
+                    .setSubtitle(new Text(getPoliticalViewRes(details.getPolitical()))));
         }
 
         if (nonNull(getLifeMainRes(details.getLifeMain()))) {

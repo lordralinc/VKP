@@ -46,51 +46,53 @@ public interface ISettings {
 
     interface IIDMSettings {
         boolean getShowCommandsOnDialog();
+
         void setShowCommandsOnDialog(boolean value);
 
         String getAccessToken(int accountId);
+
         void storeAccessToken(int accountId, String accessToken);
+
         void updateAccessToken(int accountId);
     }
 
     interface IOtherSettings {
+
         String getFeedSourceIds(int accountId);
-
         void setFeedSourceIds(int accountId, String sourceIds);
-
         void storeFeedScrollState(int accountId, String state);
-
         String restoreFeedScrollState(int accountId);
-
         String restoreFeedNextFrom(int accountId);
-
         void storeFeedNextFrom(int accountId, String nextFrom);
 
-        boolean isAudioBroadcastActive();
+        Boolean isPinned(int peerId);
+        void setPinState(int peerId, Boolean state);
 
+
+        boolean getAudioBroadcastActive();
         void setAudioBroadcastActive(boolean active);
 
         int getMaxBitmapResolution();
 
-        boolean isNative_parcel();
+        boolean isNativeParcel();
 
-        boolean isExtra_debug();
+        boolean isExtraDebug();
 
-        boolean isUse_coil();
+        boolean isUseCoil();
 
-        String get_Api_Domain();
+        String getApiDomain();
 
-        String get_Auth_Domain();
+        String getAuthDomain();
 
-        boolean isUse_old_vk_api();
+        boolean isUseOldVkApi();
 
-        boolean isDisable_history();
+        boolean isDisableHistory();
 
-        boolean isShow_wall_cover();
+        boolean isShowWallCover();
 
-        boolean isDeveloper_mode();
+        boolean isDeveloperMode();
 
-        boolean isForce_cache();
+        boolean isForceCache();
 
         boolean isKeepLongpoll();
 
@@ -100,49 +102,49 @@ public interface ISettings {
 
         boolean isDisabledErrorFCM();
 
-        boolean isSettings_no_push();
+        boolean isSettingsNoPush();
 
         boolean isCommentsDesc();
 
         boolean toggleCommentsDirection();
 
-        boolean isInfo_reading();
+        boolean isInfoReading();
 
-        boolean isAuto_read();
+        boolean isAutoRead();
 
-        boolean isNot_update_dialogs();
+        boolean isNotUpdateDialogs();
 
-        boolean isBe_online();
+        boolean isBeOnline();
 
-        boolean isShow_donate_anim();
+        boolean isShowDonateAnim();
 
         int getColorChat();
 
         int getSecondColorChat();
 
-        boolean isCustom_chat_color();
+        boolean isCustomChatColor();
 
         int getColorMyMessage();
 
         int getSecondColorMyMessage();
 
-        boolean isCustom_MyMessage();
+        boolean isCustomMyMessage();
 
-        boolean isUse_stop_audio();
+        boolean isUseStopAudio();
 
-        boolean isBlur_for_player();
+        boolean isBlurForPlayer();
 
-        boolean isShow_mini_player();
+        boolean isShowMiniPlayer();
 
-        boolean isEnable_show_recent_dialogs();
+        boolean isEnableShowRecentDialogs();
 
-        boolean isEnable_show_audio_top();
+        boolean isEnableShowAudioTop();
 
-        boolean isUse_internal_downloader();
+        boolean isUseInternalDownloader();
 
-        boolean isEnable_last_read();
+        boolean isEnableLastRead();
 
-        boolean isNot_read_show();
+        boolean isNotReadShow();
 
         String getMusicDir();
 
@@ -154,49 +156,49 @@ public interface ISettings {
 
         String getStickerDir();
 
-        boolean isPhoto_to_user_dir();
+        boolean isPhotoToUserDir();
 
-        boolean isDelete_cache_images();
+        boolean isDeleteCacheImages();
 
-        boolean isClick_next_track();
+        boolean isClickNextTrack();
 
-        boolean isDisabled_encryption();
+        boolean isDisabledEncryption();
 
-        boolean isDownload_photo_tap();
+        boolean isDownloadPhotoTap();
 
-        boolean isDisable_sensored_voice();
+        boolean isDisableSensoredVoice();
 
-        boolean isAudio_save_mode_button();
+        boolean isAudioSaveModeButton();
 
-        boolean isShow_mutual_count();
+        boolean isShowMutualCount();
 
-        boolean isNot_friend_show();
+        boolean isNotFriendShow();
 
-        boolean isDo_zoom_photo();
+        boolean isDoZoomPhoto();
 
-        boolean isChange_upload_size();
+        boolean isChangeUploadSize();
 
-        boolean isShow_photos_line();
+        boolean isShowPhotosLine();
 
-        boolean isDisable_likes();
+        boolean isDisableLikes();
 
-        void setDisable_likes(boolean disabled);
+        void setDisableLikes(boolean disabled);
 
-        boolean isDo_auto_play_video();
+        boolean isDoAutoPlayVideo();
 
-        boolean isVideo_controller_to_decor();
+        boolean isVideoControllerToDecor();
 
-        boolean isVideo_swipes();
+        boolean isVideoSwipes();
 
-        boolean isHint_stickers();
+        boolean isHintStickers();
 
-        boolean isEnable_native();
+        boolean isEnableNative();
 
         int getPaganSymbol();
 
-        boolean isRunes_show();
+        boolean isRunesShow();
 
-        boolean isShow_pagan_symbol();
+        boolean isShowPaganSymbol();
 
         @NonNull
         String getKateGMSToken();
@@ -216,6 +218,9 @@ public interface ISettings {
         LocalServerSettings getLocalServer();
 
         void setLocalServer(@NonNull LocalServerSettings settings);
+
+        void setPlayer(String playerId);
+        String getPlayer();
     }
 
     interface IAccountsSettings {
@@ -266,21 +271,21 @@ public interface ISettings {
 
         boolean isSendByEnter();
 
-        boolean isMy_message_no_color();
+        boolean isMyMessageNoColor();
 
-        boolean is_smooth_chat();
+        boolean isSmoothChat();
 
-        boolean isMessages_menu_down();
+        boolean isMessagesMenuDown();
 
         boolean isAmoledTheme();
 
-        boolean isAudio_round_icon();
+        boolean isAudioRoundIcon();
 
-        boolean isUse_long_click_download();
+        boolean isUseLongClickDownload();
 
-        boolean isShow_bot_keyboard();
+        boolean isShowBotKeyboard();
 
-        boolean isPlayer_support_volume();
+        boolean isPlayerSupportVolume();
 
         boolean isCustomTabEnabled();
 
@@ -299,11 +304,11 @@ public interface ISettings {
         @PhotoSize
         int getPrefDisplayImageSize(@PhotoSize int byDefault);
 
-        int getStart_newsMode();
+        int getStartNewsMode();
 
         void setPrefDisplayImageSize(@PhotoSize int size);
 
-        boolean isWebview_night_mode();
+        boolean isWebViewNightMode();
 
         boolean isSnow_mode();
 
@@ -311,11 +316,11 @@ public interface ISettings {
 
         int getFontSize();
 
-        boolean isLoad_history_notif();
+        boolean isLoadHistoryNotif();
 
-        boolean isDont_write();
+        boolean isDoNotWrite();
 
-        boolean isOver_ten_attach();
+        boolean isOverTenAttach();
 
         int cryptVersion();
     }
@@ -328,11 +333,11 @@ public interface ISettings {
         int FLAG_HIGH_PRIORITY = 16;
         int FLAG_PUSH = 32;
 
-        int getNotifPref(int aid, int peerid);
+        int getNotifPref(int aid, int peerId);
 
         void setDefault(int aid, int peerId);
 
-        void setNotifPref(int aid, int peerid, int flag);
+        void setNotifPref(int aid, int peerId, int flag);
 
         int getOtherNotificationMask();
 
@@ -366,17 +371,19 @@ public interface ISettings {
 
         boolean isQuickReplyImmediately();
 
-        boolean isBirtdayNotifEnabled();
+        boolean isBirthdayNotifEnabled();
 
         int getPush(int accountId, int peerId);
+
         void delPush(int accountId, int peerId);
+
         void setPush(int accountId, int peerId, int messageId);
     }
 
     interface IRecentChats {
-        List<RecentChat> get(int acountid);
+        List<RecentChat> get(int accountId);
 
-        void store(int accountid, List<RecentChat> chats);
+        void store(int accountId, List<RecentChat> chats);
     }
 
     interface IDrawerSettings {
@@ -390,7 +397,7 @@ public interface ISettings {
     }
 
     interface IPushSettings {
-        void savePushRegistations(Collection<VkPushRegistration> data);
+        void savePushRegistrations(Collection<VkPushRegistration> data);
 
         List<VkPushRegistration> getRegistrations();
     }
@@ -431,23 +438,23 @@ public interface ISettings {
 
         boolean needHideMessagesBodyForNotif();
 
-        boolean AddValueToSet(int value, String arrayName);
+        boolean addValueToSet(int value, String arrayName);
 
-        boolean RemoveValueFromSet(int value, String arrayName);
+        boolean removeValueFromSet(int value, String arrayName);
 
         int getSetSize(String arrayName);
 
         Set<Integer> loadSet(String arrayName);
 
-        boolean ContainsValuesInSet(int[] values, String arrayName);
+        boolean containsValuesInSet(int[] values, String arrayName);
 
-        boolean ContainsValueInSet(int value, String arrayName);
+        boolean containsValueInSet(int value, String arrayName);
 
         boolean getShowHiddenDialogs();
 
         void setShowHiddenDialogs(boolean showHiddenDialogs);
 
-        boolean IsShow_hidden_accounts();
+        boolean isShowHiddenAccounts();
     }
 
     interface IUISettings {
@@ -475,19 +482,19 @@ public interface ISettings {
 
         boolean isSystemEmoji();
 
-        boolean isEmojis_full_screen();
+        boolean isEmojisFullScreen();
 
-        boolean isStickers_by_theme();
+        boolean isStickersByTheme();
 
-        boolean isStickers_by_new();
+        boolean isStickersByNew();
 
-        int isPhoto_swipe_triggered_pos();
+        int isPhotoSwipeTriggeredPos();
 
-        boolean isShow_profile_in_additional_page();
+        boolean isShowProfileInAdditionalPage();
 
         @SwipesChatMode
-        int getSwipes_chat_mode();
+        int getSwipesChatMode();
 
-        boolean isDisplay_writing();
+        boolean isDisplayWriting();
     }
 }

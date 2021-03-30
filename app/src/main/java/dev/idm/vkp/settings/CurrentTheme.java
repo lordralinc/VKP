@@ -46,7 +46,7 @@ public class CurrentTheme {
     }
 
     private static Drawable getStatic(Activity activity) {
-        if (Settings.get().other().isCustom_chat_color()) {
+        if (Settings.get().other().isCustomChatColor()) {
 
             return new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                     new int[]{Settings.get().other().getColorChat(), Settings.get().other().getSecondColorChat()});
@@ -79,7 +79,7 @@ public class CurrentTheme {
                 File bitmap = getDrawerBackgroundFile(activity, !dark);
                 if (bitmap.exists()) {
                     Drawable d = Drawable.createFromPath(bitmap.getAbsolutePath());
-                    if (Settings.get().other().isCustom_chat_color())
+                    if (Settings.get().other().isCustomChatColor())
                         Utils.setColorFilter(d, Settings.get().other().getColorChat());
                     return d;
                 }
@@ -87,7 +87,7 @@ public class CurrentTheme {
             default: //"0
                 return getStatic(activity);
         }
-        if (Settings.get().other().isCustom_chat_color()) {
+        if (Settings.get().other().isCustomChatColor()) {
             Drawable r1 = ret.mutate();
             Utils.setColorFilter(r1, Settings.get().other().getColorChat());
             return r1;

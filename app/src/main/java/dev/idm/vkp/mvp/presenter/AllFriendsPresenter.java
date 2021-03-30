@@ -81,7 +81,7 @@ public class AllFriendsPresenter extends AccountDependencyPresenter<IAllFriendsV
             doLoadTabs = true;
         }
         loadAllCachedData();
-        if (!Settings.get().other().isNot_friend_show()) {
+        if (!Settings.get().other().isNotFriendShow()) {
             requestActualData(0, false);
         }
     }
@@ -92,7 +92,7 @@ public class AllFriendsPresenter extends AccountDependencyPresenter<IAllFriendsV
 
         int accountId = getAccountId();
 
-        actualDataDisposable.add(relationshipInteractor.getActualFriendsList(accountId, userId, Settings.get().other().isNot_friend_show() ? null : 200, offset)
+        actualDataDisposable.add(relationshipInteractor.getActualFriendsList(accountId, userId, Settings.get().other().isNotFriendShow() ? null : 200, offset)
                 .compose(RxUtils.applySingleIOToMainSchedulers())
                 .subscribe(users -> onActualDataReceived(offset, users, do_scan), this::onActualDataGetError));
     }
@@ -116,7 +116,7 @@ public class AllFriendsPresenter extends AccountDependencyPresenter<IAllFriendsV
     }
 
     private void onActualDataReceived(int offset, List<User> users, boolean do_scan) {
-        if (do_scan && Settings.get().other().isNot_friend_show()) {
+        if (do_scan && Settings.get().other().isNotFriendShow()) {
             List<Owner> not_friends = new ArrayList<>();
             for (User i : getAllData()) {
                 if (Utils.indexOf(users, i.getId()) == -1) {
@@ -170,7 +170,7 @@ public class AllFriendsPresenter extends AccountDependencyPresenter<IAllFriendsV
         int accountId = getAccountId();
 
         cacheLoadingNow = true;
-        if (Settings.get().other().isNot_friend_show()) {
+        if (Settings.get().other().isNotFriendShow()) {
             actualDataDisposable.add(relationshipInteractor.getCachedFriends(accountId, userId)
                     .compose(RxUtils.applySingleIOToMainSchedulers())
                     .subscribe(this::onCachedDataReceived, this::onCacheGetError));
@@ -184,7 +184,7 @@ public class AllFriendsPresenter extends AccountDependencyPresenter<IAllFriendsV
     private void onCacheGetError(Throwable t) {
         cacheLoadingNow = false;
         showError(getView(), t);
-        if (Settings.get().other().isNot_friend_show()) {
+        if (Settings.get().other().isNotFriendShow()) {
             requestActualData(0, false);
         }
     }
@@ -196,7 +196,7 @@ public class AllFriendsPresenter extends AccountDependencyPresenter<IAllFriendsV
         getAllData().addAll(users);
 
         safelyNotifyDataSetChanged();
-        if (Settings.get().other().isNot_friend_show()) {
+        if (Settings.get().other().isNotFriendShow()) {
             requestActualData(0, users.size() > 0);
         }
     }

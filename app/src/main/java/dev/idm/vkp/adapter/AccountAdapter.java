@@ -23,13 +23,13 @@ import dev.idm.vkp.fragment.UserInfoResolveUtil;
 import dev.idm.vkp.model.Account;
 import dev.idm.vkp.model.Owner;
 import dev.idm.vkp.model.User;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.settings.CurrentTheme;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.Objects;
 import dev.idm.vkp.util.Utils;
 import dev.idm.vkp.util.ViewUtils;
 import dev.idm.vkp.view.OnlineView;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 import static dev.idm.vkp.util.Utils.nonEmpty;
 
@@ -49,7 +49,7 @@ public class AccountAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         data = items;
         transformation = CurrentTheme.createTransformationForAvatar(context);
         this.callback = callback;
-        showHidden = Settings.get().security().IsShow_hidden_accounts();
+        showHidden = Settings.get().security().isShowHiddenAccounts();
     }
 
     @NotNull

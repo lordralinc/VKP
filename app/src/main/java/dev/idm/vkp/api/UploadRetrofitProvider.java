@@ -83,7 +83,7 @@ public class UploadRetrofitProvider implements IUploadRetrofitProvider {
         ProxyUtil.applyProxyConfig(builder, proxySettings.getActiveProxy());
 
         return new Retrofit.Builder()
-                .baseUrl("https://" + Settings.get().other().get_Api_Domain() + "/method/") // dummy
+                .baseUrl("https://" + Settings.get().other().getApiDomain() + "/method/") // dummy
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .client(builder.build())

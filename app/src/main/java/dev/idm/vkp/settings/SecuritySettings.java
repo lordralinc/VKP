@@ -83,7 +83,7 @@ public class SecuritySettings implements ISettings.ISecuritySettings {
     }
 
     @Override
-    public boolean IsShow_hidden_accounts() {
+    public boolean isShowHiddenAccounts() {
         return PreferenceManager.getDefaultSharedPreferences(mApplication)
                 .getBoolean("show_hidden_accounts", true);
     }
@@ -224,18 +224,18 @@ public class SecuritySettings implements ISettings.ISecuritySettings {
         return editor.commit();
     }
 
-    public boolean AddValueToSet(int value, String arrayName) {
+    public boolean addValueToSet(int value, String arrayName) {
         Set<Integer> itr = loadSet(arrayName);
         itr.add(value);
         return saveSet(itr, arrayName);
     }
 
-    public boolean ContainsValueInSet(int value, String arrayName) {
+    public boolean containsValueInSet(int value, String arrayName) {
         Set<Integer> itr = loadSet(arrayName);
         return itr.contains(value);
     }
 
-    public boolean ContainsValuesInSet(int[] values, String arrayName) {
+    public boolean containsValuesInSet(int[] values, String arrayName) {
         Set<Integer> itr = loadSet(arrayName);
         for (Integer i : values) {
             if (!itr.contains(i))
@@ -244,7 +244,7 @@ public class SecuritySettings implements ISettings.ISecuritySettings {
         return true;
     }
 
-    public boolean RemoveValueFromSet(int value, String arrayName) {
+    public boolean removeValueFromSet(int value, String arrayName) {
         Set<Integer> itr = loadSet(arrayName);
         itr.remove(value);
         return saveSet(itr, arrayName);

@@ -205,7 +205,7 @@ class ChatFragment : PlaceSupportMvpFragment<ChatPresenter, IChatView>(), IChatV
         recyclerView = root.findViewById(R.id.fragment_friend_dialog_list)
         recyclerView?.apply {
             layoutManager = createLayoutManager()
-            if (!Settings.get().main().is_smooth_chat) {
+            if (!Settings.get().main().isSmoothChat) {
                 itemAnimator?.changeDuration = 0
                 itemAnimator?.addDuration = 0
                 itemAnimator?.moveDuration = 0
@@ -274,7 +274,7 @@ class ChatFragment : PlaceSupportMvpFragment<ChatPresenter, IChatView>(), IChatV
                 it.setOnLongClickListener { presenter?.fireDialogAttachmentsClick(); true; }
             }
 
-            if (!Settings.get().other().isEnable_last_read)
+            if (!Settings.get().other().isEnableLastRead)
                 it.visibility = View.GONE
             else
                 it.visibility = View.VISIBLE
@@ -411,7 +411,7 @@ class ChatFragment : PlaceSupportMvpFragment<ChatPresenter, IChatView>(), IChatV
         fun isVisible(): Boolean = rootView.visibility == View.VISIBLE
 
         fun hide() {
-            if (Settings.get().main().isMessages_menu_down) {
+            if (Settings.get().main().isMessagesMenuDown) {
                 reference.get()?.InputView?.visibility = View.VISIBLE
                 reference.get()?.downMenuGroup?.visibility = View.GONE
             }
@@ -636,7 +636,7 @@ class ChatFragment : PlaceSupportMvpFragment<ChatPresenter, IChatView>(), IChatV
         peer: Peer
     ) {
         if (!Settings.get()
-                .other().isNot_read_show || requireActivity() is SwipebleActivity || requireActivity() is SendAttachmentsActivity
+                .other().isNotReadShow || requireActivity() is SwipebleActivity || requireActivity() is SendAttachmentsActivity
             || requireActivity() is SelectProfilesActivity || requireActivity() is AttachmentsActivity
         ) {
             return
@@ -715,7 +715,7 @@ class ChatFragment : PlaceSupportMvpFragment<ChatPresenter, IChatView>(), IChatV
         canStar: Boolean,
         doStar: Boolean
     ) {
-        if (!Settings.get().main().isMessages_menu_down) {
+        if (!Settings.get().main().isMessagesMenuDown) {
             toolbarRootView?.run {
                 if (childCount == Constants.FRAGMENT_CHAT_APP_BAR_VIEW_COUNT) {
                     val v =
@@ -753,7 +753,7 @@ class ChatFragment : PlaceSupportMvpFragment<ChatPresenter, IChatView>(), IChatV
 
     override fun finishActionMode() {
         actionModeHolder?.rootView?.visibility = View.GONE
-        if (Settings.get().main().isMessages_menu_down) {
+        if (Settings.get().main().isMessagesMenuDown) {
             InputView?.visibility = View.VISIBLE
             downMenuGroup?.visibility = View.GONE
         }
@@ -1300,8 +1300,8 @@ class ChatFragment : PlaceSupportMvpFragment<ChatPresenter, IChatView>(), IChatV
 
     override fun showChatCommands(accountId: Int, chatId: Int) {
         ChatCommandsFragment.newInstance(
-                Settings.get().accounts().current,
-                chatId
+            Settings.get().accounts().current,
+            chatId
         ) { t -> insertCommand(t) }.show(childFragmentManager, "chat_commands")
 
     }

@@ -90,6 +90,7 @@ internal class PopupMenuAdapter(
         @CallSuper
         open fun bindItem(popupMenuItem: MaterialPopupMenu.AbstractPopupMenuItem) {
             popupMenuItem.viewBoundCallback.dismissPopupAction = dismissPopupCallback
+
             popupMenuItem.viewBoundCallback.invoke(itemView)
         }
     }

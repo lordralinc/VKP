@@ -81,7 +81,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private static String getDatabaseFileName(int aid) {
-        return "fenrir_" + aid + ".sqlite";
+        return "vkp_" + aid + ".sqlite";
     }
 
     @Override

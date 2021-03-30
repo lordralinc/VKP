@@ -30,7 +30,6 @@ import dev.idm.vkp.listener.BackPressCallback
 import dev.idm.vkp.media.gif.IGifPlayer
 import dev.idm.vkp.model.PhotoSize
 import dev.idm.vkp.model.Story
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView
 import dev.idm.vkp.mvp.core.IPresenterFactory
 import dev.idm.vkp.mvp.presenter.StoryPagerPresenter
 import dev.idm.vkp.mvp.view.IStoryPagerView
@@ -52,6 +51,7 @@ import dev.idm.vkp.view.pager.WeakPicassoLoadCallback
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior.Companion.from
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior.SettleOnTopAction
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView
 import java.lang.ref.WeakReference
 import java.util.*
 

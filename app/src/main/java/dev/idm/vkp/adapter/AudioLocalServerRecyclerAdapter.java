@@ -39,7 +39,6 @@ import dev.idm.vkp.modalbottomsheetdialogfragment.ModalBottomSheetDialogFragment
 import dev.idm.vkp.modalbottomsheetdialogfragment.OptionRequest;
 import dev.idm.vkp.model.Audio;
 import dev.idm.vkp.model.menu.AudioItem;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.picasso.PicassoInstance;
 import dev.idm.vkp.picasso.transforms.PolyTransformation;
 import dev.idm.vkp.picasso.transforms.RoundTransformation;
@@ -53,6 +52,7 @@ import dev.idm.vkp.util.DownloadWorkUtils;
 import dev.idm.vkp.util.RxUtils;
 import dev.idm.vkp.util.Utils;
 import dev.idm.vkp.view.WeakViewAnimatorAdapter;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -109,11 +109,11 @@ public class AudioLocalServerRecyclerAdapter extends RecyclerView.Adapter<AudioL
 
     @DrawableRes
     private int getAudioCoverSimple() {
-        return Settings.get().main().isAudio_round_icon() ? R.drawable.audio_button : R.drawable.audio_button_material;
+        return Settings.get().main().isAudioRoundIcon() ? R.drawable.audio_button : R.drawable.audio_button_material;
     }
 
     private Transformation TransformCover() {
-        return Settings.get().main().isAudio_round_icon() ? new RoundTransformation() : new PolyTransformation();
+        return Settings.get().main().isAudioRoundIcon() ? new RoundTransformation() : new PolyTransformation();
     }
 
     private void updateAudioStatus(AudioHolder holder, Audio audio) {
@@ -196,7 +196,7 @@ public class AudioLocalServerRecyclerAdapter extends RecyclerView.Adapter<AudioL
 
         holder.play.setOnClickListener(v -> {
             if (MusicUtils.isNowPlayingOrPreparingOrPaused(audio)) {
-                if (!Settings.get().other().isUse_stop_audio()) {
+                if (!Settings.get().other().isUseStopAudio()) {
                     MusicUtils.playOrPause();
                 } else {
                     MusicUtils.stop();
@@ -272,7 +272,7 @@ public class AudioLocalServerRecyclerAdapter extends RecyclerView.Adapter<AudioL
                     case AudioItem.play_item_audio:
                         if (mClickListener != null) {
                             mClickListener.onClick(position, audio);
-                            if (Settings.get().other().isShow_mini_player())
+                            if (Settings.get().other().isShowMiniPlayer())
                                 PlaceFactory.getPlayerPlace(Settings.get().accounts().getCurrent()).tryOpenWith(mContext);
                         }
                         break;

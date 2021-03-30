@@ -34,7 +34,6 @@ import dev.idm.vkp.Extra;
 import dev.idm.vkp.R;
 import dev.idm.vkp.fragment.base.BaseMvpDialogFragment;
 import dev.idm.vkp.model.Audio;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.mvp.core.IPresenterFactory;
 import dev.idm.vkp.mvp.presenter.AudioDuplicatePresenter;
 import dev.idm.vkp.mvp.view.IAudioDuplicateView;
@@ -47,6 +46,7 @@ import dev.idm.vkp.player.util.MusicUtils;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.AppTextUtils;
 import dev.idm.vkp.util.Utils;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 import static dev.idm.vkp.util.Objects.nonNull;
 
@@ -165,12 +165,12 @@ public class AudioDuplicateDialog extends BaseMvpDialogFragment<AudioDuplicatePr
     }
 
     private Transformation TransformCover() {
-        return Settings.get().main().isAudio_round_icon() ? new RoundTransformation() : new PolyTransformation();
+        return Settings.get().main().isAudioRoundIcon() ? new RoundTransformation() : new PolyTransformation();
     }
 
     @DrawableRes
     private int getAudioCoverSimple() {
-        return Settings.get().main().isAudio_round_icon() ? R.drawable.audio_button : R.drawable.audio_button_material;
+        return Settings.get().main().isAudioRoundIcon() ? R.drawable.audio_button : R.drawable.audio_button_material;
     }
 
     private void bind(AudioHolder holder, Audio audio) {
@@ -196,7 +196,7 @@ public class AudioDuplicateDialog extends BaseMvpDialogFragment<AudioDuplicatePr
         }
         holder.play.setOnClickListener(v -> {
             if (MusicUtils.isNowPlayingOrPreparingOrPaused(audio)) {
-                if (!Settings.get().other().isUse_stop_audio()) {
+                if (!Settings.get().other().isUseStopAudio()) {
                     MusicUtils.playOrPause();
                 } else {
                     MusicUtils.stop();

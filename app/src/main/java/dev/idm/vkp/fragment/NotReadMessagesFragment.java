@@ -194,7 +194,7 @@ public class NotReadMessagesFragment extends PlaceSupportMvpFragment<NotReadMess
             mActionView = new ActionModeHolder(LayoutInflater.from(requireActivity()).inflate(R.layout.view_action_mode, mActionRoot, false));
             mActionRoot.addView(mActionView.rootView);
         }
-        if (Settings.get().main().isMessages_menu_down()) {
+        if (Settings.get().main().isMessagesMenuDown()) {
             ((RelativeLayout.LayoutParams) mActionView.rootView.getLayoutParams()).removeRule(RelativeLayout.ALIGN_PARENT_TOP);
             ((RelativeLayout.LayoutParams) mActionView.rootView.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         } else {

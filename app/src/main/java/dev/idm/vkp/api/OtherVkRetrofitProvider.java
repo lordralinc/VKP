@@ -75,7 +75,7 @@ public class OtherVkRetrofitProvider implements IOtherVkRetrofitProvider {
             Gson gson = new GsonBuilder().create();
 
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("https://" + Settings.get().other().get_Auth_Domain() + "/")
+                    .baseUrl("https://" + Settings.get().other().getAuthDomain() + "/")
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                     .client(builder.build())
@@ -100,7 +100,7 @@ public class OtherVkRetrofitProvider implements IOtherVkRetrofitProvider {
             Gson gson = new GsonBuilder().create();
 
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("https://" + Settings.get().other().get_Api_Domain() + "/method/")
+                    .baseUrl("https://" + Settings.get().other().getApiDomain() + "/method/")
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                     .client(builder.build())
@@ -161,7 +161,7 @@ public class OtherVkRetrofitProvider implements IOtherVkRetrofitProvider {
                 .create();
 
         return new Retrofit.Builder()
-                .baseUrl("https://" + Settings.get().other().get_Api_Domain() + "/method/") // dummy
+                .baseUrl("https://" + Settings.get().other().getApiDomain() + "/method/") // dummy
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .client(builder.build())

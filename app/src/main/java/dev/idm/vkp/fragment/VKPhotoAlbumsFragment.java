@@ -284,7 +284,7 @@ public class VKPhotoAlbumsFragment extends BaseMvpFragment<PhotoAlbumsPresenter,
     @Override
     public void onPrepareOptionsMenu(@NotNull Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.action_photo_toggle_like).setIcon(Settings.get().other().isDisable_likes() ? R.drawable.ic_no_heart : R.drawable.heart);
+        menu.findItem(R.id.action_photo_toggle_like).setIcon(Settings.get().other().isDisableLikes() ? R.drawable.ic_no_heart : R.drawable.heart);
     }
 
     @Override
@@ -298,7 +298,7 @@ public class VKPhotoAlbumsFragment extends BaseMvpFragment<PhotoAlbumsPresenter,
         }
 
         if (item.getItemId() == R.id.action_photo_toggle_like) {
-            Settings.get().other().setDisable_likes(!Settings.get().other().isDisable_likes());
+            Settings.get().other().setDisableLikes(!Settings.get().other().isDisableLikes());
             requireActivity().invalidateOptionsMenu();
             return true;
         }

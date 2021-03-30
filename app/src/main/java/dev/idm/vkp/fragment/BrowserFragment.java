@@ -86,7 +86,7 @@ public class BrowserFragment extends BaseFragment implements BackPressCallback {
         });
 
 
-        if (Settings.get().main().isWebview_night_mode() && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) && Settings.get().ui().isDarkModeEnabled(requireActivity())) {
+        if (Settings.get().main().isWebViewNightMode() && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK) && Settings.get().ui().isDarkModeEnabled(requireActivity())) {
             WebSettingsCompat.setForceDark(mWebView.getSettings(), WebSettingsCompat.FORCE_DARK_ON);
         }
         mWebView.getSettings().setUserAgentString(Constants.USER_AGENT(Account_Types.BY_TYPE));

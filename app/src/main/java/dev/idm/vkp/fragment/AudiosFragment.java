@@ -91,7 +91,7 @@ public class AudiosFragment extends BaseMvpFragment<AudiosPresenter, IAudiosView
 
         @Override
         public boolean isLongPressDragEnabled() {
-            return !Settings.get().main().isUse_long_click_download() && getPresenter().isMyAudio();
+            return !Settings.get().main().isUseLongClickDownload() && getPresenter().isMyAudio();
         }
     };
     private boolean isSelectMode;
@@ -175,7 +175,7 @@ public class AudiosFragment extends BaseMvpFragment<AudiosPresenter, IAudiosView
 
         FloatingActionButton save_mode = root.findViewById(R.id.save_mode_button);
         FloatingActionButton Goto = root.findViewById(R.id.goto_button);
-        save_mode.setVisibility(isSelectMode ? View.GONE : (Settings.get().other().isAudio_save_mode_button() ? View.VISIBLE : View.GONE));
+        save_mode.setVisibility(isSelectMode ? View.GONE : (Settings.get().other().isAudioSaveModeButton() ? View.VISIBLE : View.GONE));
         save_mode.setOnClickListener(v -> {
             if (!CheckDonate.isFullVersion(requireActivity())) {
                 return;

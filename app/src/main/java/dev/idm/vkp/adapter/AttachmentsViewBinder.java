@@ -59,7 +59,6 @@ import dev.idm.vkp.model.Video;
 import dev.idm.vkp.model.VoiceMessage;
 import dev.idm.vkp.model.WallReply;
 import dev.idm.vkp.model.WikiPage;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.picasso.PicassoInstance;
 import dev.idm.vkp.settings.CurrentTheme;
 import dev.idm.vkp.settings.Settings;
@@ -70,6 +69,7 @@ import dev.idm.vkp.util.Utils;
 import dev.idm.vkp.util.ViewUtils;
 import dev.idm.vkp.view.WaveFormView;
 import dev.idm.vkp.view.emoji.EmojiconTextView;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 import static dev.idm.vkp.util.Objects.isNull;
 import static dev.idm.vkp.util.Objects.nonNull;
@@ -103,7 +103,7 @@ public class AttachmentsViewBinder {
         mAttachmentsActionCallback = attachmentsActionCallback;
         mActiveWaveFormColor = CurrentTheme.getColorPrimary(context);
         mNoactiveWaveFormColor = Utils.adjustAlpha(mActiveWaveFormColor, 0.5f);
-        isNightStiker = Settings.get().ui().isStickers_by_theme() && Settings.get().ui().isDarkModeEnabled(context);
+        isNightStiker = Settings.get().ui().isStickersByTheme() && Settings.get().ui().isDarkModeEnabled(context);
     }
 
     private static void safeSetVisibitity(@Nullable View view, int visibility) {
@@ -473,7 +473,7 @@ public class AttachmentsViewBinder {
                 itemView.setVisibility(View.VISIBLE);
                 itemView.setTag(message);
 
-                if (Settings.get().other().isDeveloper_mode()) {
+                if (Settings.get().other().isDeveloperMode()) {
                     itemView.findViewById(R.id.item_message_bubble).setOnLongClickListener(v -> {
                         mAttachmentsActionCallback.onGoToMessagesLookup(message);
                         return true;

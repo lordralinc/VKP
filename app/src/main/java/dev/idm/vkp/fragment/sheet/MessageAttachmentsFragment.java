@@ -149,7 +149,7 @@ public class MessageAttachmentsFragment extends AbsPresenterBottomSheetFragment<
         view.findViewById(R.id.button_doc).setOnClickListener(v -> getPresenter().fireButtonDocClick());
         view.findViewById(R.id.button_camera).setOnClickListener(v -> getPresenter().fireButtonCameraClick());
         view.findViewById(R.id.button_photo_settings).setOnClickListener(v -> getPresenter().fireCompressSettings(requireActivity()));
-        view.findViewById(R.id.button_photo_settings).setVisibility(Settings.get().other().isChange_upload_size() ? View.VISIBLE : View.GONE);
+        view.findViewById(R.id.button_photo_settings).setVisibility(Settings.get().other().isChangeUploadSize() ? View.VISIBLE : View.GONE);
 
         dialog.setContentView(view);
         fireViewCreated();

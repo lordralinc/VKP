@@ -79,7 +79,19 @@ class OtherSettings implements ISettings.IOtherSettings {
     }
 
     @Override
-    public boolean isAudioBroadcastActive() {
+    public Boolean isPinned(int peerId) {
+        return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("pinned_dialog_" + peerId, false);
+    }
+
+    @Override
+    public void setPinState(int peerId, Boolean state) {
+        PreferenceManager.getDefaultSharedPreferences(app).edit()
+                .putBoolean("pinned_dialog_" + peerId, state)
+                .apply();
+    }
+
+    @Override
+    public boolean getAudioBroadcastActive() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("broadcast", false);
     }
 
@@ -129,7 +141,7 @@ class OtherSettings implements ISettings.IOtherSettings {
     }
 
     @Override
-    public boolean isSettings_no_push() {
+    public boolean isSettingsNoPush() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("settings_no_push", false);
     }
 
@@ -166,42 +178,42 @@ class OtherSettings implements ISettings.IOtherSettings {
     }
 
     @Override
-    public boolean isUse_coil() {
+    public boolean isUseCoil() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("use_coil_library", false);
     }
 
     @Override
-    public String get_Api_Domain() {
+    public String getApiDomain() {
         return PreferenceManager.getDefaultSharedPreferences(app).getString("vk_api_domain", "api.vk.com").trim();
     }
 
     @Override
-    public String get_Auth_Domain() {
+    public String getAuthDomain() {
         return PreferenceManager.getDefaultSharedPreferences(app).getString("vk_auth_domain", "oauth.vk.com").trim();
     }
 
     @Override
-    public boolean isDeveloper_mode() {
+    public boolean isDeveloperMode() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("developer_mode", false);
     }
 
     @Override
-    public boolean isForce_cache() {
+    public boolean isForceCache() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("force_cache", false);
     }
 
     @Override
-    public boolean isUse_old_vk_api() {
+    public boolean isUseOldVkApi() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("use_old_vk_api", false);
     }
 
     @Override
-    public boolean isDisable_history() {
+    public boolean isDisableHistory() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("disable_history", false);
     }
 
     @Override
-    public boolean isShow_wall_cover() {
+    public boolean isShowWallCover() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_wall_cover", true);
     }
 
@@ -216,7 +228,7 @@ class OtherSettings implements ISettings.IOtherSettings {
     }
 
     @Override
-    public boolean isCustom_chat_color() {
+    public boolean isCustomChatColor() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("custom_chat_color_usage", false);
     }
 
@@ -231,72 +243,72 @@ class OtherSettings implements ISettings.IOtherSettings {
     }
 
     @Override
-    public boolean isCustom_MyMessage() {
+    public boolean isCustomMyMessage() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("custom_message_color_usage", false);
     }
 
     @Override
-    public boolean isInfo_reading() {
+    public boolean isInfoReading() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("info_reading", true);
     }
 
     @Override
-    public boolean isAuto_read() {
+    public boolean isAutoRead() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("auto_read", false);
     }
 
     @Override
-    public boolean isNot_update_dialogs() {
+    public boolean isNotUpdateDialogs() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("not_update_dialogs", false);
     }
 
     @Override
-    public boolean isBe_online() {
+    public boolean isBeOnline() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("be_online", false);
     }
 
     @Override
-    public boolean isShow_donate_anim() {
-        return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_donate_anim", true);
+    public boolean isShowDonateAnim() {
+        return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_donate_anim", false);
     }
 
     @Override
-    public boolean isUse_stop_audio() {
+    public boolean isUseStopAudio() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("use_stop_audio", false);
     }
 
     @Override
-    public boolean isBlur_for_player() {
+    public boolean isBlurForPlayer() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("blur_for_player", true);
     }
 
     @Override
-    public boolean isShow_mini_player() {
+    public boolean isShowMiniPlayer() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_mini_player", true);
     }
 
     @Override
-    public boolean isEnable_last_read() {
+    public boolean isEnableLastRead() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("enable_last_read", true);
     }
 
     @Override
-    public boolean isNot_read_show() {
+    public boolean isNotReadShow() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("not_read_show", true);
     }
 
     @Override
-    public boolean isEnable_show_recent_dialogs() {
+    public boolean isEnableShowRecentDialogs() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_recent_dialogs", true);
     }
 
     @Override
-    public boolean isEnable_show_audio_top() {
+    public boolean isEnableShowAudioTop() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_audio_top", false);
     }
 
     @Override
-    public boolean isUse_internal_downloader() {
+    public boolean isUseInternalDownloader() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("use_internal_downloader", true);
     }
 
@@ -314,7 +326,7 @@ class OtherSettings implements ISettings.IOtherSettings {
     public String getPhotoDir() {
         String ret = PreferenceManager.getDefaultSharedPreferences(app).getString("photo_dir", null);
         if (Utils.isEmpty(ret) || !new File(ret).exists()) {
-            ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/Fenrir";
+            ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath() + "/VKP";
             PreferenceManager.getDefaultSharedPreferences(app).edit().putString("photo_dir", ret).apply();
         }
         return ret;
@@ -324,7 +336,7 @@ class OtherSettings implements ISettings.IOtherSettings {
     public String getVideoDir() {
         String ret = PreferenceManager.getDefaultSharedPreferences(app).getString("video_dir", null);
         if (Utils.isEmpty(ret) || !new File(ret).exists()) {
-            ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath() + "/Fenrir";
+            ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).getAbsolutePath() + "/VKP";
             PreferenceManager.getDefaultSharedPreferences(app).edit().putString("video_dir", ret).apply();
         }
         return ret;
@@ -334,7 +346,7 @@ class OtherSettings implements ISettings.IOtherSettings {
     public String getDocDir() {
         String ret = PreferenceManager.getDefaultSharedPreferences(app).getString("docs_dir", null);
         if (Utils.isEmpty(ret) || !new File(ret).exists()) {
-            ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/Fenrir";
+            ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/VKP";
             PreferenceManager.getDefaultSharedPreferences(app).edit().putString("docs_dir", ret).apply();
         }
         return ret;
@@ -344,114 +356,114 @@ class OtherSettings implements ISettings.IOtherSettings {
     public String getStickerDir() {
         String ret = PreferenceManager.getDefaultSharedPreferences(app).getString("sticker_dir", null);
         if (Utils.isEmpty(ret) || !new File(ret).exists()) {
-            ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/Fenrir_Stickers";
+            ret = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/VKP_Stickers";
             PreferenceManager.getDefaultSharedPreferences(app).edit().putString("sticker_dir", ret).apply();
         }
         return ret;
     }
 
     @Override
-    public boolean isPhoto_to_user_dir() {
+    public boolean isPhotoToUserDir() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("photo_to_user_dir", true);
     }
 
     @Override
-    public boolean isDelete_cache_images() {
+    public boolean isDeleteCacheImages() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("delete_cache_images", false);
     }
 
     @Override
-    public boolean isClick_next_track() {
+    public boolean isClickNextTrack() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("click_next_track", true);
     }
 
     @Override
-    public boolean isDisabled_encryption() {
+    public boolean isDisabledEncryption() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("disable_encryption", false);
     }
 
     @Override
-    public boolean isDownload_photo_tap() {
+    public boolean isDownloadPhotoTap() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("download_photo_tap", true);
     }
 
     @Override
-    public boolean isAudio_save_mode_button() {
+    public boolean isAudioSaveModeButton() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("audio_save_mode_button", true);
     }
 
     @Override
-    public boolean isShow_mutual_count() {
+    public boolean isShowMutualCount() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_mutual_count", false);
     }
 
     @Override
-    public boolean isNot_friend_show() {
+    public boolean isNotFriendShow() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("not_friend_show", false);
     }
 
     @Override
-    public boolean isDo_zoom_photo() {
+    public boolean isDoZoomPhoto() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("do_zoom_photo", true);
     }
 
     @Override
-    public boolean isChange_upload_size() {
+    public boolean isChangeUploadSize() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("change_upload_size", false);
     }
 
     @Override
-    public boolean isShow_photos_line() {
+    public boolean isShowPhotosLine() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_photos_line", true);
     }
 
     @Override
-    public boolean isDo_auto_play_video() {
+    public boolean isDoAutoPlayVideo() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("do_auto_play_video", false);
     }
 
     @Override
-    public boolean isVideo_controller_to_decor() {
+    public boolean isVideoControllerToDecor() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("video_controller_to_decor", false);
     }
 
     @Override
-    public boolean isVideo_swipes() {
+    public boolean isVideoSwipes() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("video_swipes", true);
     }
 
     @Override
-    public boolean isDisable_likes() {
+    public boolean isDisableLikes() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("disable_likes", false);
     }
 
     @Override
-    public void setDisable_likes(boolean disabled) {
+    public void setDisableLikes(boolean disabled) {
         PreferenceManager.getDefaultSharedPreferences(app).edit().putBoolean("disable_likes", disabled).apply();
     }
 
     @Override
-    public boolean isNative_parcel() {
+    public boolean isNativeParcel() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("native_parcel_enable", true);
     }
 
     @Override
-    public boolean isExtra_debug() {
+    public boolean isExtraDebug() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("extra_debug", false);
     }
 
     @Override
-    public boolean isHint_stickers() {
+    public boolean isHintStickers() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("hint_stickers", true);
     }
 
     @Override
-    public boolean isEnable_native() {
+    public boolean isEnableNative() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("enable_native", true);
     }
 
     @Override
-    public boolean isDisable_sensored_voice() {
+    public boolean isDisableSensoredVoice() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("disable_sensored_voice", false);
     }
 
@@ -469,6 +481,20 @@ class OtherSettings implements ISettings.IOtherSettings {
     @Override
     public void setLocalServer(@NonNull LocalServerSettings settings) {
         PreferenceManager.getDefaultSharedPreferences(app).edit().putString("local_media_server", new Gson().toJson(settings)).apply();
+    }
+
+    @Override
+    public void setPlayer(String playerId) {
+        PreferenceManager.getDefaultSharedPreferences(app)
+                .edit()
+                .putString("player_to_use", playerId)
+                .apply();
+    }
+
+    @Override
+    public String getPlayer() {
+        return PreferenceManager.getDefaultSharedPreferences(app)
+                .getString("player_to_use", "internal");
     }
 
     @Override
@@ -503,8 +529,8 @@ class OtherSettings implements ISettings.IOtherSettings {
     }
 
     @Override
-    public boolean isShow_pagan_symbol() {
-        return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_pagan_symbol", true);
+    public boolean isShowPaganSymbol() {
+        return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_pagan_symbol", false);
     }
 
     @Override
@@ -517,7 +543,7 @@ class OtherSettings implements ISettings.IOtherSettings {
     }
 
     @Override
-    public boolean isRunes_show() {
+    public boolean isRunesShow() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("runes_show", true);
     }
 }

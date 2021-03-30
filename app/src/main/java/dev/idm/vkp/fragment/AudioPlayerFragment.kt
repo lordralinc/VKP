@@ -30,7 +30,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.PicassoDrawable
-import dev.ragnarok.fenrir.module.FenrirNative
 import dev.idm.vkp.Constants
 import dev.idm.vkp.Extra
 import dev.idm.vkp.Injection
@@ -63,6 +62,7 @@ import dev.idm.vkp.util.RxUtils
 import dev.idm.vkp.util.Utils
 import dev.idm.vkp.util.Utils.isEmpty
 import dev.idm.vkp.view.swipehelper.HorizontalSwipeBehavior
+import dev.ragnarok.fenrir.module.FenrirNative
 import dev.ragnarok.fenrir.module.qrcode.QrGenerator.generateQR
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -369,7 +369,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
             override fun onReleased() {}
             override fun onCaptured() {}
             override fun onPreSettled(diff: Int) {
-                if (abs(diff) > Settings.get().ui().isPhoto_swipe_triggered_pos - 40) {
+                if (abs(diff) > Settings.get().ui().isPhotoSwipeTriggeredPos - 40) {
                     ivCover?.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 }
             }
@@ -381,7 +381,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
             }
         }
 
-        if (Settings.get().other().isClick_next_track) {
+        if (Settings.get().other().isClickNextTrack) {
             ivCover?.setOnClickListener {
                 MusicUtils.next()
             }
@@ -409,7 +409,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
             }
         }
         ivAdd = root.findViewById(R.id.audio_add)
-        if (Settings.get().main().isPlayer_support_volume) {
+        if (Settings.get().main().isPlayerSupportVolume) {
             ivAdd?.setImageResource(R.drawable.volume_minus)
             ivAdd?.setOnClickListener {
                 val audio =
@@ -425,7 +425,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
             ivAdd?.setOnClickListener { onAddButtonClick() }
         }
         val ivShare: ImageView = root.findViewById(R.id.audio_share)
-        if (Settings.get().main().isPlayer_support_volume) {
+        if (Settings.get().main().isPlayerSupportVolume) {
             ivShare.setImageResource(R.drawable.volume_plus)
             ivShare.setOnClickListener {
                 val audio =
@@ -448,7 +448,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
     private val isAudioStreaming: Boolean
         get() = Settings.get()
             .other()
-            .isAudioBroadcastActive
+            .audioBroadcastActive
 
     @SuppressLint("ShowToast")
     private fun onSaveButtonClick(v: View) {
@@ -765,7 +765,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
                 })
                 crossfade(true)
             }
-            if (Settings.get().other().isBlur_for_player) {
+            if (Settings.get().other().isBlurForPlayer) {
                 ivBackground!!.load(coverUrl) {
                     crossfade(true)
                     transformations(coil.transform.BlurTransformation(requireActivity(), 25f, 1f))
@@ -778,7 +778,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
                     .getMetadataAudioThumbnail(Uri.parse(audio), 512, 512)
                 if (btm == null) {
                     ivCover!!.clear()
-                    if (Settings.get().other().isBlur_for_player) {
+                    if (Settings.get().other().isBlurForPlayer) {
                         ivBackground!!.clear()
                         ivBackground?.setImageDrawable(null)
                     }
@@ -795,7 +795,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
                         false,
                         false
                     )
-                    if (Settings.get().other().isBlur_for_player) {
+                    if (Settings.get().other().isBlurForPlayer) {
                         PicassoDrawable.setBitmap(
                             ivBackground!!,
                             requireActivity(),
@@ -808,7 +808,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
                 }
             } else {
                 ivCover!!.clear()
-                if (Settings.get().other().isBlur_for_player) {
+                if (Settings.get().other().isBlurForPlayer) {
                     ivBackground!!.clear()
                     ivBackground?.setImageDrawable(null)
                 }
@@ -911,7 +911,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), OnSeekBarChangeListener
     }
 
     private fun resolveAddButton() {
-        if (Settings.get().main().isPlayer_support_volume) return
+        if (Settings.get().main().isPlayerSupportVolume) return
         if (!isAdded) return
         val currentAudio = MusicUtils.getCurrentAudio() ?: return
         //ivAdd.setVisibility(currentAudio == null ? View.INVISIBLE : View.VISIBLE);

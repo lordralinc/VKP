@@ -109,7 +109,7 @@ public abstract class RxSupportPresenter<V extends IMvpView> extends AbsPresente
             throwable.printStackTrace();
         }
 
-        if (Settings.get().other().isDeveloper_mode()) {
+        if (Settings.get().other().isDeveloperMode()) {
             view.showThrowable(throwable);
         } else {
             view.showError(ErrorLocalizer.localizeThrowable(getApplicationContext(), throwable));

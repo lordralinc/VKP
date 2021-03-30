@@ -2,31 +2,23 @@ package dev.idm.vkp
 
 import android.annotation.SuppressLint
 import android.app.*
-import android.content.Intent
 import android.os.Handler
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationCompat
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import dev.idm.vkp.activity.MainActivity
 import dev.idm.vkp.domain.Repository.messages
-import dev.idm.vkp.idm.NetWorker
 import dev.idm.vkp.longpoll.NotificationHelper
 import dev.idm.vkp.model.PeerUpdate
 import dev.idm.vkp.model.SentMsg
 import dev.idm.vkp.picasso.PicassoInstance
-import dev.idm.vkp.place.Place
 import dev.idm.vkp.player.util.MusicUtils
-import dev.idm.vkp.push.NotificationUtils
 import dev.idm.vkp.service.ErrorLocalizer
 import dev.idm.vkp.service.KeepLongpollService
 import dev.idm.vkp.settings.Settings
+import dev.idm.vkp.util.*
 import dev.idm.vkp.util.CustomToast.Companion.CreateCustomToast
-import dev.idm.vkp.util.Objects
-import dev.idm.vkp.util.PersistentLogger
-import dev.idm.vkp.util.RxUtils
-import dev.idm.vkp.util.Utils
 import dev.ragnarok.fenrir.module.FenrirNative
 import ealvatag.tag.TagOptionSingleton
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -49,10 +41,13 @@ class App : Application(), ImageLoaderFactory {
     }
 
 
-    fun showNotification(title: String, message: String){
+    fun showNotification(title: String, message: String) {
 
-        val manager = applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        if (Objects.isNull(manager)) { return }
+        val manager =
+            applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if (Objects.isNull(manager)) {
+            return
+        }
 
         if (Utils.hasOreo()) {
             val channel = NotificationChannel(
@@ -68,8 +63,10 @@ class App : Application(), ImageLoaderFactory {
         val notification = NotificationCompat.Builder(applicationContext, "update_channel")
             .setSmallIcon(R.drawable.ic_notification_upload)
             .setContentTitle(title)
-            .setStyle(NotificationCompat.BigTextStyle()
-                .bigText(message))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(message)
+            )
             .apply {
                 priority = NotificationCompat.PRIORITY_DEFAULT
             }
@@ -84,7 +81,7 @@ class App : Application(), ImageLoaderFactory {
         AppCompatDelegate.setDefaultNightMode(Settings.get().ui().nightMode)
 
         //CrashConfig.Builder.create().apply()
-        if (Settings.get().other().isEnable_native) {
+        if (Settings.get().other().isEnableNative) {
             FenrirNative.loadNativeLibrary { PersistentLogger.logThrowable("NativeError", it) }
         }
         FenrirNative.updateAppContext(this)
@@ -162,7 +159,8 @@ class App : Application(), ImageLoaderFactory {
                         if (versionCode < json.getInt("version_code")) {
                             showNotification(
                                 applicationContext.getString(R.string.update_title),
-                                applicationContext.getString(R.string.update_text).format(json.getString("version_name"))
+                                applicationContext.getString(R.string.update_text)
+                                    .format(json.getString("version_name"))
                             )
                         }
                     } catch (e: Exception) {

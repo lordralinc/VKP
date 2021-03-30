@@ -232,7 +232,7 @@ object DownloadWorkUtils {
             Temp.delete()
         }
         try {
-            if (!Settings.get().other().isUse_internal_downloader) {
+            if (!Settings.get().other().isUseInternalDownloader) {
                 toExternalDownloader(context, url, result_filename)
             } else {
                 toDefaultInternalDownloader(context, url, result_filename)
@@ -259,7 +259,7 @@ object DownloadWorkUtils {
             return
         }
         try {
-            if (!Settings.get().other().isUse_internal_downloader) {
+            if (!Settings.get().other().isUseInternalDownloader) {
                 toExternalDownloader(context, url, result_filename)
             } else {
                 toDefaultInternalDownloader(context, url, result_filename)
@@ -287,7 +287,7 @@ object DownloadWorkUtils {
             return
         }
         try {
-            if (!Settings.get().other().isUse_internal_downloader) {
+            if (!Settings.get().other().isUseInternalDownloader) {
                 toExternalDownloader(context, doc.linkMp3, result_filename)
             } else {
                 toDefaultInternalDownloader(context, doc.linkMp3, result_filename)
@@ -320,7 +320,7 @@ object DownloadWorkUtils {
             return
         }
         try {
-            if (!Settings.get().other().isUse_internal_downloader) {
+            if (!Settings.get().other().isUseInternalDownloader) {
                 toExternalDownloader(context, link!!, result_filename)
             } else {
                 toDefaultInternalDownloader(context, link!!, result_filename)
@@ -363,7 +363,7 @@ object DownloadWorkUtils {
             }
         }
         try {
-            if (!Settings.get().other().isUse_internal_downloader) {
+            if (!Settings.get().other().isUseInternalDownloader) {
                 toExternalDownloader(context, doc.url, result_filename)
             } else {
                 toDefaultInternalDownloader(context, doc.url, result_filename)
@@ -382,7 +382,7 @@ object DownloadWorkUtils {
             return
         }
         try {
-            if (!Settings.get().other().isUse_internal_downloader) {
+            if (!Settings.get().other().isUseInternalDownloader) {
                 toExternalDownloader(context, url, result_filename)
             } else {
                 toDefaultInternalDownloader(context, url, result_filename)
@@ -675,7 +675,7 @@ object DownloadWorkUtils {
                 )
                 mBuilder.setContentIntent(ReadPendingIntent)
 
-                if (Settings.get().other().isDeveloper_mode) {
+                if (Settings.get().other().isDeveloperMode) {
                     val DeleteIntent = QuickReplyService.intentForDeleteFile(
                         applicationContext,
                         file_v.build(),
@@ -828,7 +828,7 @@ object DownloadWorkUtils {
                 )
                 mBuilder.setContentIntent(ReadPendingIntent)
 
-                if (Settings.get().other().isDeveloper_mode) {
+                if (Settings.get().other().isDeveloperMode) {
                     val DeleteIntent = QuickReplyService.intentForDeleteFile(
                         applicationContext,
                         file_v.build(),

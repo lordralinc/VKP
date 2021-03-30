@@ -1555,4 +1555,8 @@
     <string name="update_started">Запущен процесс обновения</string>
     <string name="update_title">Обновление</string>
     <string name="update_text">Доступно обновлние %s\nP.S. Можете загрузить его в настройках</string>
+    <string name="player_to_use">Использовать плейер</string>
+    <string name="install_vkx">Сначала установите VKX</string>
+    <string name="error_on_checking_donuts">Ошибка при обновлении списка донатеров</string>
+    <string name="do_update_verifications">Обновить галочки</string>
 </resources>

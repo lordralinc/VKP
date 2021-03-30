@@ -17,7 +17,7 @@ public class VoicePlayerFactory implements IVoicePlayerFactory {
     public VoicePlayerFactory(Context context, IProxySettings proxySettings, ISettings.IOtherSettings otherSettings) {
         app = context.getApplicationContext();
         this.proxySettings = proxySettings;
-        NotSensered = otherSettings.isDisable_sensored_voice();
+        NotSensered = otherSettings.isDisableSensoredVoice();
     }
 
     @NonNull

@@ -34,7 +34,7 @@ class PhotosViewHelper internal constructor(
     @PhotoSize
     private val mPhotoPreviewSize = Settings.get().main().prefPreviewImageSize
     private val mIconColorActive = CurrentTheme.getColorPrimary(context)
-    private val isUseCoil = Settings.get().other().isUse_coil
+    private val isUseCoil = Settings.get().other().isUseCoil
 
     @SuppressLint("SetTextI18n")
     fun displayVideos(videos: List<PostImage>, container: ViewGroup) {

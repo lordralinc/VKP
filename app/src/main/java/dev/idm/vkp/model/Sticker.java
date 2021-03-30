@@ -50,7 +50,7 @@ public class Sticker extends AbsModel {
     }
 
     public Image getImage(int prefSize, Context context) {
-        return getImage(prefSize, Settings.get().ui().isStickers_by_theme() && Settings.get().ui().isDarkModeEnabled(context));
+        return getImage(prefSize, Settings.get().ui().isStickersByTheme() && Settings.get().ui().isDarkModeEnabled(context));
     }
 
     public Image getImageLight(int prefSize) {
@@ -104,7 +104,7 @@ public class Sticker extends AbsModel {
     }
 
     public String getAnimationByDayNight(Context context) {
-        if (!Settings.get().ui().isStickers_by_theme()) {
+        if (!Settings.get().ui().isStickersByTheme()) {
             return getAnimationByType("light");
         }
         return getAnimationByType(Settings.get().ui().isDarkModeEnabled(context) ? "dark" : "light");

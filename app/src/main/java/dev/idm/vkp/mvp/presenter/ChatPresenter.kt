@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -126,7 +125,7 @@ class ChatPresenter(
 
     private val isEncryptionSupport: Boolean
         get() = Peer.isUser(peerId) && peerId != messagesOwnerId && !Settings.get()
-            .other().isDisabled_encryption
+            .other().isDisabledEncryption
 
     private val isEncryptionEnabled: Boolean
         get() = Settings.get()
@@ -680,7 +679,7 @@ class ChatPresenter(
     }
 
     private fun fireCheckMessages() {
-        if (Settings.get().other().isAuto_read) {
+        if (Settings.get().other().isAutoRead) {
             appendDisposable(
                 checkErrorMessages().compose(applySingleIOToMainSchedulers())
                     .subscribe({ t -> if (t) startSendService() else readAllUnreadMessagesIfExists() }) { })
@@ -695,7 +694,7 @@ class ChatPresenter(
                 view?.notifyDataChanged()
             }
         }
-        if (Settings.get().other().isAuto_read) {
+        if (Settings.get().other().isAutoRead) {
             appendDisposable(
                 checkErrorMessages().compose(applySingleIOToMainSchedulers())
                     .subscribe({ t -> if (t) startSendService() else readAllUnreadMessagesIfExists() }) { })
@@ -789,7 +788,7 @@ class ChatPresenter(
     }
 
     fun fireTextEdited(s: String?) {
-        if (!Settings.get().other().isHint_stickers) {
+        if (!Settings.get().other().isHintStickers) {
             return
         }
         stickersWordsDisplayDisposable.dispose()
@@ -817,7 +816,7 @@ class ChatPresenter(
             }
         }
 
-        if (Settings.get().idm().showCommandsOnDialog){
+        if (Settings.get().idm().showCommandsOnDialog) {
             if (showInsertViews && !isEmpty(s) && s.length == 2 && (s[0] == '!' || s[0] == '.') && (s[1] == 'с' || s[1] == 'л')) {
                 view?.showChatCommands(accountId, Peer.toChatId(peerId))
             }
@@ -840,7 +839,7 @@ class ChatPresenter(
             resolvePrimaryButton()
         }
 
-        if (!isHiddenAccount(accountId) && !Settings.get().main().isDont_write) {
+        if (!isHiddenAccount(accountId) && !Settings.get().main().isDoNotWrite) {
             readAllUnreadMessagesIfExists()
             textingNotifier.notifyAboutTyping(peerId)
         }
@@ -912,7 +911,7 @@ class ChatPresenter(
             .fromIOToMain()
             .doOnSuccess {
                 if (Settings.get()
-                        .main().isOver_ten_attach && it.isHasAttachments && it.attachments.size() > 10
+                        .main().isOverTenAttach && it.isHasAttachments && it.attachments.size() > 10
                 ) {
                     val temp = it.attachments.toList()
                     val att: ArrayList<AbsModel> = ArrayList()
@@ -1232,7 +1231,7 @@ class ChatPresenter(
             conversation?.currentKeyboard = message.keyboard
             view?.convert_to_keyboard(message.keyboard)
         }
-        if (Settings.get().other().isAuto_read && !Processors.realtimeMessages()
+        if (Settings.get().other().isAutoRead && !Processors.realtimeMessages()
                 .isNotificationIntercepted(accountId, peerId)
         ) {
             readAllUnreadMessagesIfExists()
@@ -1244,7 +1243,7 @@ class ChatPresenter(
     }
 
     private fun displayUserTextingInToolbar(writeText: WriteText) {
-        if (!Settings.get().ui().isDisplay_writing)
+        if (!Settings.get().ui().isDisplayWriting)
             return
 
         view?.displayWriting(writeText)
@@ -1507,8 +1506,9 @@ class ChatPresenter(
 
             view?.notifyDataChanged()
 
-            val pushId = Settings.get().notifications().getPush(Settings.get().accounts().current, peerId)
-            if (pushId != 0 &&  pushId <= message.originalId){
+            val pushId =
+                Settings.get().notifications().getPush(Settings.get().accounts().current, peerId)
+            if (pushId != 0 && pushId <= message.originalId) {
                 Settings.get().notifications().delPush(Settings.get().accounts().current, peerId)
             }
 

@@ -35,7 +35,6 @@ import dev.idm.vkp.model.LastReadId;
 import dev.idm.vkp.model.Message;
 import dev.idm.vkp.model.MessageStatus;
 import dev.idm.vkp.model.Sticker;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.picasso.PicassoInstance;
 import dev.idm.vkp.settings.CurrentTheme;
 import dev.idm.vkp.settings.Settings;
@@ -47,6 +46,7 @@ import dev.idm.vkp.view.MessageView;
 import dev.idm.vkp.view.OnlineView;
 import dev.idm.vkp.view.emoji.BotKeyboardView;
 import dev.idm.vkp.view.emoji.EmojiconTextView;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 import static dev.idm.vkp.util.AppTextUtils.getDateFromUnixTime;
 import static dev.idm.vkp.util.Objects.nonNull;
@@ -100,7 +100,7 @@ public class MessagesAdapter extends RecyclerBindableAdapter<Message, RecyclerVi
         selectedDrawable.getPaint().setColor(CurrentTheme.getColorPrimary(context));
         unreadColor = CurrentTheme.getMessageUnreadColor(context);
         this.disable_read = disable_read;
-        isNightStiker = Settings.get().ui().isStickers_by_theme() && Settings.get().ui().isDarkModeEnabled(context);
+        isNightStiker = Settings.get().ui().isStickersByTheme() && Settings.get().ui().isDarkModeEnabled(context);
     }
 
     @Override
@@ -343,10 +343,10 @@ public class MessagesAdapter extends RecyclerBindableAdapter<Message, RecyclerVi
                 case CryptStatus.NO_ENCRYPTION:
                 case CryptStatus.DECRYPTED:
                     if (message.isOut()) {
-                        if (Settings.get().other().isCustom_MyMessage())
+                        if (Settings.get().other().isCustomMyMessage())
                             holder.bubble.setGradientColor(Settings.get().other().getColorMyMessage(), Settings.get().other().getSecondColorMyMessage());
                         else {
-                            if (Settings.get().main().isMy_message_no_color())
+                            if (Settings.get().main().isMyMessageNoColor())
                                 holder.bubble.setNonGradientColor(CurrentTheme.getColorFromAttrs(R.attr.message_bubble_color, context, "#D4ff0000"));
                             else {
                                 holder.bubble.setGradientColor(CurrentTheme.getColorFromAttrs(R.attr.my_messages_bubble_color, context, "#D4ff0000"),

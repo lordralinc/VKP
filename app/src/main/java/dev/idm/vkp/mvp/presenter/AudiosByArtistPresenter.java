@@ -98,7 +98,7 @@ public class AudiosByArtistPresenter extends AccountDependencyPresenter<IAudiosB
 
     public void playAudio(Context context, int position) {
         MusicPlaybackService.startForPlayList(context, audios, position, false);
-        if (!Settings.get().other().isShow_mini_player())
+        if (!Settings.get().other().isShowMiniPlayer())
             PlaceFactory.getPlayerPlace(getAccountId()).tryOpenWith(context);
     }
 

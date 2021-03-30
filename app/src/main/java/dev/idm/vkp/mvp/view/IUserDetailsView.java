@@ -15,6 +15,7 @@ import dev.idm.vkp.mvp.core.IMvpView;
 import dev.idm.vkp.mvp.view.base.IAccountDependencyView;
 
 public interface IUserDetailsView extends IMvpView, IAccountDependencyView, IErrorView {
+
     void displayData(@NonNull List<AdvancedItem> items);
 
     void displayToolbarTitle(User user);

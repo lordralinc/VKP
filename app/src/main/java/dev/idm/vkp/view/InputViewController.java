@@ -162,10 +162,10 @@ public class InputViewController {
             keyboardOnScreen = false;
             currentKeyboardShow.setVisibility(View.GONE);
         } else {
-            botKeyboard.setVisibility(show ? (Settings.get().main().isShow_bot_keyboard() ? View.VISIBLE : View.GONE) : View.GONE);
+            botKeyboard.setVisibility(show ? (Settings.get().main().isShowBotKeyboard() ? View.VISIBLE : View.GONE) : View.GONE);
             ret = botKeyboard.setButtons(currentKeyboard.getButtons(), currentKeyboard.getOne_time() && !currentKeyboard.getInline());
             keyboardOnScreen = show;
-            currentKeyboardShow.setVisibility(Settings.get().main().isShow_bot_keyboard() ? View.VISIBLE : View.GONE);
+            currentKeyboardShow.setVisibility(Settings.get().main().isShowBotKeyboard() ? View.VISIBLE : View.GONE);
             if (show) {
                 Utils.setColorFilter(currentKeyboardShow, CurrentTheme.getColorPrimary(currentKeyboardShow.getContext()));
             } else {

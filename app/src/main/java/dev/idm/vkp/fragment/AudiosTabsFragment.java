@@ -161,7 +161,7 @@ public class AudiosTabsFragment extends BaseFragment {
             }
             adapter.addFragment(MY_RECOMMENDATIONS);
         }
-        if (getAccountId() == ownerId && Settings.get().other().isEnable_show_audio_top()) {
+        if (getAccountId() == ownerId && Settings.get().other().isEnableShowAudioTop()) {
             adapter.addFragment(TOP_ALL);
             adapter.addFragment(VKApiAudio.Genre.ETHNIC);
             adapter.addFragment(VKApiAudio.Genre.INSTRUMENTAL);

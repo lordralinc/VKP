@@ -118,7 +118,7 @@ public class PushRegistrationResolver implements IPushRegistrationResolver {
                     }
 
                     return completable
-                            .doOnComplete(() -> settings.pushSettings().savePushRegistations(target))
+                            .doOnComplete(() -> settings.pushSettings().savePushRegistrations(target))
                             .doOnComplete(() -> Logger.d(TAG, "Register success"))
                             .doOnError(throwable -> Logger.d(TAG, "Register error, t: " + throwable));
                 });

@@ -84,7 +84,9 @@ public class SettingsImpl implements ISettings {
     }
 
     @Override
-    public IIDMSettings idm() { return idmSettings; }
+    public IIDMSettings idm() {
+        return idmSettings;
+    }
 
     @Override
     public IOtherSettings other() {

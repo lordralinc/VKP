@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements AdditionalNavigat
 
         super.onCreate(savedInstanceState);
         mDestroyed = false;
-        isZoomPhoto = Settings.get().other().isDo_zoom_photo();
+        isZoomPhoto = Settings.get().other().isDoZoomPhoto();
 
         mCompositeDisposable.add(Settings.get()
                 .accounts()
@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements AdditionalNavigat
 
                     Utils.checkMusicInPC(this);
 
-                    if (Settings.get().other().isDelete_cache_images()) {
+                    if (Settings.get().other().isDeleteCacheImages()) {
                         PreferencesFragment.CleanImageCache(this, false);
                     }
                 }
@@ -570,7 +570,7 @@ public class MainActivity extends AppCompatActivity implements AdditionalNavigat
             }
             openPlace(place);
             if (place.type == Place.CHAT) {
-                return Settings.get().ui().getSwipes_chat_mode() != SwipesChatMode.SLIDR || Settings.get().ui().getSwipes_chat_mode() == SwipesChatMode.DISABLED;
+                return Settings.get().ui().getSwipesChatMode() != SwipesChatMode.SLIDR || Settings.get().ui().getSwipesChatMode() == SwipesChatMode.DISABLED;
             }
             return true;
         }
@@ -598,7 +598,7 @@ public class MainActivity extends AppCompatActivity implements AdditionalNavigat
 
             Peer peer = new Peer(peerId).setTitle(title).setAvaUrl(imgUrl);
             PlaceFactory.getChatPlace(aid, aid, peer).tryOpenWith(this);
-            return Settings.get().ui().getSwipes_chat_mode() != SwipesChatMode.SLIDR || Settings.get().ui().getSwipes_chat_mode() == SwipesChatMode.DISABLED;
+            return Settings.get().ui().getSwipesChatMode() != SwipesChatMode.SLIDR || Settings.get().ui().getSwipesChatMode() == SwipesChatMode.DISABLED;
         }
 
         if (Intent.ACTION_VIEW.equals(action)) {
@@ -639,22 +639,22 @@ public class MainActivity extends AppCompatActivity implements AdditionalNavigat
     }
 
     private void openChat(int accountId, int messagesOwnerId, @NonNull Peer peer) {
-        if (Settings.get().other().isEnable_show_recent_dialogs()) {
+        if (Settings.get().other().isEnableShowRecentDialogs()) {
             RecentChat recentChat = new RecentChat(accountId, peer.getId(), peer.getTitle(), peer.getAvaUrl());
             getNavigationFragment().appendRecentChat(recentChat);
             getNavigationFragment().refreshNavigationItems();
             getNavigationFragment().selectPage(recentChat);
         }
-        if (Settings.get().ui().getSwipes_chat_mode() == SwipesChatMode.DISABLED) {
+        if (Settings.get().ui().getSwipesChatMode() == SwipesChatMode.DISABLED) {
             ChatFragment chatFragment = ChatFragment.Companion.newInstance(accountId, messagesOwnerId, peer);
             attachToFront(chatFragment);
         } else {
-            if (Settings.get().ui().getSwipes_chat_mode() == SwipesChatMode.SLIDR && getMainActivityTransform() == MainActivityTransforms.MAIN) {
+            if (Settings.get().ui().getSwipesChatMode() == SwipesChatMode.SLIDR && getMainActivityTransform() == MainActivityTransforms.MAIN) {
                 Intent intent = new Intent(this, ChatActivity.class);
                 intent.setAction(ChatActivity.ACTION_OPEN_PLACE);
                 intent.putExtra(Extra.PLACE, PlaceFactory.getChatPlace(accountId, messagesOwnerId, peer));
                 startActivity(intent);
-            } else if (Settings.get().ui().getSwipes_chat_mode() == SwipesChatMode.SLIDR && getMainActivityTransform() != MainActivityTransforms.MAIN) {
+            } else if (Settings.get().ui().getSwipesChatMode() == SwipesChatMode.SLIDR && getMainActivityTransform() != MainActivityTransforms.MAIN) {
                 ChatFragment chatFragment = ChatFragment.Companion.newInstance(accountId, messagesOwnerId, peer);
                 attachToFront(chatFragment);
             } else {
@@ -752,7 +752,7 @@ public class MainActivity extends AppCompatActivity implements AdditionalNavigat
             case AdditionalNavigationFragment.PAGE_GROUPS:
                 openPlace(PlaceFactory.getCommunitiesPlace(aid, aid));
                 break;
-            case AdditionalNavigationFragment.PAGE_PREFERENSES:
+            case AdditionalNavigationFragment.PAGE_PREFERENCES:
                 openPlace(PlaceFactory.getPreferencesPlace(aid));
                 break;
             case AdditionalNavigationFragment.PAGE_MUSIC:
@@ -935,7 +935,7 @@ public class MainActivity extends AppCompatActivity implements AdditionalNavigat
 
     @Override
     public void onChatResume(int accountId, int peerId, String title, String imgUrl) {
-        if (Settings.get().other().isEnable_show_recent_dialogs()) {
+        if (Settings.get().other().isEnableShowRecentDialogs()) {
             RecentChat recentChat = new RecentChat(accountId, peerId, title, imgUrl);
             getNavigationFragment().appendRecentChat(recentChat);
             getNavigationFragment().refreshNavigationItems();

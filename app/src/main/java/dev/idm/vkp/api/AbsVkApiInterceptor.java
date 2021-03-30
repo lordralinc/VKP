@@ -164,12 +164,12 @@ abstract class AbsVkApiInterceptor implements Interceptor {
                     case ApiErrorCodes.TOO_MANY_REQUESTS_PER_SECOND:
                         break;
                     case ApiErrorCodes.CAPTCHA_NEED:
-                        if (Settings.get().other().isExtra_debug()) {
+                        if (Settings.get().other().isExtraDebug()) {
                             PersistentLogger.logThrowable("Captcha request", new Exception("URL: " + request.url() + ", dump: " + new Gson().toJson(error)));
                         }
                         break;
                     default:
-                        if (Settings.get().other().isExtra_debug()) {
+                        if (Settings.get().other().isExtraDebug()) {
                             StringBuilder uu = new StringBuilder();
                             FormBody formBody = formBuilder.build();
                             boolean first = true;
@@ -236,7 +236,7 @@ abstract class AbsVkApiInterceptor implements Interceptor {
                             break;
                         }
                     }
-                    if (Settings.get().other().isExtra_debug()) {
+                    if (Settings.get().other().isExtraDebug()) {
                         PersistentLogger.logThrowable("Captcha answer", new Exception("URL: " + request.url() + ", code: " + code + ", sid: " + captcha.getSid()));
                     }
                     if (nonNull(code)) {

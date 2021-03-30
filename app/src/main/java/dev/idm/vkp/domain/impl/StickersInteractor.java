@@ -49,7 +49,7 @@ public class StickersInteractor implements IStickersInteractor {
                 .flatMapCompletable(items -> {
                     List<VKApiStickerSet.Product> list = listEmptyIfNull(items.sticker_pack.items);
 
-                    if (Settings.get().ui().isStickers_by_new()) {
+                    if (Settings.get().ui().isStickersByNew()) {
                         Collections.reverse(list);
                     }
 
@@ -59,7 +59,7 @@ public class StickersInteractor implements IStickersInteractor {
                     ret.add(temp);
                     return storage.store(accountId, ret);
                 });
-        if (Settings.get().other().isHint_stickers()) {
+        if (Settings.get().other().isHintStickers()) {
             return stickerSet.andThen(networker.vkDefault(accountId)
                     .store()
                     .getStickerKeywords()

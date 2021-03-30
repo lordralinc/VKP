@@ -12,7 +12,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.squareup.picasso.Transformation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,9 +39,9 @@ public class ChatCommandsListAdapter extends RecyclerView.Adapter<ChatCommandsLi
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         return new ViewHolder(
-            LayoutInflater.from(viewGroup.getContext()).inflate(
-                R.layout.item_chat_command_ist_second, viewGroup, false
-            )
+                LayoutInflater.from(viewGroup.getContext()).inflate(
+                        R.layout.item_chat_command_ist_second, viewGroup, false
+                )
         );
     }
 

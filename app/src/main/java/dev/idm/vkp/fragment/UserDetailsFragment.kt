@@ -45,6 +45,7 @@ class UserDetailsFragment : BaseMvpFragment<UserDetailsPresenter, IUserDetailsVi
     private var ivAvatar: ImageView? = null
     private var ivAvatarHighRes: ImageView? = null
     private var ivMail: FloatingActionButton? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

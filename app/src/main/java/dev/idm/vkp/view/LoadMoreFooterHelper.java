@@ -5,10 +5,10 @@ import android.widget.ProgressBar;
 
 import dev.idm.vkp.R;
 import dev.idm.vkp.model.LoadMoreState;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.settings.CurrentTheme;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.Utils;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 public class LoadMoreFooterHelper {
 

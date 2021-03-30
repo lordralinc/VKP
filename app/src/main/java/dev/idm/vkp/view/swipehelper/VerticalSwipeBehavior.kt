@@ -80,7 +80,7 @@ class VerticalSwipeBehavior<V : View> : CoordinatorLayout.Behavior<V> {
         override fun onViewReleased(child: View, xvel: Float, yvel: Float) {
             val diff = child.top - originTop
             val settled = dragHelper?.let {
-                if (abs(diff) > Settings.get().ui().isPhoto_swipe_triggered_pos) {
+                if (abs(diff) > Settings.get().ui().isPhotoSwipeTriggeredPos) {
                     settle.releasedAbove(it, diff, child)
                 } else {
                     settle.releasedBelow(it, diff, child)
@@ -158,7 +158,7 @@ class VerticalSwipeBehavior<V : View> : CoordinatorLayout.Behavior<V> {
                 child.postOnAnimation(this)
             } else {
                 child.removeCallbacks(this)
-                listener?.onPostSettled(abs(diff) > Settings.get().ui().isPhoto_swipe_triggered_pos)
+                listener?.onPostSettled(abs(diff) > Settings.get().ui().isPhotoSwipeTriggeredPos)
             }
         }
     }

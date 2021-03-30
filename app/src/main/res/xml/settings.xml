@@ -525,6 +525,15 @@
         app:iconSpaceReserved="false"
         app:initialExpandedChildrenCount="3">
 
+        <ListPreference
+            android:defaultValue="Internal"
+            android:entries="@array/array_music_services"
+            android:entryValues="@array/array_music_services_values"
+            android:key="player_to_use"
+            android:title="@string/player_to_use"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+
         <SwitchPreference
             android:defaultValue="true"
             android:key="audio_round_icon"
@@ -691,12 +700,12 @@
         android:title="@string/wall_themed"
         app:iconSpaceReserved="false">
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="runes_show"
             android:title="@string/runes_show"
             app:iconSpaceReserved="false" />
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="show_pagan_symbol"
             android:title="@string/show_pagan_symbol"
             app:iconSpaceReserved="false" />

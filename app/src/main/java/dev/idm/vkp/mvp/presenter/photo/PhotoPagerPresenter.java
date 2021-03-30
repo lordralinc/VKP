@@ -327,7 +327,7 @@ public class PhotoPagerPresenter extends AccountDependencyPresenter<IPhotoPagerV
     }
 
     private void addOrRemoveLike() {
-        if (Settings.get().other().isDisable_likes() || Utils.isHiddenAccount(getAccountId())) {
+        if (Settings.get().other().isDisableLikes() || Utils.isHiddenAccount(getAccountId())) {
             return;
         }
         Photo photo = getCurrent();
@@ -401,7 +401,7 @@ public class PhotoPagerPresenter extends AccountDependencyPresenter<IPhotoPagerV
     }
 
     private void DownloadResult(String Prefix, File dir, Photo photo) {
-        if (Prefix != null && Settings.get().other().isPhoto_to_user_dir()) {
+        if (Prefix != null && Settings.get().other().isPhotoToUserDir()) {
             File dir_final = new File(dir.getAbsolutePath() + "/" + Prefix);
             if (!dir_final.isDirectory()) {
                 boolean created = dir_final.mkdirs();

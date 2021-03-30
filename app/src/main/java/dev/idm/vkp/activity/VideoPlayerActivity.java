@@ -152,7 +152,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements SurfaceHol
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Settings.get().other().isVideo_swipes()) {
+        if (Settings.get().other().isVideoSwipes()) {
             Slidr.attach(this, new SlidrConfig.Builder().scrimColor(CurrentTheme.getColorBackground(this)).build());
         }
 
@@ -198,7 +198,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements SurfaceHol
         mPlayer.play();
 
         mControllerView.setMediaPlayer(this);
-        if (Settings.get().other().isVideo_controller_to_decor()) {
+        if (Settings.get().other().isVideoControllerToDecor()) {
             mControllerView.setAnchorView((ViewGroup) mDecorView, true);
         } else {
             mControllerView.setAnchorView(findViewById(R.id.panel), false);

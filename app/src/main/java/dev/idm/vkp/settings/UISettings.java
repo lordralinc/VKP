@@ -203,22 +203,22 @@ class UISettings implements ISettings.IUISettings {
     }
 
     @Override
-    public boolean isEmojis_full_screen() {
+    public boolean isEmojisFullScreen() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("emojis_full_screen", false);
     }
 
     @Override
-    public boolean isStickers_by_theme() {
+    public boolean isStickersByTheme() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("stickers_by_theme", true);
     }
 
     @Override
-    public boolean isStickers_by_new() {
+    public boolean isStickersByNew() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("stickers_by_new", false);
     }
 
     @Override
-    public int isPhoto_swipe_triggered_pos() {
+    public int isPhotoSwipeTriggeredPos() {
         try {
             return Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(app).getString("photo_swipe_triggered_pos", "180"));
         } catch (Exception e) {
@@ -227,13 +227,13 @@ class UISettings implements ISettings.IUISettings {
     }
 
     @Override
-    public boolean isShow_profile_in_additional_page() {
+    public boolean isShowProfileInAdditionalPage() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("show_profile_in_additional_page", true);
     }
 
     @SwipesChatMode
     @Override
-    public int getSwipes_chat_mode() {
+    public int getSwipesChatMode() {
         try {
             return Integer.parseInt(Objects.requireNonNull(PreferenceManager.getDefaultSharedPreferences(app).getString("swipes_for_chats", "1")));
         } catch (Exception e) {
@@ -242,7 +242,7 @@ class UISettings implements ISettings.IUISettings {
     }
 
     @Override
-    public boolean isDisplay_writing() {
+    public boolean isDisplayWriting() {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean("display_writing", true);
     }
 }

@@ -28,7 +28,6 @@ import dev.idm.vkp.activity.ActivityFeatures;
 import dev.idm.vkp.activity.ActivityUtils;
 import dev.idm.vkp.media.gif.IGifPlayer;
 import dev.idm.vkp.model.Document;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.mvp.core.IPresenterFactory;
 import dev.idm.vkp.mvp.presenter.GifPagerPresenter;
 import dev.idm.vkp.mvp.view.IGifPagerView;
@@ -40,6 +39,7 @@ import dev.idm.vkp.view.AlternativeAspectRatioFrameLayout;
 import dev.idm.vkp.view.CircleCounterButton;
 import dev.idm.vkp.view.FlingRelativeLayout;
 import dev.idm.vkp.view.pager.CloseOnFlingListener;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 public class GifPagerFragment extends AbsDocumentPreviewFragment<GifPagerPresenter, IGifPagerView>
         implements IGifPagerView {

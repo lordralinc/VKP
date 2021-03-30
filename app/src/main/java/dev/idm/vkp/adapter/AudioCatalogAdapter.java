@@ -175,7 +175,7 @@ public class AudioCatalogAdapter extends RecyclerView.Adapter<AudioCatalogAdapte
     @Override
     public void onClick(int position, int catalog, Audio audio) {
         MusicPlaybackService.startForPlayList(mContext, new ArrayList<>(data.get(catalog).getAudios()), position, false);
-        if (!Settings.get().other().isShow_mini_player())
+        if (!Settings.get().other().isShowMiniPlayer())
             PlaceFactory.getPlayerPlace(account_id).tryOpenWith(mContext);
     }
 

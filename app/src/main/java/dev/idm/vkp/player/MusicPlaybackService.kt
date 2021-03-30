@@ -509,7 +509,7 @@ class MusicPlaybackService : Service() {
                 return
             }
 
-            if (Settings.get().other().isForce_cache && TrackIsDownloaded(audio) == 1)
+            if (Settings.get().other().isForceCache && TrackIsDownloaded(audio) == 1)
                 audio.url = GetLocalTrackLink(audio)
             if (UpdateMeta) {
                 ErrorsCount = 0

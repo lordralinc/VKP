@@ -14,9 +14,9 @@ import java.io.File;
 import dev.idm.vkp.Constants;
 import dev.idm.vkp.R;
 import dev.idm.vkp.model.Sticker;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.picasso.PicassoInstance;
 import dev.idm.vkp.util.Utils;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 public class MyStickersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int TYPE_IMAGE = 0;

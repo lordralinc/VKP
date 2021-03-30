@@ -203,7 +203,7 @@ public class VideoPreviewFragment extends BaseMvpFragment<VideoPreviewPresenter,
 
         mTransformation = CurrentTheme.createTransformationForAvatar(requireActivity());
 
-        if (Settings.get().other().isDo_auto_play_video()) {
+        if (Settings.get().other().isDoAutoPlayVideo()) {
             mRootView.findViewById(R.id.cover_cardview).setOnClickListener(v -> getPresenter().fireAutoPlayClick());
             mRootView.findViewById(R.id.cover_cardview).setOnLongClickListener(v -> {
                 getPresenter().firePlayClick();

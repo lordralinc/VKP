@@ -3,13 +3,8 @@ package dev.idm.vkp.fragment;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,7 +26,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.content.FileProvider;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -44,8 +39,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.squareup.picasso.BitmapSafeResize;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,7 +48,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import dev.idm.vkp.Account_Types;
-import dev.idm.vkp.BuildConfig;
 import dev.idm.vkp.CheckDonate;
 import dev.idm.vkp.Constants;
 import dev.idm.vkp.Extra;
@@ -66,21 +58,13 @@ import dev.idm.vkp.activity.ActivityUtils;
 import dev.idm.vkp.activity.EnterPinActivity;
 import dev.idm.vkp.activity.PhotosActivity;
 import dev.idm.vkp.activity.ProxyManagerActivity;
-import dev.idm.vkp.activity.alias.BlackFenrirAlias;
-import dev.idm.vkp.activity.alias.BlueFenrirAlias;
-import dev.idm.vkp.activity.alias.DefaultFenrirAlias;
-import dev.idm.vkp.activity.alias.GreenFenrirAlias;
-import dev.idm.vkp.activity.alias.RedFenrirAlias;
-import dev.idm.vkp.activity.alias.VKFenrirAlias;
-import dev.idm.vkp.activity.alias.VioletFenrirAlias;
-import dev.idm.vkp.activity.alias.WhiteFenrirAlias;
-import dev.idm.vkp.activity.alias.YellowFenrirAlias;
 import dev.idm.vkp.api.model.LocalServerSettings;
 import dev.idm.vkp.db.DBHelper;
 import dev.idm.vkp.filepicker.model.DialogConfigs;
 import dev.idm.vkp.filepicker.model.DialogProperties;
 import dev.idm.vkp.filepicker.view.FilePickerDialog;
-import dev.idm.vkp.idm.NetWorker;
+import dev.idm.vkp.idmapi.IdmApiService;
+import dev.idm.vkp.idmapi.requests.GetTokenByVKToken;
 import dev.idm.vkp.listener.OnSectionResumeCallback;
 import dev.idm.vkp.model.LocalPhoto;
 import dev.idm.vkp.model.SwitchableCategory;
@@ -97,56 +81,104 @@ import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.settings.VkPushRegistration;
 import dev.idm.vkp.util.AppPerms;
 import dev.idm.vkp.util.CustomToast;
-import dev.idm.vkp.util.Objects;
 import dev.idm.vkp.util.Utils;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static dev.idm.vkp.util.Utils.isEmpty;
 
 public class PreferencesFragment extends PreferenceFragmentCompat {
-
+    public static final String KEY_ACCOUNT_CACHE_CLEANER = "account_cache_cleaner";
+    public static final String KEY_ADDITIONAL_DEBUG = "additional_debug";
+    public static final String KEY_AMOLED_THEME = "amoled_theme";
+    public static final String KEY_APP_THEME = "app_theme";
+    public static final String KEY_AUDIO_ROUND_ICON = "audio_round_icon";
+    public static final String KEY_BLACKLIST = "blacklist";
+    public static final String KEY_CHAT_BACKGROUND = "chat_background";
+    public static final String KEY_CHAT_DARK_BACKGROUND = "chat_dark_background";
+    public static final String KEY_CHAT_LIGHT_BACKGROUND = "chat_light_background";
+    public static final String KEY_CHECK_UPDATES = "check_updates";
     public static final String KEY_DEFAULT_CATEGORY = "default_category";
+    public static final String KEY_DOCS_DIR = "docs_dir";
+    public static final String KEY_DO_ZOOM_PHOTO = "do_zoom_photo";
+    public static final String KEY_DRAWER_CATEGORIES = "drawer_categories";
+    public static final String KEY_FONT_SIZE = "font_size";
+    public static final String KEY_FRIENDS_BY_PHONE = "friends_by_phone";
+    public static final String KEY_KATE_GMS_TOKEN = "kate_gms_token";
+    public static final String KEY_KEEP_LONGPOLL = "keep_longpoll";
+    public static final String KEY_LANGUAGE_UI = "language_ui";
+    public static final String KEY_LOCAL_MEDIA_SERVER = "local_media_server";
+    public static final String KEY_MAX_BITMAP_RESOLUTION = "max_bitmap_resolution";
+    public static final String KEY_MESSAGES_MENU_DOWN = "messages_menu_down";
+    public static final String KEY_MUSIC_DIR = "music_dir";
+    public static final String KEY_NIGHT_SWITCH = "night_switch";
+    public static final String KEY_NOTIFICATIONS = "notifications";
+    public static final String KEY_PHOTO_DIR = "photo_dir";
+    public static final String KEY_PHOTO_PREVIEW_SIZE = "photo_preview_size";
+    public static final String KEY_PLAYER_TO_USE = "player_to_use";
+    public static final String KEY_PICTURE_CACHE_CLEANER = "picture_cache_cleaner";
+    public static final String KEY_PROXY = "proxy";
+    public static final String KEY_REQUEST_EXECUTOR = "request_executor";
+    public static final String KEY_RESET_CHAT_BACKGROUND = "reset_chat_background";
+    public static final String KEY_SECURITY = "security";
+    public static final String KEY_SELECT_CUSTOM_ICON = "select_custom_icon";
+    public static final String KEY_SETTINGS_IDM_SHOW_COMMANDS_ON_DIALOG = "settings_idm_show_commands_on_dialog";
+    public static final String KEY_SHOW_LOGS = "show_logs";
+    public static final String KEY_SHOW_MINI_PLAYER = "show_mini_player";
+    public static final String KEY_SHOW_MODE = "show_mode";
+    public static final String KEY_SHOW_PROFILE_IN_ADDITIONAL_PAGE = "show_profile_in_additional_page";
+    public static final String KEY_SHOW_RECENT_DIALOGS = "show_profile_in_additional_page";
+    public static final String KEY_STICKER_DIR = "sticker_dir";
+    public static final String KEY_UPDATE_IDM_TOKEN = "update_idm_token";
+    public static final String KEY_UPDATE_VERIFICATIONS = "update_verifications";
+    public static final String KEY_VERSION = "version";
+    public static final String KEY_VIDEO_DIR = "video_dir";
+    public static final String KEY_VK_API_DOMAIN = "vk_api_domain";
+    public static final String KEY_VK_AUTH_DOMAIN = "vk_auth_domain";
     public static final String KEY_AVATAR_STYLE = "avatar_style";
-    private static final String KEY_APP_THEME = "app_theme";
-    private static final String KEY_NIGHT_SWITCH = "night_switch";
-    private static final String KEY_NOTIFICATION = "notifications";
-    private static final String KEY_SECURITY = "security";
-    private static final String KEY_DRAWER_ITEMS = "drawer_categories";
 
     private static final String TAG = PreferencesFragment.class.getSimpleName();
 
-    private final ActivityResultLauncher<Intent> requestLightBackgound = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+    private final ActivityResultLauncher<Intent> requestLightBackground = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     changeDrawerBackground(false, result.getData());
                     //requireActivity().recreate();
                 }
-            });
+            }
+    );
 
-    private final ActivityResultLauncher<Intent> requestDarkBackgound = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+    private final ActivityResultLauncher<Intent> requestDarkBackground = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     changeDrawerBackground(true, result.getData());
                     //requireActivity().recreate();
                 }
-            });
+            }
+    );
 
-    private final ActivityResultLauncher<Intent> requestPin = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+    private final ActivityResultLauncher<Intent> requestPin = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     PlaceFactory.getSecuritySettingsPlace().tryOpenWith(requireActivity());
                 }
-            });
+            }
+    );
 
-    private final AppPerms.doRequestPermissions requestContactsPermission = AppPerms.requestPermissions(this,
+    private final AppPerms.doRequestPermissions requestContactsPermission = AppPerms.requestPermissions(
+            this,
             new String[]{Manifest.permission.READ_CONTACTS},
-            () -> PlaceFactory.getFriendsByPhonesPlace(getAccountId()).tryOpenWith(requireActivity()));
+            () -> PlaceFactory.getFriendsByPhonesPlace(getAccountId()).tryOpenWith(requireActivity())
+    );
 
-    private final AppPerms.doRequestPermissions requestReadPermission = AppPerms.requestPermissions(this,
+    private final AppPerms.doRequestPermissions requestReadPermission = AppPerms.requestPermissions(
+            this,
             new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-            () -> CustomToast.CreateCustomToast(requireActivity()).showToast(R.string.permission_all_granted_text));
+            () -> CustomToast.CreateCustomToast(requireActivity()).showToast(R.string.permission_all_granted_text)
+    );
 
     public static Bundle buildArgs(int accountId) {
         Bundle args = new Bundle();
@@ -164,6 +196,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         return new File(context.getFilesDir(), light ? "chat_light.jpg" : "chat_dark.jpg");
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void CleanImageCache(Context context, boolean notify) {
         try {
             PicassoInstance.clear_cache();
@@ -201,7 +234,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     }
 
     private void selectLocalImage(boolean isDark) {
-        if (!AppPerms.hasReadStoragePermission(getActivity())) {
+        if (!AppPerms.hasReadStoragePermission(requireActivity())) {
             requestReadPermission.launch();
             return;
         }
@@ -209,9 +242,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         Intent intent = new Intent(getActivity(), PhotosActivity.class);
         intent.putExtra(PhotosActivity.EXTRA_MAX_SELECTION_COUNT, 1);
         if (isDark) {
-            requestDarkBackgound.launch(intent);
+            requestDarkBackground.launch(intent);
         } else {
-            requestLightBackgound.launch(intent);
+            requestLightBackground.launch(intent);
         }
     }
 
@@ -228,9 +261,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                 bEnable = true;
                 break;
         }
-        Preference prefLightChat = findPreference("chat_light_background");
-        Preference prefDarkChat = findPreference("chat_dark_background");
-        Preference prefResetPhotoChat = findPreference("reset_chat_background");
+        Preference prefLightChat = findPreference(PreferencesFragment.KEY_CHAT_LIGHT_BACKGROUND);
+        Preference prefDarkChat = findPreference(PreferencesFragment.KEY_CHAT_DARK_BACKGROUND);
+        Preference prefResetPhotoChat = findPreference(PreferencesFragment.KEY_RESET_CHAT_BACKGROUND);
         if (prefDarkChat == null || prefLightChat == null || prefResetPhotoChat == null)
             return;
         prefDarkChat.setEnabled(bEnable);
@@ -238,164 +271,213 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         prefResetPhotoChat.setEnabled(bEnable);
     }
 
+    private boolean vkxIsInstalled(){
+        try {
+            requireActivity().getPackageManager().getPackageInfo("ua.itaysonlab.vkx", PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+
+    @SuppressLint("CheckResult")
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.settings);
 
-        ListPreference nightPreference = findPreference(KEY_NIGHT_SWITCH);
+        ListPreference prefNightSwitch = findPreference(PreferencesFragment.KEY_NIGHT_SWITCH);
+        if (prefNightSwitch != null) {
+            prefNightSwitch.setOnPreferenceChangeListener((preference, newValue) -> {
+                switch (Integer.parseInt(newValue.toString())) {
+                    case NightMode.DISABLE:
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        break;
+                    case NightMode.ENABLE:
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        break;
+                    case NightMode.AUTO:
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
+                        break;
+                    case NightMode.FOLLOW_SYSTEM:
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                        break;
+                    default:
+                        break;
+                }
 
-        nightPreference.setOnPreferenceChangeListener((preference, newValue) -> {
-            switch (Integer.parseInt(newValue.toString())) {
-                case NightMode.DISABLE:
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    break;
-                case NightMode.ENABLE:
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    break;
-                case NightMode.AUTO:
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY);
-                    break;
-                case NightMode.FOLLOW_SYSTEM:
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                    break;
-            }
+                return true;
+            });
+        }
 
-            return true;
-        });
+        SwitchPreference prefMessagesMenuDown = findPreference(PreferencesFragment.KEY_MESSAGES_MENU_DOWN);
+        if (prefMessagesMenuDown != null) {
+            prefMessagesMenuDown.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        SwitchPreference messages_menu_down = findPreference("messages_menu_down");
-        messages_menu_down.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        SwitchPreference prefAMOLEDTheme = findPreference(PreferencesFragment.KEY_AMOLED_THEME);
+        if (prefAMOLEDTheme != null) {
+            prefAMOLEDTheme.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        SwitchPreference prefAmoled = findPreference("amoled_theme");
-        prefAmoled.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        SwitchPreference prefShowMiniPlayer = findPreference(PreferencesFragment.KEY_SHOW_MINI_PLAYER);
+        if (prefShowMiniPlayer != null) {
+            prefShowMiniPlayer.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        SwitchPreference prefMiniplayer = findPreference("show_mini_player");
-        prefMiniplayer.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        Preference prefVKAuthDomain = findPreference(PreferencesFragment.KEY_VK_AUTH_DOMAIN);
+        if (prefVKAuthDomain != null) {
+            prefVKAuthDomain.setOnPreferenceChangeListener((preference, newValue) -> {
+                Injection.provideProxySettings().setActive(Injection.provideProxySettings().getActiveProxy());
+                return true;
+            });
+        }
 
-        findPreference("vk_auth_domain").setOnPreferenceChangeListener((preference, newValue) -> {
-            Injection.provideProxySettings().setActive(Injection.provideProxySettings().getActiveProxy());
-            return true;
-        });
+        Preference prefVKAPIDomain = findPreference(PreferencesFragment.KEY_VK_API_DOMAIN);
+        if (prefVKAPIDomain != null) {
+            prefVKAPIDomain.setOnPreferenceChangeListener((preference, newValue) -> {
+                Injection.provideProxySettings().setActive(Injection.provideProxySettings().getActiveProxy());
+                return true;
+            });
+        }
 
-        findPreference("vk_api_domain").setOnPreferenceChangeListener((preference, newValue) -> {
-            Injection.provideProxySettings().setActive(Injection.provideProxySettings().getActiveProxy());
-            return true;
-        });
+        Preference prefLocalMediaServer = findPreference(PreferencesFragment.KEY_LOCAL_MEDIA_SERVER);
+        if (prefLocalMediaServer != null) {
+            prefLocalMediaServer.setOnPreferenceClickListener((newValue) -> {
+                if (!CheckDonate.isFullVersion(requireActivity())) {
+                    return false;
+                }
+                View view = View.inflate(requireActivity(), R.layout.entry_local_server, null);
+                TextInputEditText url = view.findViewById(R.id.edit_url);
+                TextInputEditText password = view.findViewById(R.id.edit_password);
+                MaterialCheckBox enabled = view.findViewById(R.id.edit_enabled);
+                LocalServerSettings settings = Settings.get().other().getLocalServer();
+                url.setText(settings.url);
+                password.setText(settings.password);
+                enabled.setChecked(settings.enabled);
 
-        findPreference("local_media_server").setOnPreferenceClickListener((newValue) -> {
-            if (!CheckDonate.isFullVersion(requireActivity())) {
-                return false;
-            }
-            View view = View.inflate(requireActivity(), R.layout.entry_local_server, null);
-            TextInputEditText url = view.findViewById(R.id.edit_url);
-            TextInputEditText password = view.findViewById(R.id.edit_password);
-            MaterialCheckBox enabled = view.findViewById(R.id.edit_enabled);
-            LocalServerSettings settings = Settings.get().other().getLocalServer();
-            url.setText(settings.url);
-            password.setText(settings.password);
-            enabled.setChecked(settings.enabled);
+                new MaterialAlertDialogBuilder(requireActivity())
+                        .setView(view)
+                        .setCancelable(true)
+                        .setNegativeButton(R.string.button_cancel, null)
+                        .setPositiveButton(R.string.button_ok, (dialog, which) -> {
+                            boolean en_vl = enabled.isChecked();
+                            String url_vl = url.getEditableText().toString();
+                            String psv_vl = password.getEditableText().toString();
+                            if (en_vl && (isEmpty(url_vl) || isEmpty(psv_vl))) {
+                                return;
+                            }
+                            LocalServerSettings srv = new LocalServerSettings();
+                            srv.enabled = en_vl;
+                            srv.password = psv_vl;
+                            srv.url = url_vl;
+                            Settings.get().other().setLocalServer(srv);
+                            Injection.provideProxySettings().setActive(Injection.provideProxySettings().getActiveProxy());
+                        })
+                        .show();
+                return true;
+            });
+        }
 
-            new MaterialAlertDialogBuilder(requireActivity())
-                    .setView(view)
-                    .setCancelable(true)
-                    .setNegativeButton(R.string.button_cancel, null)
-                    .setPositiveButton(R.string.button_ok, (dialog, which) -> {
-                        boolean en_vl = enabled.isChecked();
-                        String url_vl = url.getEditableText().toString();
-                        String psv_vl = password.getEditableText().toString();
-                        if (en_vl && (isEmpty(url_vl) || isEmpty(psv_vl))) {
-                            return;
-                        }
-                        LocalServerSettings srv = new LocalServerSettings();
-                        srv.enabled = en_vl;
-                        srv.password = psv_vl;
-                        srv.url = url_vl;
-                        Settings.get().other().setLocalServer(srv);
-                        Injection.provideProxySettings().setActive(Injection.provideProxySettings().getActiveProxy());
-                    })
-                    .show();
-            return true;
-        });
+        EditTextPreference prefMaxBitmapResolution = findPreference(PreferencesFragment.KEY_MAX_BITMAP_RESOLUTION);
+        if (prefMaxBitmapResolution != null) {
+            prefMaxBitmapResolution.setOnPreferenceChangeListener((preference, newValue) -> {
+                int sz = -1;
+                try {
+                    sz = Integer.parseInt(newValue.toString().trim());
+                } catch (NumberFormatException ignored) {
+                }
+                if (BitmapSafeResize.isOverflowCanvas(sz) || sz < 100 && sz >= 0) {
+                    return false;
+                } else {
+                    BitmapSafeResize.setMaxResolution(sz);
+                }
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        EditTextPreference prefMaxResolution = findPreference("max_bitmap_resolution");
-        prefMaxResolution.setOnPreferenceChangeListener((preference, newValue) -> {
-            int sz = -1;
-            try {
-                sz = Integer.parseInt(newValue.toString().trim());
-            } catch (NumberFormatException ignored) {
-            }
-            if (BitmapSafeResize.isOverflowCanvas(sz) || sz < 100 && sz >= 0) {
-                return false;
-            } else {
-                BitmapSafeResize.setMaxResolution(sz);
-            }
-            requireActivity().recreate();
-            return true;
-        });
+        SwitchPreference prefAudioRoundIcon = findPreference(PreferencesFragment.KEY_AUDIO_ROUND_ICON);
+        if (prefAudioRoundIcon != null) {
+            prefAudioRoundIcon.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        SwitchPreference prefMiniplayerRoundIcon = findPreference("audio_round_icon");
-        prefMiniplayerRoundIcon.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        SwitchPreference prefShowProfileInAdditionalPage = findPreference(PreferencesFragment.KEY_SHOW_PROFILE_IN_ADDITIONAL_PAGE);
+        if (prefShowProfileInAdditionalPage != null) {
+            prefShowProfileInAdditionalPage.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        SwitchPreference prefshow_profile_in_additional_page = findPreference("show_profile_in_additional_page");
-        prefshow_profile_in_additional_page.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        SwitchPreference prefShowRecentDialogs = findPreference(PreferencesFragment.KEY_SHOW_RECENT_DIALOGS);
+        if (prefShowRecentDialogs != null) {
+            prefShowRecentDialogs.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        SwitchPreference prefshow_recent_dialogs = findPreference("show_recent_dialogs");
-        prefshow_recent_dialogs.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        SwitchPreference prefDoZoomPhoto = findPreference(PreferencesFragment.KEY_DO_ZOOM_PHOTO);
+        if (prefDoZoomPhoto != null) {
+            prefDoZoomPhoto.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        SwitchPreference do_zoom_photo = findPreference("do_zoom_photo");
-        do_zoom_photo.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        ListPreference prefFontSize = findPreference(PreferencesFragment.KEY_FONT_SIZE);
+        if (prefFontSize != null) {
+            prefFontSize.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        ListPreference font_size = findPreference("font_size");
-        font_size.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        ListPreference prefLanguageUI = findPreference(PreferencesFragment.KEY_LANGUAGE_UI);
+        if (prefLanguageUI != null) {
+            prefLanguageUI.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        ListPreference language_ui = findPreference("language_ui");
-        language_ui.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        SwitchPreference prefShowMode = findPreference(PreferencesFragment.KEY_SHOW_MODE);
+        if (prefShowMode != null) {
+            prefShowMode.setOnPreferenceChangeListener((preference, newValue) -> {
+                requireActivity().recreate();
+                return true;
+            });
+        }
 
-        SwitchPreference snow_mode = findPreference("snow_mode");
-        snow_mode.setOnPreferenceChangeListener((preference, newValue) -> {
-            requireActivity().recreate();
-            return true;
-        });
+        ListPreference prefPhotoPreviewSize = findPreference(PreferencesFragment.KEY_PHOTO_PREVIEW_SIZE);
+        if (prefPhotoPreviewSize != null) {
+            prefPhotoPreviewSize.setOnPreferenceChangeListener((preference, newValue) -> {
+                Settings.get().main().notifyPrefPreviewSizeChanged();
+                return true;
+            });
+        }
 
-        ListPreference prefPhotoPreview = findPreference("photo_preview_size");
-        prefPhotoPreview.setOnPreferenceChangeListener((preference, newValue) -> {
-            Settings.get().main().notifyPrefPreviewSizeChanged();
-            return true;
-        });
-        ListPreference defCategory = findPreference(KEY_DEFAULT_CATEGORY);
-        initStartPagePreference(defCategory);
+        ListPreference prefDefaultCategory = findPreference(PreferencesFragment.KEY_DEFAULT_CATEGORY);
+        if (prefDefaultCategory != null) {
+            initStartPagePreference(prefDefaultCategory);
+        }
 
-
-        Preference notification = findPreference(KEY_NOTIFICATION);
-        if (notification != null) {
-            notification.setOnPreferenceClickListener(preference -> {
+        Preference prefNotifications = findPreference(PreferencesFragment.KEY_NOTIFICATIONS);
+        if (prefNotifications != null) {
+            prefNotifications.setOnPreferenceClickListener(preference -> {
                 if (Utils.hasOreo()) {
                     Intent intent = new Intent();
                     intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
@@ -408,87 +490,47 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             });
         }
 
-        Preference security = findPreference(KEY_SECURITY);
-        if (Objects.nonNull(security)) {
-            security.setOnPreferenceClickListener(preference -> {
+        Preference prefSecurity = findPreference(PreferencesFragment.KEY_SECURITY);
+        if (prefSecurity != null) {
+            prefSecurity.setOnPreferenceClickListener(preference -> {
                 onSecurityClick();
                 return true;
             });
         }
 
-        Preference drawerCategories = findPreference(KEY_DRAWER_ITEMS);
-        if (drawerCategories != null) {
-            drawerCategories.setOnPreferenceClickListener(preference -> {
+        Preference prefDrawerCategories = findPreference(PreferencesFragment.KEY_DRAWER_CATEGORIES);
+        if (prefDrawerCategories != null) {
+            prefDrawerCategories.setOnPreferenceClickListener(preference -> {
                 PlaceFactory.getDrawerEditPlace().tryOpenWith(requireActivity());
                 return true;
             });
         }
 
-        Preference avatarStyle = findPreference(KEY_AVATAR_STYLE);
-        if (avatarStyle != null) {
-            avatarStyle.setOnPreferenceClickListener(preference -> {
+        Preference prefAvatarStyle = findPreference(PreferencesFragment.KEY_AVATAR_STYLE);
+        if (prefAvatarStyle != null) {
+            prefAvatarStyle.setOnPreferenceClickListener(preference -> {
                 showAvatarStyleDialog();
                 return true;
             });
         }
 
-        Preference appTheme = findPreference(KEY_APP_THEME);
-        if (appTheme != null) {
-            appTheme.setOnPreferenceClickListener(preference -> {
+        Preference prefAppTheme = findPreference(PreferencesFragment.KEY_APP_THEME);
+        if (prefAppTheme != null) {
+            prefAppTheme.setOnPreferenceClickListener(preference -> {
                 PlaceFactory.getSettingsThemePlace().tryOpenWith(requireActivity());
                 return true;
             });
         }
 
-        Preference check_updates = findPreference("check_updates");
+        Preference check_updates = findPreference(PreferencesFragment.KEY_CHECK_UPDATES);
         if (check_updates != null) {
-            check_updates.setOnPreferenceClickListener(preference -> {
-                Toast.makeText(appTheme.getContext(), appTheme.getContext().getText(R.string.update_started), Toast.LENGTH_SHORT).show();
-                new NetWorker().get("https://raw.githubusercontent.com/lordralinc/VKP/main/releases/current_version.json")
-                        .enqueue(new Callback() {
-                            @Override
-                            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                                Toast.makeText(appTheme.getContext(), appTheme.getContext().getText(R.string.error_on_checking_update), Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                                try {
-                                    JSONObject json = new JSONObject(response.body().string());
-                                    int versionCode = BuildConfig.VERSION_CODE;
-                                    if (versionCode < json.getInt("version_code")){
-                                        String folderPath = Environment.getExternalStorageDirectory().toString() +
-                                                File.separator +
-                                                Environment.DIRECTORY_DOWNLOADS +
-                                                File.separator +
-                                                "VKP" +
-                                                File.separator;
-                                        String path = folderPath + "VKP" + json.getString("version_name") + ".apk";
-
-                                        DownloadManager downloadmanager = (DownloadManager) appTheme.getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-                                        Uri uri = Uri.parse(json.getString("url"));
-                                        DownloadManager.Request request = new DownloadManager.Request(uri);
-                                        request.setTitle(getText(R.string.app_name));
-                                        request.setDescription(getText(R.string.downloading));
-                                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                                        request.setVisibleInDownloadsUi(false);
-                                        request.setDestinationUri(Uri.parse("file://" + path));
-
-                                        downloadmanager.enqueue(request);
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                return true;
-            });
+            check_updates.setOnPreferenceClickListener(preference -> onCheckUpdates());
         }
 
-        Preference version = findPreference("version");
-        if (version != null) {
-            version.setSummary(Utils.getAppVersionName(requireActivity()) + ", VK API " + Constants.API_VERSION);
-            version.setOnPreferenceClickListener(preference -> {
+        Preference pefVersion = findPreference(PreferencesFragment.KEY_VERSION);
+        if (pefVersion != null) {
+            pefVersion.setSummary(Utils.getAppVersionName(requireActivity()) + ", VK API " + Constants.API_VERSION);
+            pefVersion.setOnPreferenceClickListener(preference -> {
                 View view = View.inflate(requireActivity(), R.layout.dialog_about_us, null);
                 new MaterialAlertDialogBuilder(requireActivity())
                         .setView(view)
@@ -497,86 +539,100 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             });
         }
 
-
-        Preference additional_debug = findPreference("additional_debug");
-        if (additional_debug != null) {
-            additional_debug.setOnPreferenceClickListener(preference -> {
+        Preference prefAdditionalDebug = findPreference(PreferencesFragment.KEY_ADDITIONAL_DEBUG);
+        if (prefAdditionalDebug != null) {
+            prefAdditionalDebug.setOnPreferenceClickListener(preference -> {
                 ShowAdditionalInfo();
                 return true;
             });
         }
 
-        SwitchPreference settings_idm_show_commands_on_dialog = findPreference("settings_idm_show_commands_on_dialog");
-        if (settings_idm_show_commands_on_dialog != null){
-            settings_idm_show_commands_on_dialog.setChecked(Settings.get().idm().getShowCommandsOnDialog());
-            settings_idm_show_commands_on_dialog.setOnPreferenceChangeListener((preference, newValue) -> {
+        SwitchPreference prefSettingsIDMShowCommandsOnDialog = findPreference(PreferencesFragment.KEY_SETTINGS_IDM_SHOW_COMMANDS_ON_DIALOG);
+        if (prefSettingsIDMShowCommandsOnDialog != null) {
+            prefSettingsIDMShowCommandsOnDialog.setChecked(Settings.get().idm().getShowCommandsOnDialog());
+            prefSettingsIDMShowCommandsOnDialog.setOnPreferenceChangeListener((preference, newValue) -> {
                 Settings.get().idm().setShowCommandsOnDialog((boolean) newValue);
                 return true;
             });
         }
 
-        Preference update_idm_token = findPreference("update_idm_token");
-        if (update_idm_token != null) {
-            update_idm_token.setOnPreferenceClickListener(preference -> {
-                Settings.get().idm().updateAccessToken(Settings.get().accounts().getCurrent());
+        Preference prefUpdateIDMToken = findPreference(PreferencesFragment.KEY_UPDATE_IDM_TOKEN);
+        if (prefUpdateIDMToken != null) {
+            int accountId = Settings.get().accounts().getCurrent();
+            prefUpdateIDMToken.setOnPreferenceClickListener(preference -> {
+                IdmApiService.Factory.create()
+                        .getTokenByVKToken(new GetTokenByVKToken(
+                                Settings.get().accounts().getAccessToken(accountId)
+                                )
+                        )
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                response -> {
+                                    String idmToken = response.getResponse();
+                                    if (idmToken != null){
+                                        Settings.get().idm().storeAccessToken(accountId, idmToken);
+                                        Toast.makeText(requireContext(), "Токен обновлен", Toast.LENGTH_LONG).show();
+                                    }
+                                    Toast.makeText(requireContext(), "Не удалось обновить токен", Toast.LENGTH_LONG).show();
+                                },
+                                error -> {
+                                    Log.e("UpdateIDMToken", error.getMessage(), error);
+                                    Toast.makeText(requireContext(), "Не удалось обновить токен", Toast.LENGTH_LONG).show();
+                                }
+                        );
                 return true;
             });
         }
 
-        Preference select_icon = findPreference("select_custom_icon");
-        if (select_icon != null) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                select_icon.setVisible(false);
-            } else {
-                select_icon.setOnPreferenceClickListener(preference -> {
-                    ShowSelectIcon();
-                    return true;
-                });
-            }
+        Preference prefSelectCustomIcon = findPreference(PreferencesFragment.KEY_SELECT_CUSTOM_ICON);
+        if (prefSelectCustomIcon != null) {
+            prefSelectCustomIcon.setVisible(false);
         }
 
-        ListPreference chat_background = findPreference("chat_background");
-        if (chat_background != null) {
-            chat_background.setOnPreferenceChangeListener((preference, newValue) -> {
+        ListPreference prefChatBackground = findPreference(PreferencesFragment.KEY_CHAT_BACKGROUND);
+        if (prefChatBackground != null) {
+            prefChatBackground.setOnPreferenceChangeListener((preference, newValue) -> {
                 String val = newValue.toString();
                 int index = Integer.parseInt(val);
                 EnableChatPhotoBackground(index);
                 return true;
             });
-            EnableChatPhotoBackground(Integer.parseInt(chat_background.getValue()));
+            EnableChatPhotoBackground(Integer.parseInt(prefChatBackground.getValue()));
         }
 
-        Preference lightSideBarPreference = findPreference("chat_light_background");
-        if (lightSideBarPreference != null) {
-            lightSideBarPreference.setOnPreferenceClickListener(preference -> {
+        Preference prefChatLightBackground = findPreference(PreferencesFragment.KEY_CHAT_LIGHT_BACKGROUND);
+        if (prefChatLightBackground != null) {
+            prefChatLightBackground.setOnPreferenceClickListener(preference -> {
                 selectLocalImage(false);
                 return true;
             });
             File bitmap = getDrawerBackgroundFile(requireActivity(), true);
             if (bitmap.exists()) {
                 Drawable d = Drawable.createFromPath(bitmap.getAbsolutePath());
-                lightSideBarPreference.setIcon(d);
-            } else
-                lightSideBarPreference.setIcon(R.drawable.dir_photo);
+                prefChatLightBackground.setIcon(d);
+            } else {
+                prefChatLightBackground.setIcon(R.drawable.dir_photo);
+            }
         }
 
-        Preference darkSideBarPreference = findPreference("chat_dark_background");
-        if (darkSideBarPreference != null) {
-            darkSideBarPreference.setOnPreferenceClickListener(preference -> {
+        Preference prefChatDarkBackground = findPreference(PreferencesFragment.KEY_CHAT_DARK_BACKGROUND);
+        if (prefChatDarkBackground != null) {
+            prefChatDarkBackground.setOnPreferenceClickListener(preference -> {
                 selectLocalImage(true);
                 return true;
             });
             File bitmap = getDrawerBackgroundFile(requireActivity(), false);
             if (bitmap.exists()) {
                 Drawable d = Drawable.createFromPath(bitmap.getAbsolutePath());
-                darkSideBarPreference.setIcon(d);
+                prefChatDarkBackground.setIcon(d);
             } else
-                darkSideBarPreference.setIcon(R.drawable.dir_photo);
+                prefChatDarkBackground.setIcon(R.drawable.dir_photo);
         }
 
-        Preference resetDrawerBackground = findPreference("reset_chat_background");
-        if (resetDrawerBackground != null) {
-            resetDrawerBackground.setOnPreferenceClickListener(preference -> {
+        Preference prefResetChatBackground = findPreference(PreferencesFragment.KEY_RESET_CHAT_BACKGROUND);
+        if (prefResetChatBackground != null) {
+            prefResetChatBackground.setOnPreferenceClickListener(preference -> {
                 File chat_light = getDrawerBackgroundFile(requireActivity(), true);
                 File chat_dark = getDrawerBackgroundFile(requireActivity(), false);
 
@@ -586,188 +642,237 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                 } catch (IOException e) {
                     Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
-                if (darkSideBarPreference != null && lightSideBarPreference != null) {
+                if (prefChatDarkBackground != null && prefChatLightBackground != null) {
                     File bitmap = getDrawerBackgroundFile(requireActivity(), true);
                     if (bitmap.exists()) {
                         Drawable d = Drawable.createFromPath(bitmap.getAbsolutePath());
-                        lightSideBarPreference.setIcon(d);
+                        prefChatLightBackground.setIcon(d);
                     } else
-                        lightSideBarPreference.setIcon(R.drawable.dir_photo);
+                        prefChatLightBackground.setIcon(R.drawable.dir_photo);
                     bitmap = getDrawerBackgroundFile(requireActivity(), false);
                     if (bitmap.exists()) {
                         Drawable d = Drawable.createFromPath(bitmap.getAbsolutePath());
-                        darkSideBarPreference.setIcon(d);
+                        prefChatDarkBackground.setIcon(d);
                     } else
-                        darkSideBarPreference.setIcon(R.drawable.dir_photo);
+                        prefChatDarkBackground.setIcon(R.drawable.dir_photo);
                 }
                 return true;
             });
         }
 
-        findPreference("music_dir")
-                .setOnPreferenceClickListener(preference -> {
-                    if (!AppPerms.hasReadStoragePermission(getActivity())) {
-                        requestReadPermission.launch();
-                        return true;
-                    }
-                    DialogProperties properties = new DialogProperties();
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                    properties.selection_type = DialogConfigs.DIR_SELECT;
-                    properties.root = Environment.getExternalStorageDirectory();
-                    properties.error_dir = Environment.getExternalStorageDirectory();
-                    properties.offset = new File(Settings.get().other().getMusicDir());
-                    properties.extensions = null;
-                    properties.show_hidden_files = true;
-                    FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
-                    dialog.setTitle(R.string.music_dir);
-                    dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("music_dir", files[0]).apply());
-                    dialog.show();
+        Preference prefMusicDir = findPreference(PreferencesFragment.KEY_MUSIC_DIR);
+        if (prefMusicDir != null) {
+            prefMusicDir.setOnPreferenceClickListener(preference -> {
+                if (!AppPerms.hasReadStoragePermission(requireActivity())) {
+                    requestReadPermission.launch();
                     return true;
-                });
+                }
+                DialogProperties properties = new DialogProperties();
+                properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                properties.selection_type = DialogConfigs.DIR_SELECT;
+                properties.root = Environment.getExternalStorageDirectory();
+                properties.error_dir = Environment.getExternalStorageDirectory();
+                properties.offset = new File(Settings.get().other().getMusicDir());
+                properties.extensions = null;
+                properties.show_hidden_files = true;
+                FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
+                dialog.setTitle(R.string.music_dir);
+                dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("music_dir", files[0]).apply());
+                dialog.show();
+                return true;
+            });
+        }
 
-        findPreference("photo_dir")
-                .setOnPreferenceClickListener(preference -> {
-                    if (!AppPerms.hasReadStoragePermission(getActivity())) {
-                        requestReadPermission.launch();
-                        return true;
-                    }
-                    DialogProperties properties = new DialogProperties();
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                    properties.selection_type = DialogConfigs.DIR_SELECT;
-                    properties.root = Environment.getExternalStorageDirectory();
-                    properties.error_dir = Environment.getExternalStorageDirectory();
-                    properties.offset = new File(Settings.get().other().getPhotoDir());
-                    properties.extensions = null;
-                    properties.show_hidden_files = true;
-                    FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
-                    dialog.setTitle(R.string.photo_dir);
-                    dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("photo_dir", files[0]).apply());
-                    dialog.show();
+        Preference prefPhotoDir = findPreference(PreferencesFragment.KEY_PHOTO_DIR);
+        if (prefPhotoDir != null) {
+            prefPhotoDir.setOnPreferenceClickListener(preference -> {
+                if (!AppPerms.hasReadStoragePermission(requireActivity())) {
+                    requestReadPermission.launch();
                     return true;
-                });
+                }
+                DialogProperties properties = new DialogProperties();
+                properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                properties.selection_type = DialogConfigs.DIR_SELECT;
+                properties.root = Environment.getExternalStorageDirectory();
+                properties.error_dir = Environment.getExternalStorageDirectory();
+                properties.offset = new File(Settings.get().other().getPhotoDir());
+                properties.extensions = null;
+                properties.show_hidden_files = true;
+                FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
+                dialog.setTitle(R.string.photo_dir);
+                dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("photo_dir", files[0]).apply());
+                dialog.show();
+                return true;
+            });
+        }
 
-        findPreference("video_dir")
-                .setOnPreferenceClickListener(preference -> {
-                    if (!AppPerms.hasReadStoragePermission(getActivity())) {
-                        requestReadPermission.launch();
-                        return true;
-                    }
-                    DialogProperties properties = new DialogProperties();
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                    properties.selection_type = DialogConfigs.DIR_SELECT;
-                    properties.root = Environment.getExternalStorageDirectory();
-                    properties.error_dir = Environment.getExternalStorageDirectory();
-                    properties.offset = new File(Settings.get().other().getVideoDir());
-                    properties.extensions = null;
-                    properties.show_hidden_files = true;
-                    FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
-                    dialog.setTitle(R.string.video_dir);
-                    dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("video_dir", files[0]).apply());
-                    dialog.show();
+        Preference prefVideoDir = findPreference(PreferencesFragment.KEY_VIDEO_DIR);
+        if (prefVideoDir != null) {
+            prefVideoDir.setOnPreferenceClickListener(preference -> {
+                if (!AppPerms.hasReadStoragePermission(requireActivity())) {
+                    requestReadPermission.launch();
                     return true;
-                });
+                }
+                DialogProperties properties = new DialogProperties();
+                properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                properties.selection_type = DialogConfigs.DIR_SELECT;
+                properties.root = Environment.getExternalStorageDirectory();
+                properties.error_dir = Environment.getExternalStorageDirectory();
+                properties.offset = new File(Settings.get().other().getVideoDir());
+                properties.extensions = null;
+                properties.show_hidden_files = true;
+                FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
+                dialog.setTitle(R.string.video_dir);
+                dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("video_dir", files[0]).apply());
+                dialog.show();
+                return true;
+            });
+        }
 
-        findPreference("docs_dir")
-                .setOnPreferenceClickListener(preference -> {
-                    if (!AppPerms.hasReadStoragePermission(getActivity())) {
-                        requestReadPermission.launch();
-                        return true;
-                    }
-                    DialogProperties properties = new DialogProperties();
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                    properties.selection_type = DialogConfigs.DIR_SELECT;
-                    properties.root = Environment.getExternalStorageDirectory();
-                    properties.error_dir = Environment.getExternalStorageDirectory();
-                    properties.offset = new File(Settings.get().other().getDocDir());
-                    properties.extensions = null;
-                    properties.show_hidden_files = true;
-                    FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
-                    dialog.setTitle(R.string.docs_dir);
-                    dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("docs_dir", files[0]).apply());
-                    dialog.show();
+        Preference prefDocsDir = findPreference(PreferencesFragment.KEY_DOCS_DIR);
+        if (prefDocsDir != null) {
+            prefDocsDir.setOnPreferenceClickListener(preference -> {
+                if (!AppPerms.hasReadStoragePermission(requireActivity())) {
+                    requestReadPermission.launch();
                     return true;
-                });
+                }
+                DialogProperties properties = new DialogProperties();
+                properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                properties.selection_type = DialogConfigs.DIR_SELECT;
+                properties.root = Environment.getExternalStorageDirectory();
+                properties.error_dir = Environment.getExternalStorageDirectory();
+                properties.offset = new File(Settings.get().other().getDocDir());
+                properties.extensions = null;
+                properties.show_hidden_files = true;
+                FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
+                dialog.setTitle(R.string.docs_dir);
+                dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("docs_dir", files[0]).apply());
+                dialog.show();
+                return true;
+            });
+        }
 
-        findPreference("sticker_dir")
-                .setOnPreferenceClickListener(preference -> {
-                    if (!AppPerms.hasReadStoragePermission(getActivity())) {
-                        requestReadPermission.launch();
-                        return true;
-                    }
-                    DialogProperties properties = new DialogProperties();
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE;
-                    properties.selection_type = DialogConfigs.DIR_SELECT;
-                    properties.root = Environment.getExternalStorageDirectory();
-                    properties.error_dir = Environment.getExternalStorageDirectory();
-                    properties.offset = new File(Settings.get().other().getStickerDir());
-                    properties.extensions = null;
-                    properties.show_hidden_files = true;
-                    FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
-                    dialog.setTitle(R.string.docs_dir);
-                    dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("sticker_dir", files[0]).apply());
-                    dialog.show();
+        Preference prefStickerDir = findPreference(PreferencesFragment.KEY_STICKER_DIR);
+        if (prefStickerDir != null) {
+            prefStickerDir.setOnPreferenceClickListener(preference -> {
+                if (!AppPerms.hasReadStoragePermission(requireActivity())) {
+                    requestReadPermission.launch();
                     return true;
-                });
+                }
+                DialogProperties properties = new DialogProperties();
+                properties.selection_mode = DialogConfigs.SINGLE_MODE;
+                properties.selection_type = DialogConfigs.DIR_SELECT;
+                properties.root = Environment.getExternalStorageDirectory();
+                properties.error_dir = Environment.getExternalStorageDirectory();
+                properties.offset = new File(Settings.get().other().getStickerDir());
+                properties.extensions = null;
+                properties.show_hidden_files = true;
+                FilePickerDialog dialog = new FilePickerDialog(requireActivity(), properties, Settings.get().ui().getMainTheme());
+                dialog.setTitle(R.string.docs_dir);
+                dialog.setDialogSelectionListener(files -> PreferenceManager.getDefaultSharedPreferences(Injection.provideApplicationContext()).edit().putString("sticker_dir", files[0]).apply());
+                dialog.show();
+                return true;
+            });
+        }
 
-        findPreference("kate_gms_token").setVisible(Constants.DEFAULT_ACCOUNT_TYPE == Account_Types.KATE);
+        Preference prefKateGMSToken = findPreference(PreferencesFragment.KEY_KATE_GMS_TOKEN);
+        if (prefKateGMSToken != null) {
+            prefKateGMSToken.setVisible(true);
+        }
 
-        findPreference("show_logs")
-                .setOnPreferenceClickListener(preference -> {
-                    PlaceFactory.getLogsPlace().tryOpenWith(requireActivity());
-                    return true;
-                });
+        Preference prefShowLogs = findPreference(PreferencesFragment.KEY_SHOW_LOGS);
+        if (prefShowLogs != null) {
+            prefShowLogs.setOnPreferenceClickListener(preference -> {
+                PlaceFactory.getLogsPlace().tryOpenWith(requireActivity());
+                return true;
+            });
+        }
 
-        findPreference("request_executor")
-                .setOnPreferenceClickListener(preference -> {
-                    PlaceFactory.getRequestExecutorPlace(getAccountId()).tryOpenWith(requireActivity());
-                    return true;
-                });
+        Preference prefRequestExecutor = findPreference(PreferencesFragment.KEY_REQUEST_EXECUTOR);
+        if (prefRequestExecutor != null) {
+            prefRequestExecutor.setOnPreferenceClickListener(preference -> {
+                PlaceFactory.getRequestExecutorPlace(getAccountId()).tryOpenWith(requireActivity());
+                return true;
+            });
+        }
 
-        findPreference("picture_cache_cleaner")
-                .setOnPreferenceClickListener(preference -> {
-                    CleanImageCache(requireActivity(), true);
-                    return true;
-                });
+        Preference prefPictureCacheCleaner = findPreference(PreferencesFragment.KEY_PICTURE_CACHE_CLEANER);
+        if (prefPictureCacheCleaner != null) {
+            prefPictureCacheCleaner.setOnPreferenceClickListener(preference -> {
+                CleanImageCache(requireActivity(), true);
+                return true;
+            });
+        }
 
-        findPreference("account_cache_cleaner")
-                .setOnPreferenceClickListener(preference -> {
-                    DBHelper.removeDatabaseFor(requireActivity(), getAccountId());
-                    CleanImageCache(requireActivity(), true);
-                    return true;
-                });
+        Preference prefAccountCacheCleaner = findPreference(PreferencesFragment.KEY_ACCOUNT_CACHE_CLEANER);
+        if (prefAccountCacheCleaner != null) {
+            prefAccountCacheCleaner.setOnPreferenceClickListener(preference -> {
+                DBHelper.removeDatabaseFor(requireActivity(), getAccountId());
+                CleanImageCache(requireActivity(), true);
+                return true;
+            });
+        }
 
-        findPreference("blacklist")
-                .setOnPreferenceClickListener(preference -> {
-                    PlaceFactory.getUserBlackListPlace(getAccountId()).tryOpenWith(requireActivity());
-                    return true;
-                });
+        Preference prefBlacklist = findPreference(PreferencesFragment.KEY_BLACKLIST);
+        if (prefBlacklist != null) {
+            prefBlacklist.setOnPreferenceClickListener(preference -> {
+                PlaceFactory.getUserBlackListPlace(getAccountId()).tryOpenWith(requireActivity());
+                return true;
+            });
+        }
 
-        findPreference("friends_by_phone")
-                .setOnPreferenceClickListener(preference -> {
-                    if (!AppPerms.hasContactsPermission(requireActivity())) {
-                        requestContactsPermission.launch();
-                    } else {
-                        PlaceFactory.getFriendsByPhonesPlace(getAccountId()).tryOpenWith(requireActivity());
-                    }
-                    return true;
-                });
+        Preference prefFriendsByPhone = findPreference(PreferencesFragment.KEY_FRIENDS_BY_PHONE);
+        if (prefFriendsByPhone != null) {
+            prefFriendsByPhone.setOnPreferenceClickListener(preference -> {
+                if (!AppPerms.hasContactsPermission(requireActivity())) {
+                    requestContactsPermission.launch();
+                } else {
+                    PlaceFactory.getFriendsByPhonesPlace(getAccountId()).tryOpenWith(requireActivity());
+                }
+                return true;
+            });
+        }
 
-        findPreference("proxy")
-                .setOnPreferenceClickListener(preference -> {
-                    startActivity(new Intent(requireActivity(), ProxyManagerActivity.class));
-                    return true;
-                });
+        Preference prefProxy = findPreference(PreferencesFragment.KEY_PROXY);
+        if (prefProxy != null) {
+            prefProxy.setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(requireActivity(), ProxyManagerActivity.class));
+                return true;
+            });
 
-        SwitchPreference keepLongpoll = findPreference("keep_longpoll");
-        keepLongpoll.setOnPreferenceChangeListener((preference, newValue) -> {
-            boolean keep = (boolean) newValue;
-            if (keep) {
-                KeepLongpollService.start(preference.getContext());
-            } else {
-                KeepLongpollService.stop(preference.getContext());
+        }
+
+        Preference prefKeepLongpoll = findPreference(PreferencesFragment.KEY_KEEP_LONGPOLL);
+        if (prefKeepLongpoll != null) {
+            prefKeepLongpoll.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean keep = (boolean) newValue;
+                if (keep) {
+                    KeepLongpollService.start(preference.getContext());
+                } else {
+                    KeepLongpollService.stop(preference.getContext());
+                }
+                return true;
+            });
+        }
+
+        ListPreference prefPlayerToUse = findPreference(PreferencesFragment.KEY_PLAYER_TO_USE);
+        if (prefPlayerToUse != null) {
+            boolean mayUseVKX = vkxIsInstalled();
+            if (!mayUseVKX){
+                prefPlayerToUse.setVisible(false);
+                Settings.get().other().setPlayer("internal");
             }
-            return true;
-        });
+            prefPlayerToUse.setOnPreferenceChangeListener((preference, newValue) -> {
+                Settings.get().other().setPlayer(newValue.toString());
+                return true;
+            });
+        }
+    }
+
+    private boolean onCheckUpdates() {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("tg://resolve?domain=vkp_releases"));
+        startActivity(intent);
+        return true;
     }
 
     @Override
@@ -856,110 +961,31 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                 .show();
     }
 
-    private void ShowSelectIcon() {
-        if (!CheckDonate.isFullVersion(requireActivity())) {
-            return;
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @SuppressLint("SetTextI18n")
+    private void showThanks() {
+        View view = View.inflate(requireActivity(), R.layout.dialog_thanks, null);
+
+        StringBuilder agents = new StringBuilder("Агентам:\n");
+        StringBuilder helpers = new StringBuilder("Помощникам:\n");
+        StringBuilder donuts = new StringBuilder("Донам:\n");
+
+        for (int i: CheckDonate.agents) {
+            agents.append(CheckDonate.agents[i]).append("\n");
         }
-        View view = View.inflate(requireActivity(), R.layout.icon_select_alert, null);
-        view.findViewById(R.id.default_icon).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-        });
-        view.findViewById(R.id.blue_icon).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-        });
-        view.findViewById(R.id.green_icon).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-        });
-        view.findViewById(R.id.violet_icon).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-        });
-        view.findViewById(R.id.red_icon).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-        });
-        view.findViewById(R.id.yellow_icon).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-        });
-        view.findViewById(R.id.black_icon).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-        });
-        view.findViewById(R.id.vk_official).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-        });
-        view.findViewById(R.id.white_icon).setOnClickListener(v -> {
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), DefaultFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlueFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), GreenFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VioletFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), RedFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), YellowFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), BlackFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), VKFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-            requireActivity().getPackageManager().setComponentEnabledSetting(new ComponentName(requireActivity(), WhiteFenrirAlias.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-        });
+
+        for (int i: CheckDonate.helpers) {
+            helpers.append(CheckDonate.helpers[i]).append("\n");
+        }
+
+        for (int i: CheckDonate.donuts) {
+            donuts.append(CheckDonate.donuts[i]).append("\n");
+        }
+
+        ((TextView) view.findViewById(R.id.item_agents)).setText(agents.toString());
+        ((TextView) view.findViewById(R.id.item_helpers)).setText(helpers.toString());
+        ((TextView) view.findViewById(R.id.item_helpers)).setText(donuts.toString());
+
         new MaterialAlertDialogBuilder(requireActivity())
                 .setView(view)
                 .show();
@@ -1110,4 +1136,5 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                 .build()
                 .apply(requireActivity());
     }
+
 }

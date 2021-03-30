@@ -29,7 +29,7 @@ import dev.idm.vkp.util.Utils;
 public class BotKeyboardView extends ScrollView {
 
     private final ArrayList<View> buttonViews = new ArrayList<>();
-    private final boolean isFullSize = Settings.get().ui().isEmojis_full_screen();
+    private final boolean isFullSize = Settings.get().ui().isEmojisFullScreen();
     private LinearLayout container;
     private List<List<Keyboard.Button>> botButtons;
     private BotKeyboardViewDelegate delegate;

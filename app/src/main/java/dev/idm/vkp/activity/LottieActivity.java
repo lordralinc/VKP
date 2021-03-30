@@ -19,14 +19,14 @@ import com.google.android.material.button.MaterialButton;
 import java.io.File;
 
 import dev.idm.vkp.R;
-import dev.ragnarok.fenrir.module.FenrirNative;
-import dev.ragnarok.fenrir.module.rlottie.RLottie2Gif;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.settings.CurrentTheme;
 import dev.idm.vkp.settings.ISettings;
 import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.Objects;
 import dev.idm.vkp.util.Utils;
+import dev.ragnarok.fenrir.module.FenrirNative;
+import dev.ragnarok.fenrir.module.rlottie.RLottie2Gif;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 
 public class LottieActivity extends AppCompatActivity {

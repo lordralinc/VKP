@@ -24,7 +24,7 @@ public class Constants {
     public static final @Account_Types
     int DEFAULT_ACCOUNT_TYPE = BuildConfig.DEFAULT_ACCOUNT_TYPE;
 
-    public static final boolean IS_HAS_LOGIN_WEB = BuildConfig.DEFAULT_ACCOUNT_TYPE == Account_Types.KATE;
+    public static final boolean IS_HAS_LOGIN_WEB = true;
     public static final String FILE_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider";
 
     public static final String VK_ANDROID_APP_VERSION_NAME = "6.29";
@@ -35,7 +35,7 @@ public class Constants {
     public static final int API_ID = BuildConfig.VK_API_APP_ID;
     public static final String SECRET = BuildConfig.VK_CLIENT_SECRET;
     public static final String MAIN_OWNER_FIELDS = UserColumns.API_FIELDS + "," + GroupColumns.API_FIELDS;
-    public static final String PHOTOS_PATH = "DCIM/Fenrir";
+    public static final String PHOTOS_PATH = "DCIM/VKP";
     public static final int AUDIO_PLAYER_SERVICE_IDLE = 300000;
     public static final int PIN_DIGITS_COUNT = 4;
     public static final int MAX_RECENT_CHAT_COUNT = 4;

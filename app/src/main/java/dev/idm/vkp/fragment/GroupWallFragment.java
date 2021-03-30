@@ -45,7 +45,6 @@ import dev.idm.vkp.model.Owner;
 import dev.idm.vkp.model.ParcelableOwnerWrapper;
 import dev.idm.vkp.model.PostFilter;
 import dev.idm.vkp.model.Token;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.mvp.core.IPresenterFactory;
 import dev.idm.vkp.mvp.presenter.DocsListPresenter;
 import dev.idm.vkp.mvp.presenter.GroupWallPresenter;
@@ -58,6 +57,7 @@ import dev.idm.vkp.settings.Settings;
 import dev.idm.vkp.util.AppPerms;
 import dev.idm.vkp.util.AssertUtils;
 import dev.idm.vkp.util.Utils;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 
 import static dev.idm.vkp.util.Objects.isNull;
 import static dev.idm.vkp.util.Objects.nonNull;
@@ -129,7 +129,7 @@ public class GroupWallFragment extends AbsWallFragment<IGroupWallView, GroupWall
     }
 
     private void displayCommunityCover(String resource) {
-        if (!Settings.get().other().isShow_wall_cover())
+        if (!Settings.get().other().isShowWallCover())
             return;
         if (!Utils.isEmpty(resource)) {
             PicassoInstance.with()

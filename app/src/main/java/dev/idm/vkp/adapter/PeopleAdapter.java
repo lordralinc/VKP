@@ -96,6 +96,7 @@ public class PeopleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         holder.subtitle.setTextColor(user.isOnline() ? CurrentTheme.getColorPrimary(mContext) : STATUS_COLOR_OFFLINE);
 
         holder.ivVerified.setVisibility(user.isVerified() ? View.VISIBLE : View.GONE);
+        holder.ivVerified.setBackgroundTintList(user.getDonatedColour());
         holder.blacklisted.setVisibility(user.getBlacklisted() ? View.VISIBLE : View.GONE);
 
         holder.online.setVisibility(user.isOnline() ? View.VISIBLE : View.GONE);

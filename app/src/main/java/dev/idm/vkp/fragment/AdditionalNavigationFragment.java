@@ -1,12 +1,14 @@
 package dev.idm.vkp.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -64,7 +66,7 @@ public class AdditionalNavigationFragment extends BaseFragment implements MenuLi
     public static final int PAGE_MUSIC = 3;
     public static final int PAGE_DOCUMENTS = 4;
     public static final int PAGE_PHOTOS = 5;
-    public static final int PAGE_PREFERENSES = 6;
+    public static final int PAGE_PREFERENCES = 6;
     public static final int PAGE_ACCOUNTS = 7;
     public static final int PAGE_GROUPS = 8;
     public static final int PAGE_VIDEOS = 9;
@@ -86,7 +88,7 @@ public class AdditionalNavigationFragment extends BaseFragment implements MenuLi
     public static final SectionMenuItem SECTION_ITEM_DOCS = new IconMenuItem(PAGE_DOCUMENTS, R.drawable.file, R.string.attachment_documents);
     public static final SectionMenuItem SECTION_ITEM_SEARCH = new IconMenuItem(PAGE_SEARCH, R.drawable.magnify, R.string.search);
 
-    public static final SectionMenuItem SECTION_ITEM_SETTINGS = new IconMenuItem(PAGE_PREFERENSES, R.drawable.preferences, R.string.settings);
+    public static final SectionMenuItem SECTION_ITEM_SETTINGS = new IconMenuItem(PAGE_PREFERENCES, R.drawable.preferences, R.string.settings);
     public static final SectionMenuItem SECTION_ITEM_ACCOUNTS = new IconMenuItem(PAGE_ACCOUNTS, R.drawable.account_circle, R.string.accounts);
 
     private final CompositeDisposable mCompositeDisposable = new CompositeDisposable();
@@ -177,7 +179,7 @@ public class AdditionalNavigationFragment extends BaseFragment implements MenuLi
         recyclerView.setLayoutManager(new GridLayoutManager(requireActivity(), 2));
 
         ViewGroup vgProfileContainer = root.findViewById(R.id.content_root);
-        if (!Settings.get().ui().isShow_profile_in_additional_page())
+        if (!Settings.get().ui().isShowProfileInAdditionalPage())
             root.findViewById(R.id.profile_view).setVisibility(View.GONE);
         else
             root.findViewById(R.id.profile_view).setVisibility(View.VISIBLE);
@@ -265,7 +267,7 @@ public class AdditionalNavigationFragment extends BaseFragment implements MenuLi
         items.add(SECTION_ITEM_SETTINGS);
         items.add(SECTION_ITEM_ACCOUNTS);
 
-        if (nonEmpty(mRecentChats) && Settings.get().other().isEnable_show_recent_dialogs()) {
+        if (nonEmpty(mRecentChats) && Settings.get().other().isEnableShowRecentDialogs()) {
             items.addAll(mRecentChats);
         }
         return items;
@@ -318,8 +320,8 @@ public class AdditionalNavigationFragment extends BaseFragment implements MenuLi
             ivHeaderAvatar.setImageResource(R.drawable.ic_avatar_unknown);
         }
 
-        String domailText = "@" + user.getDomain();
-        tvDomain.setText(domailText);
+        String domainText = "@" + user.getDomain();
+        tvDomain.setText(domainText);
         tvUserName.setText(user.getFullName());
     }
 
@@ -351,8 +353,26 @@ public class AdditionalNavigationFragment extends BaseFragment implements MenuLi
         }
     }
 
-    private void selectItem(AbsMenuItem item, boolean longClick) {
+    private void selectItem(@NotNull AbsMenuItem item, boolean longClick) {
         closeSheet();
+
+        if (item.getType() == AbsMenuItem.TYPE_ICON) {
+            if (((IconMenuItem) item).getSection() == PAGE_MUSIC) {
+                if (Settings.get().other().getPlayer() != "internal") {
+                    Intent intent = requireContext().getPackageManager().getLaunchIntentForPackage(Settings.get().other().getPlayer());
+                    if (intent != null) {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        return;
+                    }
+                    Toast.makeText(
+                            requireContext(),
+                            String.format(requireContext().getString(R.string.package_not_found), Settings.get().other().getPlayer()),
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
+            }
+        }
 
         if (mCallbacks != null) {
             mCallbacks.onSheetItemSelected(item, longClick);

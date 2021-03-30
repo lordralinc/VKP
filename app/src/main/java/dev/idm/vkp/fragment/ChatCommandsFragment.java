@@ -22,15 +22,10 @@ import java.util.List;
 import dev.idm.vkp.Extra;
 import dev.idm.vkp.R;
 import dev.idm.vkp.adapter.ChatCommandsListAdapter;
-import dev.idm.vkp.adapter.ChatMembersListDomainAdapter;
 import dev.idm.vkp.fragment.base.BaseMvpBottomSheetDialogFragment;
-import dev.idm.vkp.model.AppChatUser;
-import dev.idm.vkp.model.Owner;
 import dev.idm.vkp.mvp.core.IPresenterFactory;
 import dev.idm.vkp.mvp.presenter.ChatCommandsPresenter;
-import dev.idm.vkp.mvp.presenter.ChatUsersDomainPresenter;
 import dev.idm.vkp.mvp.view.IChatCommandsView;
-import dev.idm.vkp.mvp.view.IChatUsersDomainView;
 import dev.idm.vkp.view.MySearchView;
 
 import static dev.idm.vkp.util.Objects.nonNull;

@@ -31,9 +31,6 @@ import dev.idm.vkp.domain.ILikesInteractor
 import dev.idm.vkp.fragment.base.BaseMvpFragment
 import dev.idm.vkp.listener.BackPressCallback
 import dev.idm.vkp.model.*
-import dev.ragnarok.fenrir.module.FenrirNative
-import dev.ragnarok.fenrir.module.parcel.ParcelNative
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView
 import dev.idm.vkp.mvp.core.IPresenterFactory
 import dev.idm.vkp.mvp.presenter.photo.*
 import dev.idm.vkp.mvp.view.IPhotoPagerView
@@ -56,6 +53,9 @@ import dev.idm.vkp.view.pager.WeakPicassoLoadCallback
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior.Companion.from
 import dev.idm.vkp.view.swipehelper.VerticalSwipeBehavior.SettleOnTopAction
+import dev.ragnarok.fenrir.module.FenrirNative
+import dev.ragnarok.fenrir.module.parcel.ParcelNative
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView
 import java.util.*
 
 
@@ -74,7 +74,7 @@ class PhotoPagerFragment : BaseMvpFragment<PhotoPagerPresenter, IPhotoPagerView>
         ): Bundle {
             val args = Bundle()
             args.putInt(Extra.ACCOUNT_ID, aid)
-            if (FenrirNative.isNativeLoaded() && Settings.get().other().isNative_parcel) {
+            if (FenrirNative.isNativeLoaded() && Settings.get().other().isNativeParcel) {
                 args.putLong(EXTRA_PHOTOS, ParcelNative.createParcelableList(photos))
             } else {
                 args.putParcelableArrayList(EXTRA_PHOTOS, photos)
@@ -97,7 +97,7 @@ class PhotoPagerFragment : BaseMvpFragment<PhotoPagerPresenter, IPhotoPagerView>
             args.putInt(Extra.OWNER_ID, ownerId)
             args.putInt(Extra.ALBUM_ID, albumId)
             args.putInt(Extra.INDEX, position)
-            if (FenrirNative.isNativeLoaded() && Settings.get().other().isNative_parcel) {
+            if (FenrirNative.isNativeLoaded() && Settings.get().other().isNativeParcel) {
                 args.putLong(EXTRA_PHOTOS, ParcelNative.createParcelableList(photos))
             } else {
                 args.putParcelableArrayList(EXTRA_PHOTOS, photos)
@@ -109,7 +109,7 @@ class PhotoPagerFragment : BaseMvpFragment<PhotoPagerPresenter, IPhotoPagerView>
         fun buildArgsForFave(aid: Int, photos: ArrayList<Photo?>, index: Int): Bundle {
             val args = Bundle()
             args.putInt(Extra.ACCOUNT_ID, aid)
-            if (FenrirNative.isNativeLoaded() && Settings.get().other().isNative_parcel) {
+            if (FenrirNative.isNativeLoaded() && Settings.get().other().isNativeParcel) {
                 args.putLong(EXTRA_PHOTOS, ParcelNative.createParcelableList(photos))
             } else {
                 args.putParcelableArrayList(EXTRA_PHOTOS, photos)
@@ -177,7 +177,7 @@ class PhotoPagerFragment : BaseMvpFragment<PhotoPagerPresenter, IPhotoPagerView>
     private var mPagerAdapter: Adapter? = null
     private var mCanSaveYourself = false
     private var mCanDelete = false
-    private val bShowPhotosLine = Settings.get().other().isShow_photos_line
+    private val bShowPhotosLine = Settings.get().other().isShowPhotosLine
     private val mAdapterRecycler = ImageAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -326,7 +326,7 @@ class PhotoPagerFragment : BaseMvpFragment<PhotoPagerPresenter, IPhotoPagerView>
                         val needUpdate = requireArguments().getBoolean(EXTRA_NEED_UPDATE)
                         val photos: ArrayList<Photo> =
                             if (FenrirNative.isNativeLoaded() && Settings.get()
-                                    .other().isNative_parcel
+                                    .other().isNativeParcel
                             ) ParcelNative.loadParcelableArrayList(
                                 requireArguments().getLong(
                                     EXTRA_PHOTOS
@@ -347,7 +347,7 @@ class PhotoPagerFragment : BaseMvpFragment<PhotoPagerPresenter, IPhotoPagerView>
                         val albumId = requireArguments().getInt(Extra.ALBUM_ID)
                         val photos_album: ArrayList<Photo> =
                             if (FenrirNative.isNativeLoaded() && Settings.get()
-                                    .other().isNative_parcel
+                                    .other().isNativeParcel
                             ) ParcelNative.loadParcelableArrayList(
                                 requireArguments().getLong(
                                     EXTRA_PHOTOS
@@ -367,7 +367,7 @@ class PhotoPagerFragment : BaseMvpFragment<PhotoPagerPresenter, IPhotoPagerView>
                         val findex = requireArguments().getInt(Extra.INDEX)
                         val favePhotos: ArrayList<Photo> =
                             if (FenrirNative.isNativeLoaded() && Settings.get()
-                                    .other().isNative_parcel
+                                    .other().isNativeParcel
                             ) ParcelNative.loadParcelableArrayList(
                                 requireArguments().getLong(
                                     EXTRA_PHOTOS
@@ -701,7 +701,7 @@ class PhotoPagerFragment : BaseMvpFragment<PhotoPagerPresenter, IPhotoPagerView>
                     } else container.requestDisallowInterceptTouchEvent(false)
                 }
             }
-            if (Settings.get().other().isDownload_photo_tap) {
+            if (Settings.get().other().isDownloadPhotoTap) {
                 ret.photo.setOnLongClickListener {
                     if (isPresenterPrepared) presenter?.fireSaveOnDriveClick()
                     true

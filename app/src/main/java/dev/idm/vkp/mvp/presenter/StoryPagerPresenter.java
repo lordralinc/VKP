@@ -272,7 +272,7 @@ public class StoryPagerPresenter extends AccountDependencyPresenter<IStoryPagerV
     }
 
     private void DownloadResult(String Prefix, File dir, Photo photo) {
-        if (Prefix != null && Settings.get().other().isPhoto_to_user_dir()) {
+        if (Prefix != null && Settings.get().other().isPhotoToUserDir()) {
             File dir_final = new File(dir.getAbsolutePath() + "/" + Prefix);
             if (!dir_final.isDirectory()) {
                 boolean created = dir_final.mkdirs();

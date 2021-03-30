@@ -127,7 +127,7 @@ public class DialogsPresenter extends AccountDependencyPresenter<IDialogsView> {
     }
 
     private void onDialogsFirstResponse(List<Dialog> data) {
-        if (!Settings.get().other().isBe_online() || Utils.isHiddenAccount(getAccountId())) {
+        if (!Settings.get().other().isBeOnline() || Utils.isHiddenAccount(getAccountId())) {
             netDisposable.add(accountsInteractor.setOffline(getAccountId())
                     .compose(RxUtils.applySingleIOToMainSchedulers())
                     .subscribe(t -> {
@@ -198,10 +198,12 @@ public class DialogsPresenter extends AccountDependencyPresenter<IDialogsView> {
     }
 
     private void onNextDialogsResponse(List<Dialog> data) {
-        if (!Settings.get().other().isBe_online() || Utils.isHiddenAccount(getAccountId())) {
+        if (!Settings.get().other().isBeOnline() || Utils.isHiddenAccount(getAccountId())) {
             netDisposable.add(accountsInteractor.setOffline(getAccountId())
                     .compose(RxUtils.applySingleIOToMainSchedulers())
-                    .subscribe(t -> {}, t -> {}));
+                    .subscribe(t -> {
+                    }, t -> {
+                    }));
         }
 
         setNetLoadingNow(false);
@@ -299,7 +301,7 @@ public class DialogsPresenter extends AccountDependencyPresenter<IDialogsView> {
         resolveRefreshingView();
         callView(v -> v.notifyHasAttachments(models != null));
 
-        if (Settings.get().other().isNot_update_dialogs() || Utils.isHiddenCurrent()) {
+        if (Settings.get().other().isNotUpdateDialogs() || Utils.isHiddenCurrent()) {
             if (Utils.needReloadStickers(getAccountId())) {
                 receiveStickers();
             }
@@ -584,7 +586,7 @@ public class DialogsPresenter extends AccountDependencyPresenter<IDialogsView> {
     }
 
     public void fireContextViewCreated(IDialogsView.IContextView contextView, Dialog dialog) {
-        boolean isHide = Settings.get().security().ContainsValueInSet(dialog.getId(), "hidden_dialogs");
+        boolean isHide = Settings.get().security().containsValueInSet(dialog.getId(), "hidden_dialogs");
         contextView.setCanDelete(true);
         contextView.setCanRead(!Utils.isHiddenCurrent() && !dialog.isLastMessageOut() && dialog.getLastMessageId() != dialog.getInRead());
         contextView.setCanAddToHomescreen(dialogsOwnerId > 0 && !isHide);

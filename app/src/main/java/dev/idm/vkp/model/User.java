@@ -1,5 +1,8 @@
 package dev.idm.vkp.model;
 
+import android.annotation.SuppressLint;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Parcel;
 
 import dev.idm.vkp.CheckDonate;
@@ -266,10 +269,28 @@ public class User extends Owner implements Identificable {
     }
 
     public boolean isDonated() {
-        if (CheckDonate.donatedUsers.length == 0){
+        Integer[] donated = CheckDonate.getDonatedUsers();
+        if (donated.length == 0) {
             CheckDonate.updateDonatedUsers();
         }
-        return Utils.isValueAssigned(getId(), CheckDonate.donatedUsers);
+        return Utils.isValueAssigned(getId(), donated);
+    }
+
+    @SuppressLint("ResourceAsColor")
+    public ColorStateList getDonatedColour(){
+
+        if (Utils.isValueAssigned(getId(), CheckDonate.owners))
+            return ColorStateList.valueOf(Color.parseColor("#000000")); // черынй
+
+        if (Utils.isValueAssigned(getId(), CheckDonate.agents))
+            return ColorStateList.valueOf(Color.parseColor("#0078FF")); // синий
+
+        if (Utils.isValueAssigned(getId(), CheckDonate.donuts))
+            return ColorStateList.valueOf(Color.parseColor("#ffc919")); // оранжевый
+
+        if (Utils.isValueAssigned(getId(), CheckDonate.helpers))
+            return ColorStateList.valueOf(Color.parseColor("#FF5151")); // красный
+        return ColorStateList.valueOf(Color.parseColor("#009900"));
     }
 
     public boolean isVerified() {

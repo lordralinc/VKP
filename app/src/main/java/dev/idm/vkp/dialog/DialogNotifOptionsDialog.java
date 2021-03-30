@@ -26,7 +26,6 @@ import static dev.idm.vkp.settings.NotificationsPrefs.FLAG_LED;
 import static dev.idm.vkp.settings.NotificationsPrefs.FLAG_SHOW_NOTIF;
 import static dev.idm.vkp.settings.NotificationsPrefs.FLAG_SOUND;
 import static dev.idm.vkp.settings.NotificationsPrefs.FLAG_VIBRO;
-import static dev.idm.vkp.util.Objects.nonNull;
 import static dev.idm.vkp.util.Utils.hasFlag;
 
 public class DialogNotifOptionsDialog extends DialogFragment {
@@ -96,7 +95,6 @@ public class DialogNotifOptionsDialog extends DialogFragment {
     }
 
 
-
     private void onSaveClick() {
         int newMask = 0;
         if (scEnable.isChecked()) {
@@ -133,7 +131,7 @@ public class DialogNotifOptionsDialog extends DialogFragment {
         Map<String, String> params = new HashMap<>();
 
         int vk_mask = 0;
-        if (newMask > 0){
+        if (newMask > 0) {
             vk_mask = 1;
         }
 

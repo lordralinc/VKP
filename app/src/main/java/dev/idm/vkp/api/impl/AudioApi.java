@@ -41,7 +41,7 @@ class AudioApi extends AbsApi implements IAudioApi {
     @Override
     public Single<Items<VKApiAudio>> search(String query, Boolean autoComplete, Boolean lyrics, Boolean performerOnly, Integer sort, Boolean searchOwn, Integer offset, Integer count) {
 
-        if (Settings.get().other().isUse_old_vk_api()) {
+        if (Settings.get().other().isUseOldVkApi()) {
             return provideService(IAudioService.class)
                     .flatMap(service -> service
                             .searchOld(query, integerFromBoolean(autoComplete), integerFromBoolean(lyrics),
@@ -67,7 +67,7 @@ class AudioApi extends AbsApi implements IAudioApi {
     @Override
     public Single<Items<VKApiAudioPlaylist>> searchPlaylists(String query, Integer offset, Integer count) {
 
-        if (Settings.get().other().isUse_old_vk_api()) {
+        if (Settings.get().other().isUseOldVkApi()) {
             return provideService(IAudioService.class)
                     .flatMap(service -> service
                             .searchPlaylistsOld(query, offset, count, "5.90")
@@ -180,7 +180,7 @@ class AudioApi extends AbsApi implements IAudioApi {
 
     @Override
     public Single<Items<VKApiAudioCatalog>> getCatalog(String artist_id, String query) {
-        if (Settings.get().other().isUse_old_vk_api()) {
+        if (Settings.get().other().isUseOldVkApi()) {
             return provideService(IAudioService.class)
                     .flatMap(service -> service
                             .getCatalogOld(artist_id, query, "5.90")
@@ -195,7 +195,7 @@ class AudioApi extends AbsApi implements IAudioApi {
 
     @Override
     public Single<Items<VKApiAudio>> get(Integer playlist_id, Integer ownerId, Integer offset, Integer count, String accessKey) {
-        if (Settings.get().other().isUse_old_vk_api())
+        if (Settings.get().other().isUseOldVkApi())
             return provideService(IAudioService.class).flatMap(service -> service.getOld(playlist_id, ownerId, offset, count, "5.90", accessKey).map(extractResponseWithErrorHandling()));
         else
             return provideService(IAudioService.class).flatMap(service -> service.get(playlist_id, ownerId, offset, count, accessKey).map(extractResponseWithErrorHandling()));
@@ -203,7 +203,7 @@ class AudioApi extends AbsApi implements IAudioApi {
 
     @Override
     public Single<Items<VKApiAudio>> getAudiosByArtist(String artist_id, Integer offset, Integer count) {
-        if (Settings.get().other().isUse_old_vk_api())
+        if (Settings.get().other().isUseOldVkApi())
             return provideService(IAudioService.class).flatMap(service -> service.getAudiosByArtistOld(artist_id, offset, count, "5.90").map(extractResponseWithErrorHandling()));
         else
             return provideService(IAudioService.class).flatMap(service -> service.getAudiosByArtist(artist_id, offset, count).map(extractResponseWithErrorHandling()));
@@ -212,7 +212,7 @@ class AudioApi extends AbsApi implements IAudioApi {
     @Override
     public Single<List<VKApiAudio>> getPopular(Integer foreign,
                                                Integer genre, Integer count) {
-        if (Settings.get().other().isUse_old_vk_api()) {
+        if (Settings.get().other().isUseOldVkApi()) {
             return provideService(IAudioService.class)
                     .flatMap(service -> service
                             .getPopularOld(foreign, genre, count, "5.90")
@@ -227,7 +227,7 @@ class AudioApi extends AbsApi implements IAudioApi {
 
     @Override
     public Single<Items<VKApiAudio>> getRecommendations(Integer audioOwnerId, Integer count) {
-        if (Settings.get().other().isUse_old_vk_api()) {
+        if (Settings.get().other().isUseOldVkApi()) {
             return provideService(IAudioService.class)
                     .flatMap(service -> service
                             .getRecommendationsOld(audioOwnerId, count, "5.90")
@@ -242,7 +242,7 @@ class AudioApi extends AbsApi implements IAudioApi {
 
     @Override
     public Single<Items<VKApiAudio>> getRecommendationsByAudio(String audio, Integer count) {
-        if (Settings.get().other().isUse_old_vk_api()) {
+        if (Settings.get().other().isUseOldVkApi()) {
             return provideService(IAudioService.class)
                     .flatMap(service -> service
                             .getRecommendationsByAudioOld(audio, count, "5.90")
@@ -265,7 +265,7 @@ class AudioApi extends AbsApi implements IAudioApi {
 
     @Override
     public Single<List<VKApiAudio>> getById(String audios) {
-        if (Settings.get().other().isUse_old_vk_api()) {
+        if (Settings.get().other().isUseOldVkApi()) {
             return provideService(IAudioService.class)
                     .flatMap(service -> service
                             .getByIdOld(audios, "5.90")
@@ -296,7 +296,7 @@ class AudioApi extends AbsApi implements IAudioApi {
 
     @Override
     public Single<CatalogResponse> getCatalogBlockById(String block_id, String start_from) {
-        if (Settings.get().other().isUse_old_vk_api()) {
+        if (Settings.get().other().isUseOldVkApi()) {
             return provideService(IAudioService.class)
                     .flatMap(service -> service
                             .getCatalogBlockByIdOld(block_id, start_from, "5.90")

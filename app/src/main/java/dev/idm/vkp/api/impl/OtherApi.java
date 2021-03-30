@@ -41,7 +41,7 @@ public class OtherApi implements IOtherApi {
                 .flatMap(client -> Single
                         .<Response>create(emitter -> {
                             Request request = new Request.Builder()
-                                    .url("https://" + Settings.get().other().get_Api_Domain() + "/method/" + method)
+                                    .url("https://" + Settings.get().other().getApiDomain() + "/method/" + method)
                                     .method("POST", bodyBuilder.build())
                                     .build();
 

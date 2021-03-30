@@ -210,7 +210,7 @@ public class CommentsPresenter extends PlaceSupportPresenter<ICommentsView> {
     }
 
     public void fireTextEdited(String s) {
-        if (!Settings.get().other().isHint_stickers()) {
+        if (!Settings.get().other().isHintStickers()) {
             return;
         }
         stickersWordsDisplayDisposable.dispose();

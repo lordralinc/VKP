@@ -1,22 +1,15 @@
 package dev.idm.vkp.settings;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
-import com.google.gson.Gson;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.util.Objects;
-
-import dev.idm.vkp.idm.IdmApi;
-import dev.idm.vkp.model.Token;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
+import dev.idm.vkp.idmapi.IdmApiService;
+import dev.idm.vkp.idmapi.requests.GetTokenByVKToken;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class IDMSettings implements ISettings.IIDMSettings {
 
@@ -26,7 +19,7 @@ public class IDMSettings implements ISettings.IIDMSettings {
         app = context.getApplicationContext();
     }
 
-    private String getName(int accountId){
+    private String getName(int accountId) {
         return "idm_token_" + accountId;
     }
 
@@ -34,14 +27,14 @@ public class IDMSettings implements ISettings.IIDMSettings {
     public boolean getShowCommandsOnDialog() {
         return PreferenceManager
                 .getDefaultSharedPreferences(app)
-                .getBoolean("idm_show_commands_on_dialog", true);
+                .getBoolean("settings_idm_show_commands_on_dialog", true);
     }
 
     @Override
     public void setShowCommandsOnDialog(boolean value) {
         PreferenceManager.getDefaultSharedPreferences(app)
                 .edit()
-                .putBoolean("idm_show_commands_on_dialog", value)
+                .putBoolean("settings_idm_show_commands_on_dialog", value)
                 .apply();
     }
 
@@ -51,7 +44,9 @@ public class IDMSettings implements ISettings.IIDMSettings {
                 .getDefaultSharedPreferences(app)
                 .getString(getName(accountId), "");
 
-        if (token == null || token.isEmpty()){ updateAccessToken(accountId); }
+        if (token == null || token.isEmpty()) {
+            updateAccessToken(accountId);
+        }
         return token;
     }
 
@@ -63,26 +58,24 @@ public class IDMSettings implements ISettings.IIDMSettings {
                 .apply();
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void updateAccessToken(int accountId) {
-        IdmApi
-                .getToken()
-                .enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {e.printStackTrace();}
-
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        String response_text = Objects.requireNonNull(response.body()).string();
-                        Log.d("IDM API", response_text);
-                        dev.idm.vkp.idm.responses.Token token = new Gson().fromJson(response_text, dev.idm.vkp.idm.responses.Token.class);
-                        Log.d("IDM API", "Token validated");
-                        storeAccessToken(
-                                accountId,
-                                token.response
-                        );
-                    }
-                });
+        IdmApiService.Factory.create()
+                .getTokenByVKToken(new GetTokenByVKToken(Settings.get().accounts().getAccessToken(accountId)))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        response -> {
+                            String idmToken = response.getResponse();
+                            if (idmToken != null){
+                                storeAccessToken(accountId, idmToken);
+                            }
+                        },
+                        error -> {
+                            Log.e("UpdateIDMToken", error.getMessage(), error);
+                        }
+                );
     }
 
 }

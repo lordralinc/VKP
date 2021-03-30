@@ -41,8 +41,6 @@ import dev.idm.vkp.model.LoadMoreState;
 import dev.idm.vkp.model.Post;
 import dev.idm.vkp.model.Story;
 import dev.idm.vkp.model.criteria.WallCriteria;
-import dev.ragnarok.fenrir.module.FenrirNative;
-import dev.ragnarok.fenrir.module.qrcode.QrGenerator;
 import dev.idm.vkp.mvp.presenter.base.PlaceSupportPresenter;
 import dev.idm.vkp.mvp.reflect.OnGuiCreated;
 import dev.idm.vkp.mvp.view.IWallView;
@@ -53,6 +51,8 @@ import dev.idm.vkp.util.CustomToast;
 import dev.idm.vkp.util.Pair;
 import dev.idm.vkp.util.RxUtils;
 import dev.idm.vkp.util.Utils;
+import dev.ragnarok.fenrir.module.FenrirNative;
+import dev.ragnarok.fenrir.module.qrcode.QrGenerator;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 import static dev.idm.vkp.util.Objects.nonNull;
@@ -101,7 +101,7 @@ public abstract class AbsWallPresenter<V extends IWallView> extends PlaceSupport
         loadWallCachedData();
         requestWall(0);
 
-        if (!Settings.get().other().isDisable_history()) {
+        if (!Settings.get().other().isDisableHistory()) {
             appendDisposable(ownersRepository.getStory(accountId, accountId == ownerId ? null : ownerId)
                     .compose(RxUtils.applySingleIOToMainSchedulers())
                     .subscribe(data -> {
@@ -411,7 +411,7 @@ public abstract class AbsWallPresenter<V extends IWallView> extends PlaceSupport
         cacheCompositeDisposable.clear();
 
         requestWall(0);
-        if (!Settings.get().other().isDisable_history()) {
+        if (!Settings.get().other().isDisableHistory()) {
             appendDisposable(ownersRepository.getStory(getAccountId(), getAccountId() == ownerId ? null : ownerId)
                     .compose(RxUtils.applySingleIOToMainSchedulers())
                     .subscribe(data -> {
@@ -568,7 +568,7 @@ public abstract class AbsWallPresenter<V extends IWallView> extends PlaceSupport
     }
 
     public void fireLikeClick(Post post) {
-        if (Settings.get().other().isDisable_likes() || Utils.isHiddenAccount(getAccountId())) {
+        if (Settings.get().other().isDisableLikes() || Utils.isHiddenAccount(getAccountId())) {
             return;
         }
         int accountId = getAccountId();

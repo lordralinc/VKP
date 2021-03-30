@@ -57,7 +57,6 @@ import dev.idm.vkp.model.selection.LocalGallerySelectableSource;
 import dev.idm.vkp.model.selection.LocalPhotosSelectableSource;
 import dev.idm.vkp.model.selection.LocalVideosSelectableSource;
 import dev.idm.vkp.model.selection.Sources;
-import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import dev.idm.vkp.mvp.core.IPresenterFactory;
 import dev.idm.vkp.mvp.presenter.UserWallPresenter;
 import dev.idm.vkp.mvp.view.IUserWallView;
@@ -73,6 +72,7 @@ import dev.idm.vkp.util.InputTextDialog;
 import dev.idm.vkp.util.Utils;
 import dev.idm.vkp.util.ViewUtils;
 import dev.idm.vkp.view.OnlineView;
+import dev.ragnarok.fenrir.module.rlottie.RLottieImageView;
 import me.minetsh.imaging.IMGEditActivity;
 
 import static dev.idm.vkp.util.Objects.isNull;
@@ -148,14 +148,14 @@ public class UserWallFragment extends AbsWallFragment<IUserWallView, UserWallPre
                     .transform(CurrentTheme.createTransformationForAvatar(requireActivity()))
                     .into(mHeaderHolder.ivAvatar);
 
-            if (Settings.get().other().isShow_wall_cover()) {
+            if (Settings.get().other().isShowWallCover()) {
                 PicassoInstance.with()
                         .load(photoUrl)
                         .transform(new BlurTransformation(6, 1, requireActivity()))
                         .into(mHeaderHolder.vgCover);
             }
         }
-        if (Settings.get().other().isShow_donate_anim() && user.isDonated()) {
+        if (Settings.get().other().isShowDonateAnim() && user.isDonated()) {
             mHeaderHolder.bDonate.setVisibility(View.VISIBLE);
             mHeaderHolder.bDonate.setAutoRepeat(true);
             mHeaderHolder.bDonate.fromRes(R.raw.donater, Utils.dp(100), Utils.dp(100), new int[]{0xffffff, CurrentTheme.getColorPrimary(requireActivity()), 0x777777, CurrentTheme.getColorSecondary(requireActivity())});
@@ -178,6 +178,7 @@ public class UserWallFragment extends AbsWallFragment<IUserWallView, UserWallPre
             Utils.ColoredSnack(requireView(), R.string.blacklisted, BaseTransientBottomBar.LENGTH_LONG, Color.parseColor("#ccaa0000")).show();
         }
         mHeaderHolder.ivVerified.setVisibility(user.isVerified() ? View.VISIBLE : View.GONE);
+        mHeaderHolder.ivVerified.setBackgroundTintList(user.getDonatedColour());
     }
 
     @Override
@@ -260,7 +261,7 @@ public class UserWallFragment extends AbsWallFragment<IUserWallView, UserWallPre
     @Override
     public void displayCounters(int friends, int mutual, int followers, int groups, int photos, int audios, int videos, int articles, int products, int gifts) {
         if (nonNull(mHeaderHolder)) {
-            if (Settings.get().other().isShow_mutual_count()) {
+            if (Settings.get().other().isShowMutualCount()) {
                 setupCounterWith(mHeaderHolder.bFriends, friends, mutual);
             } else {
                 setupCounter(mHeaderHolder.bFriends, friends);

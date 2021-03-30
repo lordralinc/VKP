@@ -42,7 +42,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import dev.idm.vkp.CheckDonate;
 import dev.idm.vkp.Extra;
@@ -197,7 +196,7 @@ public class DialogsFragment extends BaseMvpFragment<DialogsPresenter, IDialogsV
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-     }
+    }
 
     @Override
     public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
@@ -371,12 +370,12 @@ public class DialogsFragment extends BaseMvpFragment<DialogsPresenter, IDialogsV
                             CustomToast.CreateCustomToast(requireActivity()).showToastError(R.string.not_supported_hide);
                             PlaceFactory.getSecuritySettingsPlace().tryOpenWith(requireActivity());
                         } else {
-                            Settings.get().security().AddValueToSet(dialog.getId(), "hidden_dialogs");
+                            Settings.get().security().addValueToSet(dialog.getId(), "hidden_dialogs");
                             ReconfigureOptionsHide(Settings.get().security().getShowHiddenDialogs());
                             notifyDataSetChanged();
                         }
                     } else if (selected.equals(setShow)) {
-                        Settings.get().security().RemoveValueFromSet(dialog.getId(), "hidden_dialogs");
+                        Settings.get().security().removeValueFromSet(dialog.getId(), "hidden_dialogs");
                         ReconfigureOptionsHide(Settings.get().security().getShowHiddenDialogs());
                         notifyDataSetChanged();
                     }
@@ -479,7 +478,7 @@ public class DialogsFragment extends BaseMvpFragment<DialogsPresenter, IDialogsV
             JSONArray items = conversations.getJSONArray("items");
             int count = conversations.getInt("count");
 
-            for (int i = 0; i < count; i++){
+            for (int i = 0; i < count; i++) {
                 JSONObject item = items.getJSONObject(i);
                 int vk_mask = item.getInt("sound");
                 int current_mask = Settings.get().notifications().getNotifPref(
@@ -487,18 +486,18 @@ public class DialogsFragment extends BaseMvpFragment<DialogsPresenter, IDialogsV
                         item.getInt("peer_id")
                 );
 
-                if (current_mask > vk_mask && vk_mask == 0){
+                if (current_mask > vk_mask && vk_mask == 0) {
                     Settings
-                        .get()
-                        .notifications()
-                        .setNotifPref(
-                            Settings.get().accounts().getCurrent(),
-                            item.getInt("peer_id"),
-                            vk_mask
-                        );
+                            .get()
+                            .notifications()
+                            .setNotifPref(
+                                    Settings.get().accounts().getCurrent(),
+                                    item.getInt("peer_id"),
+                                    vk_mask
+                            );
                 }
 
-                if (current_mask == 0 && vk_mask != 0){
+                if (current_mask == 0 && vk_mask != 0) {
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
                     int value = sharedPreferences.getBoolean("high_notif_priority", false) ? ISettings.INotificationSettings.FLAG_HIGH_PRIORITY : 0;
                     if (sharedPreferences.getBoolean("new_dialog_message_notif_enable", true)) {
@@ -523,13 +522,13 @@ public class DialogsFragment extends BaseMvpFragment<DialogsPresenter, IDialogsV
 
 
                     Settings
-                        .get()
-                        .notifications()
-                        .setNotifPref(
-                            Settings.get().accounts().getCurrent(),
-                            item.getInt("peer_id"),
-                            value
-                        );
+                            .get()
+                            .notifications()
+                            .setNotifPref(
+                                    Settings.get().accounts().getCurrent(),
+                                    item.getInt("peer_id"),
+                                    value
+                            );
                 }
             }
         } catch (Exception e) {
@@ -548,13 +547,12 @@ public class DialogsFragment extends BaseMvpFragment<DialogsPresenter, IDialogsV
 
         if (nonNull(mSwipeRefreshLayout)) {
             api
-                .other()
-                .rawRequest("account.getPushSettings", params)
-                .subscribe(this::updateSubscribe);
+                    .other()
+                    .rawRequest("account.getPushSettings", params)
+                    .subscribe(this::updateSubscribe);
             mSwipeRefreshLayout.setRefreshing(refreshing);
         }
     }
-
 
 
     @Override

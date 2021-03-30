@@ -94,6 +94,7 @@ public class OwnersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         holder.name.setTextColor(Utils.getVerifiedColor(mContext, user.isVerified()));
 
         holder.ivVerified.setVisibility(user.isVerified() ? View.VISIBLE : View.GONE);
+        holder.ivVerified.setBackgroundTintList(user.getDonatedColour());
         holder.blacklisted.setVisibility(user.getBlacklisted() ? View.VISIBLE : View.GONE);
 
         holder.subtitle.setText(UserInfoResolveUtil.getUserActivityLine(mContext, user, true));

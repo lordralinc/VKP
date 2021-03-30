@@ -14,7 +14,7 @@ buildscript {
     ext.VKPNdk = '22.0.7026061'
     ext.VKPMinSDK = 29
     ext.VKPTargetSDK = 30
-    ext.VKPVersionCode = 5
+    ext.VKPVersionCode = 6
     ext.VKPVersionName = "1b$VKPVersionCode"
 
     repositories {
